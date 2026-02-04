@@ -24,15 +24,89 @@ export function createRobot({ x = 0, y = 0, w = 30, h = 20, angle = 0 } = {}) {
   return { x, y, w, h, angle };
 }
 
+export function isPointInObstacle(point, obstacle) {
+  const halfW = obstacle.w / 2;
+  const halfH = obstacle.h / 2;
+  return (
+    point.x >= obstacle.x - halfW &&
+    point.x <= obstacle.x + halfW &&
+    point.y >= obstacle.y - halfH &&
+    point.y <= obstacle.y + halfH
+  );
+}
+
+export function isCircleInObstacle(center, radius, obstacle) {
+  const halfW = obstacle.w / 2;
+  const halfH = obstacle.h / 2;
+  const angle = ((obstacle.angle || 0) * Math.PI) / 180;
+  const cos = Math.cos(-angle);
+  const sin = Math.sin(-angle);
+  const dx = center.x - obstacle.x;
+  const dy = center.y - obstacle.y;
+  const localX = dx * cos - dy * sin;
+  const localY = dx * sin + dy * cos;
+  const closestX = Math.max(-halfW, Math.min(localX, halfW));
+  const closestY = Math.max(-halfH, Math.min(localY, halfH));
+  const distX = localX - closestX;
+  const distY = localY - closestY;
+  return distX * distX + distY * distY <= radius * radius;
+}
+
+export function isRobotInObstacle(robot, obstacles = []) {
+  const radius = Math.max(robot.w, robot.h) / 2;
+  for (const obstacle of obstacles) {
+    if (isCircleInObstacle(robot, radius, obstacle)) return true;
+  }
+  return false;
+}
+
+function isCircleInAnyObstacle(center, radius, obstacles = []) {
+  for (const obstacle of obstacles) {
+    if (isCircleInObstacle(center, radius, obstacle)) return true;
+  }
+  return false;
+}
+
+function tryMoveWithAngle(robot, angle, distance, obstacles) {
+  const rad = (angle * Math.PI) / 180;
+  const radius = Math.max(robot.w, robot.h) / 2;
+  const next = {
+    x: robot.x + Math.cos(rad) * distance,
+    y: robot.y + Math.sin(rad) * distance,
+  };
+  const blocked = isCircleInAnyObstacle(next, radius, obstacles);
+  if (blocked) return false;
+  robot.x = next.x;
+  robot.y = next.y;
+  robot.angle = angle;
+  return true;
+}
+
+function moveWithAvoidance(robot, distance, obstacles) {
+  if (!obstacles || obstacles.length === 0) {
+    const rad = (robot.angle * Math.PI) / 180;
+    robot.x += Math.cos(rad) * distance;
+    robot.y += Math.sin(rad) * distance;
+    return;
+  }
+  if (!isRobotInObstacle(robot, obstacles)) {
+    if (tryMoveWithAngle(robot, robot.angle, distance, obstacles)) return;
+  }
+  const maxRotate = 90;
+  const step = 5;
+  for (let offset = step; offset <= maxRotate; offset += step) {
+    if (tryMoveWithAngle(robot, robot.angle - offset, distance, obstacles)) return;
+    if (tryMoveWithAngle(robot, robot.angle + offset, distance, obstacles)) return;
+  }
+}
+
 /**
  * Move the robot forward along its current heading.
  * @example
  * moveForward(robot, 10);
  */
-export function moveForward(robot, distance) {
-  const rad = (robot.angle * Math.PI) / 180;
-  robot.x += Math.cos(rad) * distance;
-  robot.y += Math.sin(rad) * distance;
+export function moveForward(robot, distance, obstacles = []) {
+  moveWithAvoidance(robot, distance, obstacles);
 }
 
 /**
@@ -40,8 +114,8 @@ export function moveForward(robot, distance) {
  * @example
  * moveBackward(robot, 5);
  */
-export function moveBackward(robot, distance) {
-  moveForward(robot, -distance);
+export function moveBackward(robot, distance, obstacles = []) {
+  moveForward(robot, -distance, obstacles);
 }
 
 /**
@@ -49,10 +123,16 @@ export function moveBackward(robot, distance) {
  * @example
  * moveLeft(robot, 8);
  */
-export function moveLeft(robot, distance) {
+export function moveLeft(robot, distance, obstacles = []) {
   const rad = ((robot.angle - 90) * Math.PI) / 180;
-  robot.x += Math.cos(rad) * distance;
-  robot.y += Math.sin(rad) * distance;
+  const radius = Math.max(robot.w, robot.h) / 2;
+  const next = {
+    x: robot.x + Math.cos(rad) * distance,
+    y: robot.y + Math.sin(rad) * distance,
+  };
+  if (obstacles.length && isCircleInAnyObstacle(next, radius, obstacles)) return;
+  robot.x = next.x;
+  robot.y = next.y;
 }
 
 /**
@@ -60,8 +140,8 @@ export function moveLeft(robot, distance) {
  * @example
  * moveRight(robot, 8);
  */
-export function moveRight(robot, distance) {
-  moveLeft(robot, -distance);
+export function moveRight(robot, distance, obstacles = []) {
+  moveLeft(robot, -distance, obstacles);
 }
 
 /**
@@ -144,8 +224,9 @@ export function createSimulator(mapSys, canvasSys) {
   function handleKeys() {
     const speed = 3;
     const turn = 4;
-    if (keyState.has('w')) moveForward(robot, speed);
-    if (keyState.has('s')) moveBackward(robot, speed);
+    const obstacles = mapSys.mapData.obstacles || [];
+    if (keyState.has('w')) moveForward(robot, speed, obstacles);
+    if (keyState.has('s')) moveBackward(robot, speed, obstacles);
     if (keyState.has('a')) rotateLeft(robot, turn);
     if (keyState.has('d')) rotateRight(robot, turn);
     step();
@@ -161,19 +242,19 @@ export function createSimulator(mapSys, canvasSys) {
     robot,
     gasReadout,
     moveForward: (d) => {
-      moveForward(robot, d);
+      moveForward(robot, d, mapSys.mapData.obstacles || []);
       step();
     },
     moveBackward: (d) => {
-      moveBackward(robot, d);
+      moveBackward(robot, d, mapSys.mapData.obstacles || []);
       step();
     },
     moveLeft: (d) => {
-      moveLeft(robot, d);
+      moveLeft(robot, d, mapSys.mapData.obstacles || []);
       step();
     },
     moveRight: (d) => {
-      moveRight(robot, d);
+      moveRight(robot, d, mapSys.mapData.obstacles || []);
       step();
     },
     rotateLeft: (deg) => {
