@@ -170,6 +170,8 @@ export function createMapSystem(canvasSys) {
 
   const mapData = createMapData();
   const mapWorldItems = [];
+  const undoStack = [];
+  const undoLimit = 10;
 
   const ui = {
     mode: 'idle',
@@ -195,12 +197,56 @@ export function createMapSystem(canvasSys) {
     }
   }
 
+  function cleanSnapshot() {
+    return {
+      styles: mapData.styles,
+      markers: mapData.markers.map(({ asCanvas, ...rest }) => rest),
+      routes: mapData.routes.map(({ asCanvas, ...rest }) => rest),
+      obstacles: mapData.obstacles.map(({ asCanvas, ...rest }) => rest),
+      gasNodes: mapData.gasNodes.map(({ asCanvas, ...rest }) => rest),
+    };
+  }
+
+  function pushUndo() {
+    undoStack.push(JSON.stringify(cleanSnapshot()));
+    if (undoStack.length > undoLimit) undoStack.shift();
+  }
+
+  function applyMapData(loaded) {
+    mapData.styles = loaded.styles;
+    mapData.markers = (loaded.markers || []).map((marker) => ({
+      ...marker,
+      asCanvas: markerAsCanvas(marker, loaded.styles),
+    }));
+    mapData.routes = (loaded.routes || []).map((route) => ({
+      ...route,
+      asCanvas: routeAsCanvas(route, loaded.styles),
+    }));
+    mapData.obstacles = (loaded.obstacles || []).map((obstacle) => ({
+      ...obstacle,
+      asCanvas: obstacleAsCanvas(obstacle, loaded.styles),
+    }));
+    mapData.gasNodes = (loaded.gasNodes || []).map((node) => ({
+      ...node,
+      asCanvas: gasNodeAsCanvas(node, loaded.styles),
+    }));
+    rebuildWorld();
+  }
+
+  function undo() {
+    const snapshot = undoStack.pop();
+    if (!snapshot) return;
+    const loaded = deserializeMap(snapshot);
+    applyMapData(loaded);
+  }
+
   /**
    * Add a labeled marker point to the map.
    * @example
    * mapSys.addMarker({ x: 10, y: 20, label: 'Depot' });
    */
   function addMarker({ x, y, label = 'marker' }) {
+    pushUndo();
     const marker = { id: makeId('marker'), x, y, label };
     marker.asCanvas = markerAsCanvas(marker, mapData.styles);
     mapData.markers.push(marker);
@@ -215,6 +261,7 @@ export function createMapSystem(canvasSys) {
    * mapSys.addRoute([{ x: 0, y: 0 }, { x: 50, y: 30 }]);
    */
   function addRoute(points = []) {
+    pushUndo();
     const route = { id: makeId('route'), points };
     route.asCanvas = routeAsCanvas(route, mapData.styles);
     mapData.routes.push(route);
@@ -229,6 +276,7 @@ export function createMapSystem(canvasSys) {
    * mapSys.addObstacle({ x: 10, y: 10, w: 40, h: 20 });
    */
   function addObstacle({ x, y, w, h, angle = 0 }) {
+    pushUndo();
     const obstacle = { id: makeId('obstacle'), x, y, w, h, angle };
     obstacle.asCanvas = obstacleAsCanvas(obstacle, mapData.styles);
     mapData.obstacles.push(obstacle);
@@ -243,6 +291,7 @@ export function createMapSystem(canvasSys) {
    * mapSys.addGasNode({ x: 0, y: 0, radius: 80, peak: 1.5 });
    */
   function addGasNode({ x, y, radius = 60, peak = 1 }) {
+    pushUndo();
     const node = { id: makeId('gas'), x, y, radius, peak };
     node.asCanvas = gasNodeAsCanvas(node, mapData.styles);
     mapData.gasNodes.push(node);
@@ -294,25 +343,9 @@ export function createMapSystem(canvasSys) {
    */
   function loadMapFile(file) {
     return file.text().then((text) => {
+      pushUndo();
       const loaded = deserializeMap(text);
-      mapData.styles = loaded.styles;
-      mapData.markers = (loaded.markers || []).map((marker) => ({
-        ...marker,
-        asCanvas: markerAsCanvas(marker, loaded.styles),
-      }));
-      mapData.routes = (loaded.routes || []).map((route) => ({
-        ...route,
-        asCanvas: routeAsCanvas(route, loaded.styles),
-      }));
-      mapData.obstacles = (loaded.obstacles || []).map((obstacle) => ({
-        ...obstacle,
-        asCanvas: obstacleAsCanvas(obstacle, loaded.styles),
-      }));
-      mapData.gasNodes = (loaded.gasNodes || []).map((node) => ({
-        ...node,
-        asCanvas: gasNodeAsCanvas(node, loaded.styles),
-      }));
-      rebuildWorld();
+      applyMapData(loaded);
     });
   }
 
@@ -355,8 +388,9 @@ export function createMapSystem(canvasSys) {
   const buttonGas = buildButton('Add Gas', () => setMode('add-gas'));
   const buttonSave = buildButton('Save YAML', saveMap);
   const buttonLoad = buildButton('Load YAML', () => fileInput.click());
+  const buttonUndo = buildButton('Undo', undo);
 
-  controls.append(buttonMarker, buttonRoute, buttonObstacle, buttonGas, buttonSave, buttonLoad);
+  controls.append(buttonMarker, buttonRoute, buttonObstacle, buttonGas, buttonSave, buttonLoad, buttonUndo);
 
   element.append(modeLabel, controls, fileInput);
 
@@ -399,6 +433,7 @@ export function createMapSystem(canvasSys) {
         if (!ui.pendingRoute) {
           ui.pendingRoute = addRoute([{ x: ev.worldX, y: ev.worldY }]);
         } else {
+          pushUndo();
           ui.pendingRoute.points.push({ x: ev.worldX, y: ev.worldY });
           ui.pendingRoute.asCanvas = routeAsCanvas(ui.pendingRoute, mapData.styles);
           rebuildWorld();
