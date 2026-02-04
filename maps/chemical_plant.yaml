@@ -69,7 +69,7 @@ routes:
   # Perimeter patrol route
   - id: route-patrol
     points:
-      - {x: -500, y: 650}
+    #   - {x: -500, y: 650}
       - {x: -200, y: 550}
       - {x: 250, y: 500}
       - {x: 550, y: 400}
@@ -209,13 +209,6 @@ obstacles:
     x: 220
     y: -50
     w: 160
-    h: 20
-    angle: 0
-  # Reactor to processing
-  - id: obstacle-piperack2
-    x: -150
-    y: -80
-    w: 80
     h: 20
     angle: 0
   # Tank farm to flare
