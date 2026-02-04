@@ -17,7 +17,7 @@ import {
  *      returning to the route when interest fades
  *
  * @example
- *   const pubsub = createPubSub()
+ *   const pubsub = createPubSub("agent")
  *   const agent = new GasAgent(pubsub, { decisionRate: 1 })
  *   pubsub.publish("route_update", { waypoints: [{x:0,y:0},{x:10,y:0}] })
  *   pubsub.publish("gas_reading", { ppm: 0.5 })
@@ -36,7 +36,7 @@ export class GasAgent {
      * @param {number} [config.maxBufferSize=500]          max gas_memory entries
      * @param {number} [config.decisionRate=1]             seconds — interval between gas callbacks / movement decisions
      * @param {number} [config.samplingRate=60]            ticks — interval between recording gas samples (in decision ticks)
-     * @param {number} [config.waypointThreshold=2]        meters — "close enough" to a waypoint
+     * @param {number} [config.waypointThreshold=10]        meters — "close enough" to a waypoint
      * @param {number} [config.waypointPatience=30]        ticks — skip waypoint if no progress
      * @param {number} [config.moveSpeed=1]                meters per tick
      * @param {number} [config.turnSpeed=0.3]              radians per tick
@@ -59,7 +59,7 @@ export class GasAgent {
         this.maxBufferSize       = config.maxBufferSize ?? 500
         this.decisionRate        = config.decisionRate ?? 1
         this.samplingRate        = config.samplingRate ?? 60
-        this.waypointThreshold   = config.waypointThreshold ?? 2
+        this.waypointThreshold   = config.waypointThreshold ?? 10
         this.waypointPatience    = config.waypointPatience ?? 30
         this.moveSpeed           = config.moveSpeed ?? 1
         this.turnSpeed           = config.turnSpeed ?? 0.3
@@ -78,15 +78,10 @@ export class GasAgent {
         this.bestDistanceToWaypoint = Infinity
         this.ticksAtWaypoint = 0
 
-        // Waypoint navigation tracking
-        this.currentGoal = null
-        this.lastDistanceToGoal = Infinity
-
         // Gradient exploration state
         this.mode = "inactive"
         this.gasMemory = []
         this.exploreTime = 0
-        this.tempCentroid = null
         this.tempWaypoints = []
         this.tempWaypointIndex = 0
         this.recalcPending = false
@@ -95,10 +90,18 @@ export class GasAgent {
         this.tickCount = 0
         this.lastSampleTick = 0
 
+        // Track currently published waypoint to avoid redundant publications
+        this.currentPublishedWaypoint = null
+
         // Subscribe
-        pubsub.subscribe("gas_reading", (data) => this._onGasReading(data))
-        pubsub.subscribe("route_update", (data) => this._onRouteUpdate(data))
-        pubsub.subscribe("odom", (data) => this._onOdom(data))
+        pubsub.subscribe("gas_reading", (data, publisher) => this._onGasReading(data))
+        pubsub.subscribe("route_update", (data, publisher) => this._onRouteUpdate(data))
+        pubsub.subscribe("odom", (data, publisher) => {
+            this.position.x = data.x
+            this.position.y = data.y
+            this.heading = data.heading
+        })
+        pubsub.subscribe("waypoint_reached", (data, publisher) => this._onWaypointReached(data))
     }
 
     /** Current simulation time in seconds. */
@@ -118,6 +121,7 @@ export class GasAgent {
      * @param {{waypoints: {x:number,y:number}[]}} data
      */
     _onRouteUpdate(data) {
+        console.log(`Agent: route updated with ${data.waypoints.length} waypoints`);
         this.routeWaypoints = data.waypoints.map(w => ({ x: w.x, y: w.y }))
         this.currentWaypointIndex = 0
         this.bestDistanceToWaypoint = Infinity
@@ -144,10 +148,16 @@ export class GasAgent {
         // Transition explore → inactive: reset explore state
         if (prevMode === "explore" && this.mode === "inactive") {
             this.exploreTime = 0
-            this.tempCentroid = null
             this.tempWaypoints = []
             this.tempWaypointIndex = 0
             this.recalcPending = false
+
+            // Remove visualization points
+            this.pubsub.publish('visualizePoint', { id: 'centroid', remove: true })
+            const maxWaypoints = 16;
+            for (let i = 0; i < maxWaypoints; i++) {
+                this.pubsub.publish('visualizePoint', { id: `waypoint_${i}`, remove: true })
+            }
         }
 
         if (this.mode === "explore") {
@@ -156,6 +166,14 @@ export class GasAgent {
         } else {
             this._tickRouteFollow()
         }
+
+        // Publish state for UI display
+        this.pubsub.publish('logJson', {
+            sensor: this.sensorReading.toFixed(3),
+            interest: this.computeInterest().toFixed(3),
+            refocus: this.computeRefocusPressure().toFixed(3),
+            mode: this.mode,
+        })
     }
 
     // ── Gas Memory ────────────────────────────────────────────────────
@@ -172,6 +190,7 @@ export class GasAgent {
         // Record samples immediately when they meet threshold/sensitivity requirements
         if (this.sensorReading > this.minimumGasThreshold &&
             (this.sensorReading - this.gasSensitivity) > lastPpm) {
+            console.log(`Agent: gas memory recorded at (${this.position.x.toFixed(1)}, ${this.position.y.toFixed(1)}): ${this.sensorReading.toFixed(3)} PPM (total: ${this.gasMemory.length + 1})`);
             this.gasMemory.push({
                 ppm: this.sensorReading,
                 time: this.currentTimeMinutes,
@@ -226,9 +245,18 @@ export class GasAgent {
 
     /** Update mode based on interest vs refocus pressure. */
     _updateMode() {
+        const previousMode = this.mode
+
         // Immediate exploration trigger: start exploring as soon as gas exceeds threshold
         if (this.sensorReading > this.minimumGasThreshold && this.mode === "inactive") {
             this.mode = "explore"
+            if (previousMode !== this.mode) {
+                this.pubsub.publish('logJson', {
+                    mode: this.mode,
+                    gasMemorySize: this.gasMemory.length,
+                    exploreTime: this.exploreTime,
+                })
+            }
             return
         }
 
@@ -236,6 +264,15 @@ export class GasAgent {
         const interest = this.computeInterest()
         const pressure = this.computeRefocusPressure()
         this.mode = (interest - pressure) > 1 ? "explore" : "inactive"
+
+        if (previousMode !== this.mode) {
+            console.log(`Agent: mode changed from "${previousMode}" to "${this.mode}" (interest: ${interest.toFixed(2)}, pressure: ${pressure.toFixed(2)})`);
+            this.pubsub.publish('logJson', {
+                mode: this.mode,
+                gasMemorySize: this.gasMemory.length,
+                exploreTime: this.exploreTime,
+            })
+        }
     }
 
     // ── Route Following ───────────────────────────────────────────────
@@ -248,12 +285,7 @@ export class GasAgent {
         }
 
         const target = this.routeWaypoints[this.currentWaypointIndex]
-        const { distance, progress, reached } = this._navigateToWaypoint(target)
-
-        if (reached) {
-            this._advanceWaypoint()
-            return
-        }
+        const { distance } = this._navigateToWaypoint(target)
 
         // Track best distance for patience system
         if (distance < this.bestDistanceToWaypoint) {
@@ -271,6 +303,7 @@ export class GasAgent {
     }
 
     _advanceWaypoint() {
+        console.log(`Agent: advancing to waypoint ${this.currentWaypointIndex + 1}/${this.routeWaypoints.length} (patience timeout)`);
         this.currentWaypointIndex++
         this.bestDistanceToWaypoint = Infinity
         this.ticksAtWaypoint = 0
@@ -287,7 +320,6 @@ export class GasAgent {
         // The rebuild happens on the following tick when tempWaypoints is empty.
         if (this.recalcPending) {
             this.recalcPending = false
-            this.tempCentroid = null
             this.tempWaypoints = []
             this.tempWaypointIndex = 0
             return
@@ -305,17 +337,13 @@ export class GasAgent {
         // Navigate temp waypoints
         if (this.tempWaypointIndex >= this.tempWaypoints.length) {
             // Completed circle — rebuild
-            this.tempCentroid = null
             this.tempWaypoints = []
             this.tempWaypointIndex = 0
             return
         }
 
         const target = this.tempWaypoints[this.tempWaypointIndex]
-        const { reached } = this._navigateToWaypoint(target)
-        if (reached) {
-            this.tempWaypointIndex++
-        }
+        this._navigateToWaypoint(target)
     }
 
     /**
@@ -336,21 +364,30 @@ export class GasAgent {
         if (vecMagnitude(gradDir) < 1e-9) return false
 
         // Project forward by gradientProjection distance to extrapolate source location
-        this.tempCentroid = vecAdd(this.position, vecScale(gradDir, this.gradientProjection))
+        const centroid = vecAdd(this.position, vecScale(gradDir, this.gradientProjection))
+
+        // Publish centroid visualization (with ID for replacement)
+        this.pubsub.publish('visualizePoint', {
+            id: 'centroid',
+            x: centroid.x,
+            y: centroid.y,
+            color: '#f97316',
+            label: 'centroid',
+        })
 
         // Choose CW vs CCW: favor direction away from route
         const startAngle = Math.atan2(gradDir.y, gradDir.x)
         const cwPoints = circleWaypoints(
-            this.tempCentroid, this.circlingSize,
+            centroid, this.circlingSize,
             this.circleWaypointCount, startAngle, true
         )
         const ccwPoints = circleWaypoints(
-            this.tempCentroid, this.circlingSize,
+            centroid, this.circlingSize,
             this.circleWaypointCount, startAngle, false
         )
 
         if (this.routeWaypoints.length >= 2) {
-            const nearestRoute = nearestPointOnPolyline(this.tempCentroid, this.routeWaypoints)
+            const nearestRoute = nearestPointOnPolyline(centroid, this.routeWaypoints)
             const cwDist = vecDistance(cwPoints[1] ?? cwPoints[0], nearestRoute)
             const ccwDist = vecDistance(ccwPoints[1] ?? ccwPoints[0], nearestRoute)
             this.tempWaypoints = cwDist >= ccwDist ? cwPoints : ccwPoints
@@ -358,90 +395,73 @@ export class GasAgent {
             this.tempWaypoints = ccwPoints
         }
 
+        // Remove old waypoints that won't be replaced
+        const maxWaypoints = 16; // Should match what was in main.js
+        for (let i = this.tempWaypoints.length; i < maxWaypoints; i++) {
+            this.pubsub.publish('visualizePoint', {
+                id: `waypoint_${i}`,
+                remove: true,
+            })
+        }
+
+        // Publish waypoint visualizations (with IDs for replacement)
+        this.tempWaypoints.forEach((wp, i) => {
+            this.pubsub.publish('visualizePoint', {
+                id: `waypoint_${i}`,
+                x: wp.x,
+                y: wp.y,
+                color: '#8b5cf6',
+                label: `wp${i}`,
+            })
+        })
+
         this.tempWaypointIndex = 0
+
+        // Publish scalar state info (centroid is already published via visualizePoint)
+        this.pubsub.publish('logJson', {
+            waypointCount: this.tempWaypoints.length,
+            circlingSize: this.circlingSize,
+        })
+
+        console.log(`Agent: built exploration circle with ${this.tempWaypoints.length} waypoints around centroid (${centroid.x.toFixed(1)}, ${centroid.y.toFixed(1)})`);
         return true
     }
 
     // ── Movement ──────────────────────────────────────────────────────
 
     /**
-     * Navigate to a waypoint with progress tracking and course correction.
-     * Reports progress and actively turns around if overshooting.
+     * Publish target waypoint to local planner (only if changed).
      * @param {{x:number,y:number}} target
-     * @returns {{distance:number, progress:number, reached:boolean}}
      */
     _navigateToWaypoint(target) {
-        // Track goal changes
-        if (!this.currentGoal ||
-            target.x !== this.currentGoal.x ||
-            target.y !== this.currentGoal.y) {
-            this.currentGoal = { x: target.x, y: target.y }
-            this.lastDistanceToGoal = vecDistance(this.position, target)
+        // Only publish if waypoint changed
+        if (!this.currentPublishedWaypoint ||
+            this.currentPublishedWaypoint.x !== target.x ||
+            this.currentPublishedWaypoint.y !== target.y) {
+            this.currentPublishedWaypoint = { x: target.x, y: target.y }
+            this.pubsub.publish('target_waypoint', { x: target.x, y: target.y })
         }
 
-        const currentDistance = vecDistance(this.position, target)
-        const progress = this.lastDistanceToGoal - currentDistance
-        this.lastDistanceToGoal = currentDistance
-
-        // Calculate desired heading to target
-        const diff = vecSub(target, this.position)
-        const targetAngle = Math.atan2(diff.y, diff.x)
-        let rotation = angleDifference(this.heading, targetAngle)
-
-        // Clamp rotation
-        if (Math.abs(rotation) > this.turnSpeed) {
-            rotation = Math.sign(rotation) * this.turnSpeed
-        }
-
-        // Calculate alignment: how well are we pointed at the target?
-        const alignmentError = Math.abs(angleDifference(this.heading, targetAngle))
-        const alignment = 1 - (alignmentError / Math.PI) // 1 = perfect, 0 = opposite direction
-
-        let forward = 0
-
-        // If making negative progress (overshooting/moving away), stop and turn
-        if (progress < -0.1) {
-            forward = 0  // Stop moving forward, just rotate
-        }
-        // If poorly aligned (facing wrong direction), slow down and prioritize turning
-        else if (alignment < 0.5) {
-            forward = this.moveSpeed * alignment * 0.5  // Slow down when misaligned
-        }
-        // If well aligned, move at full speed
-        else {
-            forward = Math.min(this.moveSpeed, currentDistance)
-        }
-
-        this._publishMovement(forward, rotation)
-
-        const reached = currentDistance < this.waypointThreshold
-        return { distance: currentDistance, progress, reached }
+        // Calculate distance for patience system
+        const distance = vecDistance(this.position, target)
+        return { distance }
     }
 
     /**
-     * Legacy method - redirects to new navigation system
-     * @param {{x:number,y:number}} target
+     * Handle waypoint reached event from local planner.
+     * @param {{waypoint: {x:number, y:number}}} data
      */
-    _moveToward(target) {
-        this._navigateToWaypoint(target)
+    _onWaypointReached(data) {
+        // Advance to next waypoint in route or circle
+        if (this.mode === "explore" && this.tempWaypoints.length > 0) {
+            console.log(`Agent: exploration waypoint ${this.tempWaypointIndex + 1}/${this.tempWaypoints.length} reached`);
+            this.tempWaypointIndex++
+        } else if (this.mode === "inactive" && this.routeWaypoints.length > 0) {
+            console.log(`Agent: route waypoint ${this.currentWaypointIndex + 1}/${this.routeWaypoints.length} reached`);
+            this.currentWaypointIndex++
+            this.bestDistanceToWaypoint = Infinity
+            this.ticksAtWaypoint = 0
+        }
     }
 
-    /**
-     * Publish movement command. Actual position/heading will be updated via odom.
-     * @param {number} forward  meters
-     * @param {number} rotation radians
-     */
-    _publishMovement(forward, rotation) {
-        this.pubsub.publish("movement", { forward, rotation })
-    }
-
-    /**
-     * Update position/heading from odometry (actual robot pose after obstacle avoidance).
-     * @param {{x:number, y:number, heading:number}} data - robot pose
-     */
-    _onOdom(data) {
-        this.position.x = data.x
-        this.position.y = data.y
-        this.heading = data.heading
-    }
 }

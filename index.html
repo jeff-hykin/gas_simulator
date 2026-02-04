@@ -21,29 +21,17 @@
         background: radial-gradient(circle at 20% 20%, #1b1f2a, var(--bg));
         color: var(--text);
         min-height: 100vh;
-      }
-      #app {
-        min-height: 100vh;
-        display: flex;
-        align-items: stretch;
         padding: 18px;
       }
-      .layout {
-        display: grid;
-        grid-template-columns: minmax(420px, 1fr) 320px;
-        gap: 18px;
-        width: 100%;
-      }
-      .left-panel {
-        background: #0c0f16;
-        border-radius: 14px;
-        padding: 12px;
+      canvas {
+        border-radius: 12px;
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
-        display: flex;
-        align-items: stretch;
-        justify-content: center;
       }
-      .right-panel {
+      .sidebar {
+        position: fixed;
+        top: 18px;
+        right: 18px;
+        width: 320px;
         background: var(--panel);
         border-radius: 14px;
         padding: 16px;
@@ -51,6 +39,8 @@
         flex-direction: column;
         gap: 16px;
         box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+        max-height: calc(100vh - 36px);
+        overflow-y: auto;
       }
       .map-panel {
         display: flex;
@@ -116,21 +106,25 @@
         background: rgba(34, 211, 238, 0.08);
         border: 1px solid rgba(34, 211, 238, 0.3);
       }
-      canvas {
-        border-radius: 12px;
-        width: 100%;
-        height: auto;
+      .json-state-display {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
       }
-      @media (max-width: 860px) {
-        #app {
-          padding: 12px;
-        }
-        .layout {
-          grid-template-columns: 1fr;
-        }
-        .right-panel {
-          order: -1;
-        }
+      .json-entry {
+        font-size: 14px;
+        padding: 8px 12px;
+        border-radius: 8px;
+        background: rgba(34, 211, 238, 0.05);
+        border: 1px solid rgba(34, 211, 238, 0.2);
+        font-family: inherit;
+      }
+      .json-key {
+        color: var(--accent);
+        font-weight: 700;
+      }
+      .json-value {
+        color: var(--text);
       }
     </style>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -138,7 +132,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
   </head>
   <body>
-    <div id="app"></div>
     <script type="module" src="./main.js"></script>
   </body>
 </html>

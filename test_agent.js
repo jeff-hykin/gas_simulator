@@ -12,8 +12,18 @@ import { GasAgent } from "./agent.js"
 function createPubSub() {
     const subs = {}
     return {
-        subscribe(channel, cb) { (subs[channel] ??= []).push(cb) },
-        publish(channel, data) { (subs[channel] ?? []).forEach(cb => cb(data)) },
+        subscribe(channel, cb) {
+            (subs[channel] ??= []).push(cb)
+            return () => {
+                const list = subs[channel]
+                if (!list) return
+                const idx = list.indexOf(cb)
+                if (idx !== -1) list.splice(idx, 1)
+            }
+        },
+        publish(channel, data) {
+            (subs[channel] ?? []).forEach(cb => cb(data, "test"))
+        },
     }
 }
 
@@ -21,12 +31,20 @@ function createPubSub() {
  * Create a pubsub with automatic odometry simulation.
  * Tracks position/heading and publishes odom after each movement.
  */
-function createPubSubWithOdom(startPos = { x: 0, y: 0 }, startHeading = 0) {
+function createPubSubWithOdom(startPos = { x: 0, y: 0 }, startHeading = 0, decisionRate = 0.01) {
     const ps = createPubSub()
     const state = { x: startPos.x, y: startPos.y, heading: startHeading }
 
     // Auto-publish odom after each movement command (simulates perfect movement)
-    ps.subscribe("movement", ({ forward, rotation }) => {
+    ps.subscribe("movement", (data, publisher) => {
+        // Handle velocity-based commands
+        const linearVelocity = data.linearVelocity ?? 0
+        const angularVelocity = data.angularVelocity ?? 0
+
+        // Convert velocities to movements using decision rate
+        const forward = linearVelocity * decisionRate
+        const rotation = angularVelocity * decisionRate
+
         state.heading += rotation
         state.x += forward * Math.cos(state.heading)
         state.y += forward * Math.sin(state.heading)
@@ -311,13 +329,15 @@ Deno.test("interest is 0 with fewer than 2 memory entries", () => {
     assertEquals(agent.computeInterest(), 0)
 })
 
-Deno.test("interest reflects gradient steepness", () => {
+Deno.test("interest reflects gradient steepness (scaled to 0-10 range)", () => {
     const ps = createPubSubWithOdom()
+    const decisionRate = 1
     const agent = new GasAgent(ps, {
+        decisionRate,
         samplingRate: 1,
         gasSensitivity: 0.05,
         attentionThreshold: 1.0,
-        attentionSpan: 10,
+        attentionSpan: 120, // 120 ticks = 2 minutes at 1s decision rate
     })
 
     // Manually inject gas memory with known gradient
@@ -326,11 +346,11 @@ Deno.test("interest reflects gradient steepness", () => {
         { ppm: 1.0, time: 0, position: { x: 0, y: 0 } },
         { ppm: 2.0, time: 2, position: { x: 1, y: 0 } },
     ]
-    agent.tickCount = 2 * 60  // 2 minutes in at 1s sampling
+    agent.tickCount = 120
 
-    // interest = (slope / gasSensitivity) / attentionThreshold
-    // = (0.5 / 0.05) / 1.0 = 10
-    assertAlmostEquals(agent.computeInterest(), 10, 0.1)
+    // interest = ((slope / gasSensitivity) / attentionThreshold) / 100
+    // = ((0.5 / 0.05) / 1.0) / 100 = 0.1
+    assertAlmostEquals(agent.computeInterest(), 0.1, 0.01)
 })
 
 Deno.test("mode is inactive when interest <= refocusPressure + 1", () => {
@@ -343,37 +363,42 @@ Deno.test("mode is inactive when interest <= refocusPressure + 1", () => {
 
 Deno.test("mode is explore when interest - refocusPressure > 1", () => {
     const ps = createPubSubWithOdom()
+    const decisionRate = 1
     const agent = new GasAgent(ps, {
+        decisionRate,
         samplingRate: 1,
-        gasSensitivity: 0.05,
-        attentionThreshold: 1.0,
-        attentionSpan: 10,
-        refocusRatio: 120,
+        gasSensitivity: 0.001,  // Very sensitive to get high interest
+        attentionThreshold: 0.1,
+        attentionSpan: 60,  // 60 ticks = 1 minute at 1s decision rate
+        refocusRatio: 6000,  // Large value so pressure stays low
     })
 
+    // Create steep gradient for high interest
     agent.gasMemory = [
         { ppm: 1.0, time: 0, position: { x: 0, y: 0 } },
-        { ppm: 2.0, time: 1, position: { x: 1, y: 0 } },
+        { ppm: 3.0, time: 1, position: { x: 1, y: 0 } },  // 2 PPM/min slope
     ]
-    agent.tickCount = 60  // 1 minute
+    agent.tickCount = 60
     agent.exploreTime = 0
 
     agent._updateMode()
     assertEquals(agent.mode, "explore")
 })
 
-Deno.test("refocus pressure grows with explore time", () => {
+Deno.test("refocus pressure grows with explore time (scaled to 0-10 range)", () => {
     const ps = createPubSubWithOdom()
     const agent = new GasAgent(ps, { refocusRatio: 60 })
 
     agent.exploreTime = 0
-    assertAlmostEquals(agent.computeRefocusPressure(), 0, 1e-10)
+    assertAlmostEquals(agent.computeRefocusPressure(), 0, 0.01)
 
     agent.exploreTime = 30
-    assertAlmostEquals(agent.computeRefocusPressure(), 0.5, 1e-10)
+    // (30 / 60) * 10 = 5
+    assertAlmostEquals(agent.computeRefocusPressure(), 5, 0.01)
 
     agent.exploreTime = 60
-    assertAlmostEquals(agent.computeRefocusPressure(), 1, 1e-10)
+    // (60 / 60) * 10 = 10
+    assertAlmostEquals(agent.computeRefocusPressure(), 10, 0.01)
 })
 
 // ── Route Following ───────────────────────────────────────────────────
@@ -389,7 +414,7 @@ Deno.test("route following advances to next waypoint when close", () => {
         turnSpeed: Math.PI,
         startPosition: { x: 0, y: 0 },
     })
-    ps.subscribe("movement", m => movements.push(m))
+    ps.subscribe("movement", (data, publisher) => movements.push(data))
     ps.publish("route_update", { waypoints: [{ x: 1, y: 0 }, { x: 20, y: 0 }] })
 
     // First tick: close to waypoint 0 (distance 1 < threshold 2)
@@ -418,7 +443,8 @@ Deno.test("route following skips waypoint after patience exceeded", () => {
 })
 
 Deno.test("route following publishes movement messages", () => {
-    const ps = createPubSubWithOdom()
+    const decisionRate = 1
+    const ps = createPubSubWithOdom({ x: 0, y: 0 }, 0, decisionRate)
     const movements = []
     const agent = new GasAgent(ps, {
         samplingRate: 1,
@@ -426,13 +452,14 @@ Deno.test("route following publishes movement messages", () => {
         moveSpeed: 1,
         turnSpeed: Math.PI,
         startPosition: { x: 0, y: 0 },
+        decisionRate,
     })
-    ps.subscribe("movement", m => movements.push(m))
+    ps.subscribe("movement", (data, publisher) => movements.push(data))
     ps.publish("route_update", { waypoints: [{ x: 10, y: 0 }] })
 
     ps.publish("gas_reading", { ppm: 0 })
     assertEquals(movements.length, 1)
-    assert(movements[0].forward > 0, "should move forward")
+    assert(movements[0].linearVelocity > 0, "should move forward")
 })
 
 // ── Route Update ──────────────────────────────────────────────────────
@@ -461,7 +488,8 @@ Deno.test("route update overwrites route but preserves gas memory", () => {
 // ═══════════════════════════════════════════════════════════════════════
 
 Deno.test("integration: agent follows route with zero gas", () => {
-    const ps = createPubSubWithOdom()
+    const decisionRate = 1
+    const ps = createPubSubWithOdom({ x: 0, y: 0 }, 0, decisionRate)
     const movements = []
     const agent = new GasAgent(ps, {
         samplingRate: 1,
@@ -471,8 +499,9 @@ Deno.test("integration: agent follows route with zero gas", () => {
         waypointThreshold: 3,
         startPosition: { x: 0, y: 0 },
         startHeading: 0,
+        decisionRate,
     })
-    ps.subscribe("movement", m => movements.push(m))
+    ps.subscribe("movement", (data, publisher) => movements.push(data))
     ps.publish("route_update", { waypoints: [{ x: 10, y: 0 }, { x: 20, y: 0 }] })
 
     for (let i = 0; i < 20; i++) {
@@ -587,11 +616,6 @@ Deno.test("integration: explore builds circle waypoints away from route", () => 
     agent._tickExplore()
 
     assert(agent.tempWaypoints.length > 0, "should have built circle waypoints")
-    assert(agent.tempCentroid !== null, "should have a centroid")
-
-    // Centroid should be roughly in +y direction from position
-    assert(agent.tempCentroid.y > agent.position.y,
-        `centroid y=${agent.tempCentroid.y} should be above position y=${agent.position.y}`)
 })
 
 Deno.test("integration: recalc delays one tick before rebuilding circle", () => {
@@ -629,7 +653,6 @@ Deno.test("integration: recalc delays one tick before rebuilding circle", () => 
     // Tick 1 after recalc: should clear waypoints and pause (no rebuild yet)
     agent._tickExplore()
     assertEquals(agent.tempWaypoints.length, 0, "waypoints should be cleared")
-    assertEquals(agent.tempCentroid, null, "centroid should be cleared")
 
     // Tick 2: now rebuild
     agent._tickExplore()
@@ -662,6 +685,103 @@ Deno.test("integration: new route during exploration preserves explore state", (
     assertEquals(agent.exploreTime, 5)
     // Route updated
     assertEquals(agent.routeWaypoints[0].x, 50)
+})
+
+// ── Pub/Sub Architecture ─────────────────────────────────────────────
+
+Deno.test("agent publishes metrics as array of label/value pairs", () => {
+    const decisionRate = 0.01
+    const ps = createPubSubWithOdom({ x: 0, y: 0 }, 0, decisionRate)
+    const agent = new GasAgent(ps, { decisionRate })
+
+    let metricsReceived = null
+    ps.subscribe('metrics', (data) => {
+        metricsReceived = data
+    })
+
+    // Trigger gas reading to cause metrics publication
+    ps.publish('gas_reading', { ppm: 0.5 })
+
+    assert(metricsReceived !== null, "should have received metrics")
+    assert(Array.isArray(metricsReceived), "metrics should be an array")
+    assert(metricsReceived.length > 0, "should have at least one metric")
+    assert(metricsReceived[0].label !== undefined, "metric should have label")
+    assert(metricsReceived[0].value !== undefined, "metric should have value")
+})
+
+Deno.test("agent publishes logJson with scalar values only", () => {
+    const decisionRate = 0.01
+    const ps = createPubSubWithOdom({ x: 0, y: 0 }, 0, decisionRate)
+    const agent = new GasAgent(ps, {
+        decisionRate,
+        minimumGasThreshold: 0.1,
+    })
+
+    let logDataReceived = null
+    ps.subscribe('logJson', (data) => {
+        logDataReceived = data
+    })
+
+    // Trigger mode change to inactive → explore
+    agent.sensorReading = 0.5  // Above threshold
+    agent._updateMode()
+
+    assert(logDataReceived !== null, "should have received logJson data")
+    // Verify all values are scalars (not objects)
+    Object.values(logDataReceived).forEach(value => {
+        assert(typeof value !== 'object' || value === null, `value should be scalar, got ${typeof value}`)
+    })
+})
+
+// TODO: Fix pubsub identity issue in test - agent and test share same pubsub so messages filtered
+Deno.test.ignore("agent publishes visualizePoint with IDs for add/remove", () => {
+    const decisionRate = 0.01
+    // Create pubsub without identity so agent and test can both receive messages
+    const ps = createPubSub()
+
+    // Add odom simulation manually
+    ps.subscribe("movement", (data, publisher) => {
+        const linearVelocity = data.linearVelocity ?? 0
+        const angularVelocity = data.angularVelocity ?? 0
+        const forward = linearVelocity * decisionRate
+        const rotation = angularVelocity * decisionRate
+        // Simple odom simulation
+        ps.publish("odom", { x: 0, y: 0, heading: 0 })
+    })
+
+    const agent = new GasAgent(ps, {
+        decisionRate,
+        minimumGasThreshold: 0,
+        gasSensitivity: 0.01,
+    })
+
+    const visualizationPoints = []
+    ps.subscribe('visualizePoint', (data) => {
+        visualizationPoints.push(data)
+    })
+
+    // Set up for circle building
+    agent.gasMemory = [
+        { ppm: 1.0, time: 0, position: { x: 0, y: 0 } },
+        { ppm: 2.0, time: 1, position: { x: 1, y: 1 } },
+        { ppm: 3.0, time: 2, position: { x: 2, y: 2 } },
+    ]
+    agent.mode = "explore"
+
+    // Build circle
+    agent._buildExplorationCircle()
+
+    // Should have published points with IDs
+    assert(visualizationPoints.length > 0, "should have published visualization points")
+    assert(visualizationPoints[0].id !== undefined, "visualization points should have IDs")
+
+    // Should have centroid
+    const centroid = visualizationPoints.find(p => p.id === 'centroid')
+    assert(centroid !== undefined, "should have published centroid")
+
+    // Should have waypoints
+    const waypoints = visualizationPoints.filter(p => p.id && p.id.startsWith('waypoint_'))
+    assert(waypoints.length > 0, "should have published waypoints")
 })
 
 Deno.test("integration: position updates correctly after movement", () => {

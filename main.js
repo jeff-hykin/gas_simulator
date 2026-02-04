@@ -4,38 +4,13 @@ import { createSimulator } from './simulator.js';
 import { createPubSub } from './pubsub.js';
 import { GasAgent } from './agent.js';
 
-const app = document.getElementById('app');
+const canvasSys = createCanvasSystem({ width: 1100, height: 830 });
 
-const canvasSys = createCanvasSystem({ width: 900, height: 600 });
+// Visualization points by ID (for debugging/analysis)
+const visualizationPointsById = new Map();
 
-// Centroid visualization for agent exploration
-const centroidCanvas = {
-  type: 'point',
-  x: 0,
-  y: 0,
-  r: 8,
-  stroke: '#f97316',
-  fill: 'rgba(249, 115, 22, 0.3)',
-  lineWidth: 3,
-};
-canvasSys.addToWorld(centroidCanvas);
-
-// Exploration waypoints visualization (circle points)
-const explorationWaypoints = [];
-const maxWaypoints = 16; // Support up to 16 waypoints
-for (let i = 0; i < maxWaypoints; i++) {
-  const waypoint = {
-    type: 'point',
-    x: 0,
-    y: 0,
-    r: 0, // Hidden by default
-    stroke: '#8b5cf6',
-    fill: 'rgba(139, 92, 246, 0.2)',
-    lineWidth: 2,
-  };
-  explorationWaypoints.push(waypoint);
-  canvasSys.addToWorld(waypoint);
-}
+// Current JSON state (merged from all logJson publishes)
+const currentJsonState = {};
 
 function getStartPosition() {
   const markers = mapSys.mapData.markers || [];
@@ -51,7 +26,7 @@ function onMapLoaded() {
   if (sim.agentActive || agent !== null) {
     sim.stopAgentLoop();
     agent = null;
-    agentPubSub = null;
+    mainPubSub = null;
     updateAgentButtons();
   }
 }
@@ -61,7 +36,7 @@ const sim = createSimulator(mapSys, canvasSys);
 
 // ── Agent state ───────────────────────────────────────────────────────
 
-let agentPubSub = null;
+let mainPubSub = null;
 let agent = null;
 const agentConfig = {
   decisionRate: 0.01,       // How often agent makes movement decisions (100 times per second)
@@ -85,10 +60,76 @@ function updateAgentButtons() {
 function playAgent() {
   if (sim.agentActive) return;
 
-  if (!agentPubSub) {
+  if (!mainPubSub) {
     const startPos = getStartPosition();
-    agentPubSub = createPubSub();
-    agent = new GasAgent(agentPubSub, {
+    mainPubSub = createPubSub(); // No identity - allows simulator and agent to communicate
+
+    // Set up JSON state display (merges new data with current state)
+    mainPubSub.subscribe('logJson', (data, publisher) => {
+      // Merge new data into current state
+      Object.assign(currentJsonState, data);
+
+      // Update display
+      updateJsonStateDisplay();
+    });
+
+    // Set up visualization point channel (ID-based add/remove system)
+    mainPubSub.subscribe('visualizePoint', (data, publisher) => {
+      const { id, remove = false } = data;
+
+      if (!id) {
+        console.warn('visualizePoint requires an id');
+        return;
+      }
+
+      // Handle removal
+      if (remove) {
+        const existing = visualizationPointsById.get(id);
+        if (existing) {
+          const world = canvasSys.getWorld();
+          const index = world.indexOf(existing);
+          if (index !== -1) {
+            world.splice(index, 1);
+          }
+          visualizationPointsById.delete(id);
+          canvasSys.render();
+        }
+        return;
+      }
+
+      // Add or update point
+      const { x, y, color = '#ff0000', label = '', r = 5 } = data;
+
+      // Check if point already exists
+      let point = visualizationPointsById.get(id);
+      if (point) {
+        // Update existing point
+        point.x = x;
+        point.y = y;
+        point.r = r;
+        point.stroke = color;
+        point.fill = `${color}80`;
+        point.label = label;
+      } else {
+        // Create new point
+        point = {
+          type: 'point',
+          x,
+          y,
+          r,
+          stroke: color,
+          fill: `${color}80`,
+          lineWidth: 2,
+          label,
+        };
+        visualizationPointsById.set(id, point);
+        canvasSys.addToWorld(point);
+      }
+
+      canvasSys.render();
+    });
+
+    agent = new GasAgent(mainPubSub, {
       decisionRate: agentConfig.decisionRate,
       samplingRate: agentConfig.samplingRate,
       moveSpeed: 3,
@@ -100,49 +141,11 @@ function playAgent() {
     sim.setRobotPosition(startPos.x, startPos.y, 0);
   }
 
-  sim.startAgentLoop(agentPubSub, { samplingRate: agentConfig.decisionRate, gasNoiseStdDev: agentConfig.gasNoiseStdDev });
-
-  // Update sensor readout display, centroid, and exploration waypoints
-  agentPubSub.subscribe('gas_reading', () => {
-    if (agent) {
-      agentSensorReadout.textContent = `Agent Sensor: ${agent.sensorReading.toFixed(3)}`;
-      agentInterestReadout.textContent = `Interest: ${agent.computeInterest().toFixed(3)}`;
-      agentRefocusReadout.textContent = `Refocus Pressure: ${agent.computeRefocusPressure().toFixed(3)}`;
-
-      // Update centroid visualization
-      if (agent.tempCentroid) {
-        centroidCanvas.x = agent.tempCentroid.x;
-        centroidCanvas.y = agent.tempCentroid.y;
-        centroidCanvas.r = 8;  // Visible
-      } else {
-        centroidCanvas.r = 0;  // Hidden when no centroid
-      }
-
-      // Update exploration waypoints visualization
-      if (agent.tempWaypoints && agent.tempWaypoints.length > 0) {
-        agent.tempWaypoints.forEach((wp, i) => {
-          if (i < explorationWaypoints.length) {
-            explorationWaypoints[i].x = wp.x;
-            explorationWaypoints[i].y = wp.y;
-            explorationWaypoints[i].r = 4;  // Visible
-          }
-        });
-        // Hide unused waypoint slots
-        for (let i = agent.tempWaypoints.length; i < explorationWaypoints.length; i++) {
-          explorationWaypoints[i].r = 0;
-        }
-      } else {
-        // Hide all waypoints when not exploring
-        explorationWaypoints.forEach(wp => wp.r = 0);
-      }
-
-      canvasSys.render();
-    }
-  });
+  sim.startAgentLoop(mainPubSub, { samplingRate: agentConfig.decisionRate, gasNoiseStdDev: agentConfig.gasNoiseStdDev });
 
   const routes = mapSys.mapData.routes || [];
   if (routes.length > 0 && routes[0].points.length > 0) {
-    agentPubSub.publish('route_update', { waypoints: routes[0].points });
+    mainPubSub.publish('route_update', { waypoints: routes[0].points });
   }
 
   updateAgentButtons();
@@ -153,46 +156,66 @@ function pauseAgent() {
   updateAgentButtons();
 }
 
+function updateJsonStateDisplay() {
+  if (!jsonStateDisplay) return;
+
+  // Clear existing content
+  jsonStateDisplay.innerHTML = '';
+
+  // Display each key-value pair
+  Object.entries(currentJsonState).forEach(([key, value]) => {
+    const entry = document.createElement('div');
+    entry.className = 'json-entry';
+
+    const keySpan = document.createElement('span');
+    keySpan.className = 'json-key';
+    keySpan.textContent = key + ': ';
+
+    const valueSpan = document.createElement('span');
+    valueSpan.className = 'json-value';
+    valueSpan.textContent = typeof value === 'object' ? JSON.stringify(value) : String(value);
+
+    entry.appendChild(keySpan);
+    entry.appendChild(valueSpan);
+    jsonStateDisplay.appendChild(entry);
+  });
+}
+
 function resetAgent() {
   const startPos = getStartPosition();
   sim.resetRobot({ x: startPos.x, y: startPos.y, angle: 0 });
   agent = null;
-  agentPubSub = null;
-  agentSensorReadout.textContent = 'Agent Sensor: 0.000';
-  agentInterestReadout.textContent = 'Interest: 0.000';
-  agentRefocusReadout.textContent = 'Refocus Pressure: 0.000';
-  centroidCanvas.r = 0;  // Hide centroid
-  explorationWaypoints.forEach(wp => wp.r = 0);  // Hide all waypoints
+  mainPubSub = null;
+
+  // Clear JSON state
+  Object.keys(currentJsonState).forEach(key => delete currentJsonState[key]);
+  updateJsonStateDisplay();
+
+  // Clear visualization points
+  const world = canvasSys.getWorld();
+  visualizationPointsById.forEach(point => {
+    const index = world.indexOf(point);
+    if (index !== -1) world.splice(index, 1);
+  });
+  visualizationPointsById.clear();
+
   canvasSys.render();
   updateAgentButtons();
 }
 
 // ── Layout ────────────────────────────────────────────────────────────
 
-const leftPanel = document.createElement('div');
-leftPanel.className = 'left-panel';
-leftPanel.append(canvasSys.canvas);
+// Canvas goes directly in body
+document.body.append(canvasSys.canvas);
 
-const rightPanel = document.createElement('div');
-rightPanel.className = 'right-panel';
+// Sidebar on the right with all controls
+const sidebar = document.createElement('div');
+sidebar.className = 'sidebar';
 
-const agentPanel = document.createElement('div');
-agentPanel.className = 'agent-panel';
+// Agent controls
 const agentLabel = document.createElement('div');
 agentLabel.className = 'mode-label';
 agentLabel.textContent = 'Agent';
-
-const agentSensorReadout = document.createElement('div');
-agentSensorReadout.className = 'gas-readout';
-agentSensorReadout.textContent = 'Agent Sensor: 0.000';
-
-const agentInterestReadout = document.createElement('div');
-agentInterestReadout.className = 'gas-readout';
-agentInterestReadout.textContent = 'Interest: 0.000';
-
-const agentRefocusReadout = document.createElement('div');
-agentRefocusReadout.className = 'gas-readout';
-agentRefocusReadout.textContent = 'Refocus Pressure: 0.000';
 
 const agentControls = document.createElement('div');
 agentControls.className = 'agent-controls';
@@ -207,27 +230,24 @@ function toggleAgent() {
 
 const btnToggle = buildButton('Play', toggleAgent);
 const btnReset = buildButton('Reset', resetAgent);
+btnToggle.classList.add('full-width');
 btnReset.classList.add('full-width');
-
 agentControls.append(btnToggle, btnReset);
-agentPanel.append(agentLabel, agentControls);
 
-rightPanel.append(mapSys.element, sim.gasReadout, agentSensorReadout, agentInterestReadout, agentRefocusReadout, agentPanel);
+// JSON state display container
+const jsonStateDisplay = document.createElement('div');
+jsonStateDisplay.className = 'json-state-display';
 
-const layout = document.createElement('div');
-layout.className = 'layout';
-layout.append(leftPanel, rightPanel);
-app.append(layout);
+// Build sidebar
+sidebar.append(
+  mapSys.element,
+  sim.gasReadout,
+  agentLabel,
+  agentControls,
+  jsonStateDisplay
+);
 
-function handleResize() {
-  const rect = leftPanel.getBoundingClientRect();
-  const width = Math.max(400, rect.width - 24);
-  const height = Math.max(300, window.innerHeight - 24);
-  canvasSys.setSize(width, height);
-}
-
-window.addEventListener('resize', handleResize);
-handleResize();
+document.body.append(sidebar);
 
 // ── Load default map on startup ───────────────────────────────────────
 

@@ -2,6 +2,9 @@
  * @typedef {{x:number,y:number}} Point
  */
 
+import { createPubSub } from './pubsub.js';
+import { createLocalPlanner } from './local_planner.js';
+
 export function gaussianPeakAt(distance, radius, peak) {
   if (radius <= 0) return 0;
   const sigma2 = radius * radius;
@@ -112,76 +115,16 @@ function moveWithAvoidance(robot, distance, obstacles) {
   }
 }
 
-/**
- * Move the robot forward along its current heading.
- * @example
- * moveForward(robot, 10);
- */
-export function moveForward(robot, distance, obstacles = []) {
-  moveWithAvoidance(robot, distance, obstacles);
-}
-
-/**
- * Move the robot backward along its current heading.
- * @example
- * moveBackward(robot, 5);
- */
-export function moveBackward(robot, distance, obstacles = []) {
-  moveForward(robot, -distance, obstacles);
-}
-
-/**
- * Move the robot left (strafe) relative to its heading.
- * @example
- * moveLeft(robot, 8);
- */
-export function moveLeft(robot, distance, obstacles = []) {
-  const rad = ((robot.angle - 90) * Math.PI) / 180;
-  const radius = Math.max(robot.w, robot.h) / 2;
-  const next = {
-    x: robot.x + Math.cos(rad) * distance,
-    y: robot.y + Math.sin(rad) * distance,
-  };
-  if (obstacles.length && isCircleInAnyObstacle(next, radius, obstacles)) return;
-  robot.x = next.x;
-  robot.y = next.y;
-}
-
-/**
- * Move the robot right (strafe) relative to its heading.
- * @example
- * moveRight(robot, 8);
- */
-export function moveRight(robot, distance, obstacles = []) {
-  moveLeft(robot, -distance, obstacles);
-}
-
-/**
- * Rotate the robot left by a number of degrees.
- * @example
- * rotateLeft(robot, 15);
- */
-export function rotateLeft(robot, degrees) {
-  robot.angle = (robot.angle - degrees + 360) % 360;
-}
-
-/**
- * Rotate the robot right by a number of degrees.
- * @example
- * rotateRight(robot, 15);
- */
-export function rotateRight(robot, degrees) {
-  robot.angle = (robot.angle + degrees) % 360;
-}
 
 /**
  * Create the simulator system for robot + gas sensing.
  *
  * @example
  * const sim = createSimulator(mapSys, canvasSys);
- * sim.moveForward(10);
+ * sim.startAgentLoop(pubsub);
  */
-export function createSimulator(mapSys, canvasSys) {
+export function createSimulator(mapSys, canvasSys, { maxLinearVelocity = 100, maxAngularVelocity = 10 * Math.PI } = {}) {
+
   const robot = createRobot({ x: 0, y: 0, w: 26, h: 18, angle: 0 });
   const robotCanvas = {
     type: 'rect',
@@ -197,9 +140,83 @@ export function createSimulator(mapSys, canvasSys) {
 
   canvasSys.addToWorld(robotCanvas);
 
+  let lastMoveTime = 0; // Virtual time of last movement command
+
   const gasReadout = document.createElement('div');
   gasReadout.className = 'gas-readout';
   gasReadout.textContent = 'Gas: 0.00';
+
+  // ── Clock System ──────────────────────────────────────────────────────
+  const clock = {
+    virtualTime: 0,        // Virtual time in seconds
+    timeSpeed: 1.0,        // Speed multiplier (1.0 = real-time)
+    isRunning: false,      // Clock running state
+    lastRealTime: null,    // Last real timestamp from requestAnimationFrame
+    rafId: null,           // requestAnimationFrame ID
+  };
+
+  function clockTick(realTime) {
+    if (!clock.isRunning) {
+      clock.lastRealTime = null;
+      return;
+    }
+
+    if (clock.lastRealTime === null) {
+      clock.lastRealTime = realTime;
+      clock.rafId = requestAnimationFrame(clockTick);
+      return;
+    }
+
+    const realDelta = (realTime - clock.lastRealTime) / 1000; // Convert ms to seconds
+    const virtualDelta = realDelta * clock.timeSpeed;
+    clock.virtualTime += virtualDelta;
+    clock.lastRealTime = realTime;
+
+    // Check if it's time to publish gas reading
+    if (agentActive && agentPubSub && clock.virtualTime - lastGasSampleTime >= gasSamplingRate) {
+      const gas = maxGasAt(robot, mapSys.mapData.gasNodes || []);
+      const noisy = Math.max(0, gas + gaussianNoise(gasNoiseStdDev));
+      agentPubSub.publish('gas_reading', { ppm: noisy });
+      lastGasSampleTime = clock.virtualTime;
+    }
+
+    // Publish odometry at regular intervals (every clock tick)
+    if (agentActive && agentPubSub) {
+      agentPubSub.publish('odom', {
+        x: robot.x,
+        y: robot.y,
+        heading: robot.angle * (Math.PI / 180),
+      });
+    }
+
+    clock.rafId = requestAnimationFrame(clockTick);
+  }
+
+  function pauseClock() {
+    clock.isRunning = false;
+    if (clock.rafId !== null) {
+      cancelAnimationFrame(clock.rafId);
+      clock.rafId = null;
+    }
+  }
+
+  function playClock() {
+    if (!clock.isRunning) {
+      clock.isRunning = true;
+      clock.lastRealTime = null;
+      clock.rafId = requestAnimationFrame(clockTick);
+    }
+  }
+
+  function resetClock() {
+    pauseClock();
+    clock.virtualTime = 0;
+    clock.lastRealTime = null;
+  }
+
+  function setTimeSpeed(speed) {
+    clock.timeSpeed = Math.max(0, speed);
+  }
 
   function syncRobot() {
     robotCanvas.x = robot.x;
@@ -225,9 +242,43 @@ export function createSimulator(mapSys, canvasSys) {
     }
   }
 
+  /**
+   * Apply velocity-based movement to the robot. Caps velocities to max robot capabilities
+   * and calculates actual movement based on time elapsed since last command.
+   *
+   * @param {number} linearVelocity - desired forward velocity in meters/second
+   * @param {number} angularVelocity - desired rotation velocity in radians/second
+   */
+  function move(linearVelocity, angularVelocity) {
+    const currentTime = clock.virtualTime;
+    const deltaTime = currentTime - lastMoveTime;
+    lastMoveTime = currentTime;
+
+    // Cap velocities to robot maximums
+    const cappedLinearVel = Math.max(-maxLinearVelocity, Math.min(linearVelocity, maxLinearVelocity));
+    const cappedAngularVel = Math.max(-maxAngularVelocity, Math.min(angularVelocity, maxAngularVelocity));
+
+    // Calculate actual movement from capped velocities and time delta
+    const linearDistance = cappedLinearVel * deltaTime;
+    const angularDistance = cappedAngularVel * deltaTime; // radians
+
+    const obstacles = mapSys.mapData.obstacles || [];
+
+    // Apply rotation (inline from rotateLeft/rotateRight)
+    const angularDeg = angularDistance * (180 / Math.PI);
+    robot.angle = (robot.angle + angularDeg + 360) % 360;
+
+    // Apply linear movement (inline from moveForward/moveWithAvoidance)
+    moveWithAvoidance(robot, linearDistance, obstacles);
+  }
+
   let agentActive = false;
-  let agentInterval = null;
+  let agentPubSub = null;
+  let localPlanner = null;
   let movementUnsub = null;
+  let lastGasSampleTime = 0; // Track last gas sample in virtual time
+  let gasSamplingRate = 1; // Seconds between gas readings
+  let gasNoiseStdDev = 0; // Gaussian noise std-dev
 
   const keyState = new Set();
   window.addEventListener('keydown', (e) => {
@@ -242,10 +293,10 @@ export function createSimulator(mapSys, canvasSys) {
       const speed = 3;
       const turn = 4;
       const obstacles = mapSys.mapData.obstacles || [];
-      if (keyState.has('w')) moveForward(robot, speed, obstacles);
-      if (keyState.has('s')) moveBackward(robot, speed, obstacles);
-      if (keyState.has('a')) rotateLeft(robot, turn);
-      if (keyState.has('d')) rotateRight(robot, turn);
+      if (keyState.has('w')) moveWithAvoidance(robot, speed, obstacles);
+      if (keyState.has('s')) moveWithAvoidance(robot, -speed, obstacles);
+      if (keyState.has('a')) robot.angle = (robot.angle - turn + 360) % 360;
+      if (keyState.has('d')) robot.angle = (robot.angle + turn) % 360;
     }
     step();
     requestAnimationFrame(handleKeys);
@@ -264,10 +315,30 @@ export function createSimulator(mapSys, canvasSys) {
    * @param {object} [opts]
    * @param {number} [opts.samplingRate=1]     seconds between gas readings
    * @param {number} [opts.gasNoiseStdDev=0]   Gaussian noise std-dev (PPM)
+   * @param {number} [opts.timeSpeed=1.0]      Clock speed multiplier
    */
-  function startAgentLoop(pubsub, { samplingRate = 1, gasNoiseStdDev = 0 } = {}) {
-    if (agentInterval) return;
+  function startAgentLoop(pubsub, { samplingRate = 1, gasNoiseStdDev: noiseStdDev = 0, timeSpeed = 1.0 } = {}) {
+    if (agentActive) return;
     agentActive = true;
+    agentPubSub = pubsub;
+
+    // Create local planner with same velocity limits as simulator
+    localPlanner = createLocalPlanner(pubsub, {
+      maxLinearVelocity,
+      maxAngularVelocity,
+      waypointThreshold: 10,
+      minAlignment: 0.5,
+    });
+
+    // Store gas sampling parameters for clock tick handler
+    gasSamplingRate = samplingRate;
+    gasNoiseStdDev = noiseStdDev;
+
+    // Set clock speed and start clock
+    setTimeSpeed(timeSpeed);
+    lastGasSampleTime = clock.virtualTime;
+    lastMoveTime = clock.virtualTime;
+    playClock();
 
     // Publish initial odometry so agent knows its starting pose
     pubsub.publish('odom', {
@@ -276,39 +347,23 @@ export function createSimulator(mapSys, canvasSys) {
       heading: robot.angle * (Math.PI / 180),
     });
 
-    movementUnsub = pubsub.subscribe('movement', ({ forward, rotation }) => {
-      const obstacles = mapSys.mapData.obstacles || [];
-      const deg = rotation * (180 / Math.PI);
-      if (deg >= 0) rotateRight(robot, deg);
-      else rotateLeft(robot, Math.abs(deg));
-      if (forward >= 0) moveForward(robot, forward, obstacles);
-      else moveBackward(robot, Math.abs(forward), obstacles);
+    movementUnsub = pubsub.subscribe('movement', (data, publisher) => {
+      // Accept velocity-based commands
+      const linearVelocity = data.linearVelocity ?? 0;
+      const angularVelocity = data.angularVelocity ?? 0;
+
+      move(linearVelocity, angularVelocity);
       step();
-
-      // Publish actual robot pose after movement (including obstacle avoidance)
-      pubsub.publish('odom', {
-        x: robot.x,
-        y: robot.y,
-        heading: robot.angle * (Math.PI / 180), // Convert degrees to radians
-      });
     });
-
-    agentInterval = setInterval(() => {
-      const gas = maxGasAt(robot, mapSys.mapData.gasNodes || []);
-      const noisy = Math.max(0, gas + gaussianNoise(gasNoiseStdDev));
-      pubsub.publish('gas_reading', { ppm: noisy });
-    }, samplingRate * 1000);
   }
 
   function stopAgentLoop() {
-    if (agentInterval) {
-      clearInterval(agentInterval);
-      agentInterval = null;
-    }
     if (movementUnsub) {
       movementUnsub();
       movementUnsub = null;
     }
+    localPlanner = null;
+    pauseClock();
     agentActive = false;
   }
 
@@ -335,30 +390,13 @@ export function createSimulator(mapSys, canvasSys) {
     setRobotPosition,
     resetRobot,
     get agentActive() { return agentActive; },
-    moveForward: (d) => {
-      moveForward(robot, d, mapSys.mapData.obstacles || []);
-      step();
-    },
-    moveBackward: (d) => {
-      moveBackward(robot, d, mapSys.mapData.obstacles || []);
-      step();
-    },
-    moveLeft: (d) => {
-      moveLeft(robot, d, mapSys.mapData.obstacles || []);
-      step();
-    },
-    moveRight: (d) => {
-      moveRight(robot, d, mapSys.mapData.obstacles || []);
-      step();
-    },
-    rotateLeft: (deg) => {
-      rotateLeft(robot, deg);
-      step();
-    },
-    rotateRight: (deg) => {
-      rotateRight(robot, deg);
-      step();
-    },
-    step,
+    // Clock control methods
+    pause: pauseClock,
+    play: playClock,
+    reset: resetClock,
+    setTimeSpeed,
+    get virtualTime() { return clock.virtualTime; },
+    get timeSpeed() { return clock.timeSpeed; },
+    get isClockRunning() { return clock.isRunning; },
   };
 }

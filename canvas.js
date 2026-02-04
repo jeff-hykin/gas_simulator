@@ -13,10 +13,14 @@
 export function createCanvasSystem({ width = 800, height = 600 } = {}) {
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
-  canvas.width = width;
-  canvas.height = height;
+  const pixelRatio = 2; // Double resolution for crisp rendering
+  canvas.width = width * pixelRatio;
+  canvas.height = height * pixelRatio;
+  canvas.style.width = `${width}px`;
+  canvas.style.height = `${height}px`;
   canvas.style.border = '1px solid #222';
   canvas.style.background = '#0f0f10';
+  ctx.scale(pixelRatio, pixelRatio);
 
   const world = [];
   const state = {
@@ -32,8 +36,12 @@ export function createCanvasSystem({ width = 800, height = 600 } = {}) {
   const controllers = [];
 
   function setSize(w, h) {
-    canvas.width = w;
-    canvas.height = h;
+    const pixelRatio = 2;
+    canvas.width = w * pixelRatio;
+    canvas.height = h * pixelRatio;
+    canvas.style.width = `${w}px`;
+    canvas.style.height = `${h}px`;
+    ctx.scale(pixelRatio, pixelRatio);
     render();
   }
 
