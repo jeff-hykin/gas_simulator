@@ -1,5 +1,5 @@
 import { createCanvasSystem } from './canvas.js';
-import { createMapSystem } from './map.js';
+import { createMapSystem, deserializeMap } from './map.js';
 import { createSimulator } from './simulator.js';
 import { createPubSub } from './pubsub.js';
 import { GasAgent } from './agent.js';
@@ -7,7 +7,27 @@ import { GasAgent } from './agent.js';
 const app = document.getElementById('app');
 
 const canvasSys = createCanvasSystem({ width: 900, height: 600 });
-const mapSys = createMapSystem(canvasSys);
+
+function getStartPosition() {
+  const markers = mapSys.mapData.markers || [];
+  const start = markers.find((m) => m.label && m.label.toLowerCase() === 'start');
+  return start ? { x: start.x, y: start.y } : { x: 0, y: 0 };
+}
+
+function onMapLoaded() {
+  // When a map is loaded, reset the robot to the start marker position
+  const startPos = getStartPosition();
+  sim.setRobotPosition(startPos.x, startPos.y, 0);
+  // If the agent is running, stop it and clear agent state
+  if (sim.agentActive || agent !== null) {
+    sim.stopAgentLoop();
+    agent = null;
+    agentPubSub = null;
+    updateAgentButtons();
+  }
+}
+
+const mapSys = createMapSystem(canvasSys, { onMapLoaded });
 const sim = createSimulator(mapSys, canvasSys);
 
 // ── Agent state ───────────────────────────────────────────────────────
@@ -36,12 +56,15 @@ function playAgent() {
   if (sim.agentActive) return;
 
   if (!agentPubSub) {
+    const startPos = getStartPosition();
     agentPubSub = createPubSub();
     agent = new GasAgent(agentPubSub, {
       samplingRate: agentConfig.samplingRate,
       moveSpeed: 3,
       turnSpeed: 0.3,
+      startPosition: startPos,
     });
+    sim.setRobotPosition(startPos.x, startPos.y, 0);
   }
 
   sim.startAgentLoop(agentPubSub, agentConfig);
@@ -60,7 +83,8 @@ function pauseAgent() {
 }
 
 function resetAgent() {
-  sim.resetRobot();
+  const startPos = getStartPosition();
+  sim.resetRobot({ x: startPos.x, y: startPos.y, angle: 0 });
   agent = null;
   agentPubSub = null;
   updateAgentButtons();
@@ -108,3 +132,12 @@ function handleResize() {
 
 window.addEventListener('resize', handleResize);
 handleResize();
+
+// ── Load default map on startup ───────────────────────────────────────
+
+fetch('./maps/chemical_plant.yaml')
+  .then((response) => response.text())
+  .then((yamlText) => {
+    mapSys.loadMapText(yamlText);
+  })
+  .catch((err) => console.warn('Could not load default map:', err));

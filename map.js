@@ -164,7 +164,7 @@ export function buildAsCanvas(mapData) {
  * document.body.append(mapSys.element);
  * mapSys.addMarker({ x: 10, y: 20, label: 'A' });
  */
-export function createMapSystem(canvasSys) {
+export function createMapSystem(canvasSys, { onMapLoaded } = {}) {
   const element = document.createElement('div');
   element.className = 'map-panel';
 
@@ -231,6 +231,7 @@ export function createMapSystem(canvasSys) {
       asCanvas: gasNodeAsCanvas(node, loaded.styles),
     }));
     rebuildWorld();
+    if (onMapLoaded) onMapLoaded();
   }
 
   function undo() {
@@ -347,6 +348,17 @@ export function createMapSystem(canvasSys) {
       const loaded = deserializeMap(text);
       applyMapData(loaded);
     });
+  }
+
+  /**
+   * Load a YAML map from text.
+   * @example
+   * mapSys.loadMapText(yamlString);
+   */
+  function loadMapText(text) {
+    pushUndo();
+    const loaded = deserializeMap(text);
+    applyMapData(loaded);
   }
 
   function buildButton(label, onClick) {
@@ -530,6 +542,7 @@ export function createMapSystem(canvasSys) {
     rebuildWorld,
     saveMap,
     loadMapFile,
+    loadMapText,
     releaseControl,
   };
 }

@@ -298,11 +298,18 @@ export function createSimulator(mapSys, canvasSys) {
     agentActive = false;
   }
 
-  function resetRobot() {
+  function setRobotPosition(x, y, angle = 0) {
+    robot.x = x;
+    robot.y = y;
+    robot.angle = angle;
+    step();
+  }
+
+  function resetRobot({ x = 0, y = 0, angle = 0 } = {}) {
     stopAgentLoop();
-    robot.x = 0;
-    robot.y = 0;
-    robot.angle = 0;
+    robot.x = x;
+    robot.y = y;
+    robot.angle = angle;
     step();
   }
 
@@ -311,6 +318,7 @@ export function createSimulator(mapSys, canvasSys) {
     gasReadout,
     startAgentLoop,
     stopAgentLoop,
+    setRobotPosition,
     resetRobot,
     get agentActive() { return agentActive; },
     moveForward: (d) => {
