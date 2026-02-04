@@ -20,6 +20,23 @@ const centroidCanvas = {
 };
 canvasSys.addToWorld(centroidCanvas);
 
+// Exploration waypoints visualization (circle points)
+const explorationWaypoints = [];
+const maxWaypoints = 16; // Support up to 16 waypoints
+for (let i = 0; i < maxWaypoints; i++) {
+  const waypoint = {
+    type: 'point',
+    x: 0,
+    y: 0,
+    r: 0, // Hidden by default
+    stroke: '#8b5cf6',
+    fill: 'rgba(139, 92, 246, 0.2)',
+    lineWidth: 2,
+  };
+  explorationWaypoints.push(waypoint);
+  canvasSys.addToWorld(waypoint);
+}
+
 function getStartPosition() {
   const markers = mapSys.mapData.markers || [];
   const start = markers.find((m) => m.label && m.label.toLowerCase() === 'start');
@@ -61,8 +78,8 @@ function buildButton(label, onClick) {
 
 function updateAgentButtons() {
   const running = sim.agentActive;
-  btnPlay.classList.toggle('is-active', running);
-  btnPause.classList.toggle('is-active', !running && agent !== null);
+  btnToggle.textContent = running ? 'Pause' : 'Play';
+  btnToggle.classList.toggle('is-active', running);
 }
 
 function playAgent() {
@@ -85,10 +102,12 @@ function playAgent() {
 
   sim.startAgentLoop(agentPubSub, { samplingRate: agentConfig.decisionRate, gasNoiseStdDev: agentConfig.gasNoiseStdDev });
 
-  // Update sensor readout display and centroid visualization
+  // Update sensor readout display, centroid, and exploration waypoints
   agentPubSub.subscribe('gas_reading', () => {
     if (agent) {
       agentSensorReadout.textContent = `Agent Sensor: ${agent.sensorReading.toFixed(3)}`;
+      agentInterestReadout.textContent = `Interest: ${agent.computeInterest().toFixed(3)}`;
+      agentRefocusReadout.textContent = `Refocus Pressure: ${agent.computeRefocusPressure().toFixed(3)}`;
 
       // Update centroid visualization
       if (agent.tempCentroid) {
@@ -98,6 +117,25 @@ function playAgent() {
       } else {
         centroidCanvas.r = 0;  // Hidden when no centroid
       }
+
+      // Update exploration waypoints visualization
+      if (agent.tempWaypoints && agent.tempWaypoints.length > 0) {
+        agent.tempWaypoints.forEach((wp, i) => {
+          if (i < explorationWaypoints.length) {
+            explorationWaypoints[i].x = wp.x;
+            explorationWaypoints[i].y = wp.y;
+            explorationWaypoints[i].r = 4;  // Visible
+          }
+        });
+        // Hide unused waypoint slots
+        for (let i = agent.tempWaypoints.length; i < explorationWaypoints.length; i++) {
+          explorationWaypoints[i].r = 0;
+        }
+      } else {
+        // Hide all waypoints when not exploring
+        explorationWaypoints.forEach(wp => wp.r = 0);
+      }
+
       canvasSys.render();
     }
   });
@@ -121,7 +159,10 @@ function resetAgent() {
   agent = null;
   agentPubSub = null;
   agentSensorReadout.textContent = 'Agent Sensor: 0.000';
+  agentInterestReadout.textContent = 'Interest: 0.000';
+  agentRefocusReadout.textContent = 'Refocus Pressure: 0.000';
   centroidCanvas.r = 0;  // Hide centroid
+  explorationWaypoints.forEach(wp => wp.r = 0);  // Hide all waypoints
   canvasSys.render();
   updateAgentButtons();
 }
@@ -145,18 +186,33 @@ const agentSensorReadout = document.createElement('div');
 agentSensorReadout.className = 'gas-readout';
 agentSensorReadout.textContent = 'Agent Sensor: 0.000';
 
+const agentInterestReadout = document.createElement('div');
+agentInterestReadout.className = 'gas-readout';
+agentInterestReadout.textContent = 'Interest: 0.000';
+
+const agentRefocusReadout = document.createElement('div');
+agentRefocusReadout.className = 'gas-readout';
+agentRefocusReadout.textContent = 'Refocus Pressure: 0.000';
+
 const agentControls = document.createElement('div');
 agentControls.className = 'agent-controls';
 
-const btnPlay = buildButton('Play', playAgent);
-const btnPause = buildButton('Pause', pauseAgent);
+function toggleAgent() {
+  if (sim.agentActive) {
+    pauseAgent();
+  } else {
+    playAgent();
+  }
+}
+
+const btnToggle = buildButton('Play', toggleAgent);
 const btnReset = buildButton('Reset', resetAgent);
 btnReset.classList.add('full-width');
 
-agentControls.append(btnPlay, btnPause, btnReset);
+agentControls.append(btnToggle, btnReset);
 agentPanel.append(agentLabel, agentControls);
 
-rightPanel.append(mapSys.element, sim.gasReadout, agentSensorReadout, agentPanel);
+rightPanel.append(mapSys.element, sim.gasReadout, agentSensorReadout, agentInterestReadout, agentRefocusReadout, agentPanel);
 
 const layout = document.createElement('div');
 layout.className = 'layout';

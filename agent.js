@@ -31,8 +31,8 @@ export class GasAgent {
      * @param {number} [config.circlingSize=5]             meters — exploration circle radius
      * @param {number} [config.gradientProjection]         meters — how far to extrapolate gradient (defaults to circlingSize)
      * @param {number} [config.attentionThreshold=0.1]    (sensitivity-units/min) — minimum gradient to explore
-     * @param {number} [config.refocusRatio=60]            seconds — max explore time at baseline gradient
-     * @param {number} [config.attentionSpan=2]            minutes — lookback window for gradient calc
+     * @param {number} [config.refocusRatio=6000]          ticks — max explore time at baseline gradient
+     * @param {number} [config.attentionSpan=12000]        ticks — lookback window for gradient calc
      * @param {number} [config.maxBufferSize=500]          max gas_memory entries
      * @param {number} [config.decisionRate=1]             seconds — interval between gas callbacks / movement decisions
      * @param {number} [config.samplingRate=60]            ticks — interval between recording gas samples (in decision ticks)
@@ -45,6 +45,7 @@ export class GasAgent {
      * @param {number} [config.startHeading=0]             radians
      */
     constructor(pubsub, config = {}) {
+        globalThis.agent = this // For debugging
         this.pubsub = pubsub
 
         // Parameters
@@ -53,8 +54,8 @@ export class GasAgent {
         this.circlingSize        = config.circlingSize ?? 5
         this.gradientProjection  = config.gradientProjection ?? this.circlingSize
         this.attentionThreshold  = config.attentionThreshold ?? 0.1
-        this.refocusRatio        = config.refocusRatio ?? 60
-        this.attentionSpan       = config.attentionSpan ?? 2
+        this.refocusRatio        = config.refocusRatio ?? 6000
+        this.attentionSpan       = config.attentionSpan ?? 12000
         this.maxBufferSize       = config.maxBufferSize ?? 500
         this.decisionRate        = config.decisionRate ?? 1
         this.samplingRate        = config.samplingRate ?? 60
@@ -76,6 +77,10 @@ export class GasAgent {
         this.currentWaypointIndex = 0
         this.bestDistanceToWaypoint = Infinity
         this.ticksAtWaypoint = 0
+
+        // Waypoint navigation tracking
+        this.currentGoal = null
+        this.lastDistanceToGoal = Infinity
 
         // Gradient exploration state
         this.mode = "inactive"
@@ -146,7 +151,7 @@ export class GasAgent {
         }
 
         if (this.mode === "explore") {
-            this.exploreTime += this.decisionRate
+            this.exploreTime += 1  // Track in ticks, not seconds
             this._tickExplore()
         } else {
             this._tickRouteFollow()
@@ -156,20 +161,15 @@ export class GasAgent {
     // ── Gas Memory ────────────────────────────────────────────────────
 
     /**
-     * Record a gas memory entry if the reading passes minimum and
-     * sensitivity thresholds, and enough ticks have passed since last sample.
+     * Record a gas memory entry immediately when reading passes minimum and
+     * sensitivity thresholds. Trigger circle recalculation at samplingRate intervals.
      */
     _updateGasMemory() {
-        // Only record samples at samplingRate intervals (measured in ticks)
-        const ticksSinceLastSample = this.tickCount - this.lastSampleTick
-        if (ticksSinceLastSample < this.samplingRate) {
-            return
-        }
-
         const lastPpm = this.gasMemory.length > 0
             ? this.gasMemory[this.gasMemory.length - 1].ppm
             : -Infinity
 
+        // Record samples immediately when they meet threshold/sensitivity requirements
         if (this.sensorReading > this.minimumGasThreshold &&
             (this.sensorReading - this.gasSensitivity) > lastPpm) {
             this.gasMemory.push({
@@ -177,13 +177,18 @@ export class GasAgent {
                 time: this.currentTimeMinutes,
                 position: { x: this.position.x, y: this.position.y },
             })
-            this.lastSampleTick = this.tickCount
             if (this.gasMemory.length > this.maxBufferSize) {
                 this.gasMemory.shift()
             }
-            // Signal recalculation if we're exploring
-            if (this.mode === "explore") {
-                this.recalcPending = true
+
+            // Only trigger circle recalculation at samplingRate intervals
+            const ticksSinceLastSample = this.tickCount - this.lastSampleTick
+            if (ticksSinceLastSample >= this.samplingRate) {
+                this.lastSampleTick = this.tickCount
+                // Signal recalculation if we're exploring
+                if (this.mode === "explore") {
+                    this.recalcPending = true
+                }
             }
         }
     }
@@ -192,29 +197,42 @@ export class GasAgent {
 
     /**
      * Interest: normalized gradient steepness over the attention span window.
+     * Scaled to be comparable with refocus pressure (typically 0-10 range).
      * @returns {number}
      */
     computeInterest() {
-        const cutoff = this.currentTimeMinutes - this.attentionSpan
+        // Convert attentionSpan from ticks to minutes for comparison with memory timestamps
+        const attentionSpanMinutes = (this.attentionSpan * this.decisionRate) / 60
+        const cutoff = this.currentTimeMinutes - attentionSpanMinutes
         const recent = this.gasMemory.filter(e => e.time >= cutoff)
         if (recent.length < 2) return 0
         const slope = linearRegressionSlope(
             recent.map(e => ({ x: e.time, y: e.ppm }))
         )
         if (slope <= 0) return 0
-        return (slope / this.gasSensitivity) / this.attentionThreshold
+        // Scale down by 100x to bring into reasonable range (0-10) for typical gradients
+        return ((slope / this.gasSensitivity) / this.attentionThreshold) / 100
     }
 
     /**
-     * Refocus pressure: grows with exploration time.
+     * Refocus pressure: grows with exploration time (in ticks).
+     * Scaled to match interest range (reaches ~10 after refocusRatio ticks).
      * @returns {number}
      */
     computeRefocusPressure() {
-        return this.exploreTime / this.refocusRatio
+        // exploreTime and refocusRatio are both in ticks
+        return (this.exploreTime / this.refocusRatio) * 10
     }
 
     /** Update mode based on interest vs refocus pressure. */
     _updateMode() {
+        // Immediate exploration trigger: start exploring as soon as gas exceeds threshold
+        if (this.sensorReading > this.minimumGasThreshold && this.mode === "inactive") {
+            this.mode = "explore"
+            return
+        }
+
+        // Continue exploring or return to route based on interest/pressure
         const interest = this.computeInterest()
         const pressure = this.computeRefocusPressure()
         this.mode = (interest - pressure) > 1 ? "explore" : "inactive"
@@ -230,26 +248,26 @@ export class GasAgent {
         }
 
         const target = this.routeWaypoints[this.currentWaypointIndex]
-        const dist = vecDistance(this.position, target)
+        const { distance, progress, reached } = this._navigateToWaypoint(target)
 
-        if (dist < this.waypointThreshold) {
+        if (reached) {
             this._advanceWaypoint()
             return
         }
 
-        if (dist < this.bestDistanceToWaypoint) {
-            this.bestDistanceToWaypoint = dist
+        // Track best distance for patience system
+        if (distance < this.bestDistanceToWaypoint) {
+            this.bestDistanceToWaypoint = distance
             this.ticksAtWaypoint = 0
         } else {
             this.ticksAtWaypoint++
         }
 
+        // Skip waypoint if stuck too long
         if (this.ticksAtWaypoint >= this.waypointPatience) {
             this._advanceWaypoint()
             return
         }
-
-        this._moveToward(target)
     }
 
     _advanceWaypoint() {
@@ -294,12 +312,10 @@ export class GasAgent {
         }
 
         const target = this.tempWaypoints[this.tempWaypointIndex]
-        const dist = vecDistance(this.position, target)
-        if (dist < this.waypointThreshold) {
+        const { reached } = this._navigateToWaypoint(target)
+        if (reached) {
             this.tempWaypointIndex++
-            return
         }
-        this._moveToward(target)
     }
 
     /**
@@ -349,10 +365,25 @@ export class GasAgent {
     // ── Movement ──────────────────────────────────────────────────────
 
     /**
-     * Rotate toward target and move forward, publishing a movement message.
+     * Navigate to a waypoint with progress tracking and course correction.
+     * Reports progress and actively turns around if overshooting.
      * @param {{x:number,y:number}} target
+     * @returns {{distance:number, progress:number, reached:boolean}}
      */
-    _moveToward(target) {
+    _navigateToWaypoint(target) {
+        // Track goal changes
+        if (!this.currentGoal ||
+            target.x !== this.currentGoal.x ||
+            target.y !== this.currentGoal.y) {
+            this.currentGoal = { x: target.x, y: target.y }
+            this.lastDistanceToGoal = vecDistance(this.position, target)
+        }
+
+        const currentDistance = vecDistance(this.position, target)
+        const progress = this.lastDistanceToGoal - currentDistance
+        this.lastDistanceToGoal = currentDistance
+
+        // Calculate desired heading to target
         const diff = vecSub(target, this.position)
         const targetAngle = Math.atan2(diff.y, diff.x)
         let rotation = angleDifference(this.heading, targetAngle)
@@ -362,10 +393,37 @@ export class GasAgent {
             rotation = Math.sign(rotation) * this.turnSpeed
         }
 
-        const dist = vecMagnitude(diff)
-        const forward = Math.min(this.moveSpeed, dist)
+        // Calculate alignment: how well are we pointed at the target?
+        const alignmentError = Math.abs(angleDifference(this.heading, targetAngle))
+        const alignment = 1 - (alignmentError / Math.PI) // 1 = perfect, 0 = opposite direction
+
+        let forward = 0
+
+        // If making negative progress (overshooting/moving away), stop and turn
+        if (progress < -0.1) {
+            forward = 0  // Stop moving forward, just rotate
+        }
+        // If poorly aligned (facing wrong direction), slow down and prioritize turning
+        else if (alignment < 0.5) {
+            forward = this.moveSpeed * alignment * 0.5  // Slow down when misaligned
+        }
+        // If well aligned, move at full speed
+        else {
+            forward = Math.min(this.moveSpeed, currentDistance)
+        }
 
         this._publishMovement(forward, rotation)
+
+        const reached = currentDistance < this.waypointThreshold
+        return { distance: currentDistance, progress, reached }
+    }
+
+    /**
+     * Legacy method - redirects to new navigation system
+     * @param {{x:number,y:number}} target
+     */
+    _moveToward(target) {
+        this._navigateToWaypoint(target)
     }
 
     /**
