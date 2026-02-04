@@ -327,7 +327,7 @@ export function createSimulator(mapSys, canvasSys, { maxLinearVelocity = 100, ma
       maxLinearVelocity,
       maxAngularVelocity,
       waypointThreshold: 10,
-      minAlignment: 0.5,
+      minAlignment: 0.9, // Require tight alignment for sharper turns
     });
 
     // Store gas sampling parameters for clock tick handler

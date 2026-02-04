@@ -79,7 +79,7 @@ export class GasAgent {
         this.ticksAtWaypoint = 0
 
         // Gradient exploration state
-        this.mode = "inactive"
+        this.mode = "route-following"
         this.gasMemory = []
         this.exploreTime = 0
         this.tempWaypoints = []
@@ -145,8 +145,8 @@ export class GasAgent {
         const prevMode = this.mode
         this._updateMode()
 
-        // Transition explore → inactive: reset explore state
-        if (prevMode === "explore" && this.mode === "inactive") {
+        // Transition explore → route-following: reset explore state
+        if (prevMode === "explore" && this.mode === "route-following") {
             this.exploreTime = 0
             this.tempWaypoints = []
             this.tempWaypointIndex = 0
@@ -248,7 +248,7 @@ export class GasAgent {
         const previousMode = this.mode
 
         // Immediate exploration trigger: start exploring as soon as gas exceeds threshold
-        if (this.sensorReading > this.minimumGasThreshold && this.mode === "inactive") {
+        if (this.sensorReading > this.minimumGasThreshold && this.mode === "route-following") {
             this.mode = "explore"
             if (previousMode !== this.mode) {
                 this.pubsub.publish('logJson', {
@@ -263,7 +263,7 @@ export class GasAgent {
         // Continue exploring or return to route based on interest/pressure
         const interest = this.computeInterest()
         const pressure = this.computeRefocusPressure()
-        this.mode = (interest - pressure) > 1 ? "explore" : "inactive"
+        this.mode = (interest - pressure) > 1 ? "explore" : "route-following"
 
         if (previousMode !== this.mode) {
             console.log(`Agent: mode changed from "${previousMode}" to "${this.mode}" (interest: ${interest.toFixed(2)}, pressure: ${pressure.toFixed(2)})`);
@@ -456,7 +456,7 @@ export class GasAgent {
         if (this.mode === "explore" && this.tempWaypoints.length > 0) {
             console.log(`Agent: exploration waypoint ${this.tempWaypointIndex + 1}/${this.tempWaypoints.length} reached`);
             this.tempWaypointIndex++
-        } else if (this.mode === "inactive" && this.routeWaypoints.length > 0) {
+        } else if (this.mode === "route-following" && this.routeWaypoints.length > 0) {
             console.log(`Agent: route waypoint ${this.currentWaypointIndex + 1}/${this.routeWaypoints.length} reached`);
             this.currentWaypointIndex++
             this.bestDistanceToWaypoint = Infinity
