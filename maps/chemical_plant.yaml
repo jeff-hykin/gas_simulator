@@ -21,8 +21,8 @@ styles:
 
 markers:
   - id: marker-start
-    x: -550
-    y: 700
+    x: -500
+    y: 620
     label: Start
   - id: marker-gate
     x: -500

@@ -138,6 +138,6 @@ handleResize();
 fetch('./maps/chemical_plant.yaml')
   .then((response) => response.text())
   .then((yamlText) => {
-    mapSys.loadMapText(yamlText);
+    mapSys.loadMapText(yamlText, 'chemical_plant');
   })
   .catch((err) => console.warn('Could not load default map:', err));

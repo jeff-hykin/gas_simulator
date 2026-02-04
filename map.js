@@ -180,6 +180,7 @@ export function createMapSystem(canvasSys, { onMapLoaded } = {}) {
     pendingObstacleCanvas: null,
     pendingGas: null,
     pendingGasCanvas: null,
+    currentMapName: null,
   };
 
   /**
@@ -346,19 +347,23 @@ export function createMapSystem(canvasSys, { onMapLoaded } = {}) {
     return file.text().then((text) => {
       pushUndo();
       const loaded = deserializeMap(text);
+      ui.currentMapName = file.name.replace(/\.ya?ml$/i, '');
       applyMapData(loaded);
+      updateMapNameUI();
     });
   }
 
   /**
    * Load a YAML map from text.
    * @example
-   * mapSys.loadMapText(yamlString);
+   * mapSys.loadMapText(yamlString, 'map_name');
    */
-  function loadMapText(text) {
+  function loadMapText(text, name = null) {
     pushUndo();
     const loaded = deserializeMap(text);
+    ui.currentMapName = name;
     applyMapData(loaded);
+    updateMapNameUI();
   }
 
   function buildButton(label, onClick) {
@@ -377,6 +382,11 @@ export function createMapSystem(canvasSys, { onMapLoaded } = {}) {
     if (file) loadMapFile(file);
   });
 
+  function updateMapNameUI() {
+    const mapName = ui.currentMapName || '(none)';
+    mapNameLabel.textContent = `Map: ${mapName}`;
+  }
+
   function updateModeUI() {
     const modeText = ui.mode.replace('add-', '').replace('-', ' ');
     modeLabel.textContent = `Mode: ${modeText}`;
@@ -390,6 +400,11 @@ export function createMapSystem(canvasSys, { onMapLoaded } = {}) {
 
   const controls = document.createElement('div');
   controls.className = 'map-controls';
+
+  const mapNameLabel = document.createElement('div');
+  mapNameLabel.className = 'map-name-label';
+  mapNameLabel.textContent = 'Map: (none)';
+
   const modeLabel = document.createElement('div');
   modeLabel.className = 'mode-label';
   modeLabel.textContent = 'Mode: idle';
@@ -404,7 +419,7 @@ export function createMapSystem(canvasSys, { onMapLoaded } = {}) {
 
   controls.append(buttonMarker, buttonRoute, buttonObstacle, buttonGas, buttonSave, buttonLoad, buttonUndo);
 
-  element.append(modeLabel, controls, fileInput);
+  element.append(mapNameLabel, modeLabel, controls, fileInput);
 
   const controller = {
     onPointerDown() {
