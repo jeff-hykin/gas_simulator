@@ -86,6 +86,19 @@
         border-color: var(--accent);
         box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.5), 0 0 18px rgba(34, 211, 238, 0.2);
       }
+      .agent-panel {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .agent-controls {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+      .agent-controls .full-width {
+        grid-column: 1 / -1;
+      }
       .gas-readout {
         font-size: 18px;
         padding: 12px;

@@ -395,6 +395,10 @@ export function createMapSystem(canvasSys) {
   element.append(modeLabel, controls, fileInput);
 
   const controller = {
+    onPointerDown() {
+      if (ui.mode !== 'idle') return true;
+      return false;
+    },
     onClick(ev) {
       if (ui.mode === 'add-marker') {
         addMarker({ x: ev.worldX, y: ev.worldY, label: 'marker' });
@@ -502,6 +506,7 @@ export function createMapSystem(canvasSys) {
         canvasSys.render();
         return true;
       }
+      return false;
     },
     onDblClick() {
       if (ui.mode === 'add-route' && ui.pendingRoute) {

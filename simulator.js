@@ -8,6 +8,18 @@ export function gaussianPeakAt(distance, radius, peak) {
   return peak * Math.exp(-(distance * distance) / (2 * sigma2));
 }
 
+/**
+ * Generate a normally-distributed random number (Box-Muller transform).
+ * @param {number} stdDev - standard deviation
+ * @returns {number}
+ */
+export function gaussianNoise(stdDev) {
+  if (stdDev <= 0) return 0;
+  const u1 = Math.random();
+  const u2 = Math.random();
+  return stdDev * Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+}
+
 export function maxGasAt(point, gasNodes) {
   let max = 0;
   for (const node of gasNodes) {
@@ -213,6 +225,10 @@ export function createSimulator(mapSys, canvasSys) {
     }
   }
 
+  let agentActive = false;
+  let agentInterval = null;
+  let movementUnsub = null;
+
   const keyState = new Set();
   window.addEventListener('keydown', (e) => {
     keyState.add(e.key.toLowerCase());
@@ -222,13 +238,15 @@ export function createSimulator(mapSys, canvasSys) {
   });
 
   function handleKeys() {
-    const speed = 3;
-    const turn = 4;
-    const obstacles = mapSys.mapData.obstacles || [];
-    if (keyState.has('w')) moveForward(robot, speed, obstacles);
-    if (keyState.has('s')) moveBackward(robot, speed, obstacles);
-    if (keyState.has('a')) rotateLeft(robot, turn);
-    if (keyState.has('d')) rotateRight(robot, turn);
+    if (!agentActive) {
+      const speed = 3;
+      const turn = 4;
+      const obstacles = mapSys.mapData.obstacles || [];
+      if (keyState.has('w')) moveForward(robot, speed, obstacles);
+      if (keyState.has('s')) moveBackward(robot, speed, obstacles);
+      if (keyState.has('a')) rotateLeft(robot, turn);
+      if (keyState.has('d')) rotateRight(robot, turn);
+    }
     step();
     requestAnimationFrame(handleKeys);
   }
@@ -238,9 +256,63 @@ export function createSimulator(mapSys, canvasSys) {
   ensureRobotVisible();
   setInterval(ensureRobotVisible, 3000);
 
+  /**
+   * Start the agent simulation loop. Publishes gas readings at the given
+   * sampling rate and applies movement commands received via pubsub.
+   *
+   * @param {object} pubsub - must have subscribe/publish
+   * @param {object} [opts]
+   * @param {number} [opts.samplingRate=1]     seconds between gas readings
+   * @param {number} [opts.gasNoiseStdDev=0]   Gaussian noise std-dev (PPM)
+   */
+  function startAgentLoop(pubsub, { samplingRate = 1, gasNoiseStdDev = 0 } = {}) {
+    if (agentInterval) return;
+    agentActive = true;
+
+    movementUnsub = pubsub.subscribe('movement', ({ forward, rotation }) => {
+      const obstacles = mapSys.mapData.obstacles || [];
+      const deg = rotation * (180 / Math.PI);
+      if (deg >= 0) rotateRight(robot, deg);
+      else rotateLeft(robot, Math.abs(deg));
+      if (forward >= 0) moveForward(robot, forward, obstacles);
+      else moveBackward(robot, Math.abs(forward), obstacles);
+      step();
+    });
+
+    agentInterval = setInterval(() => {
+      const gas = maxGasAt(robot, mapSys.mapData.gasNodes || []);
+      const noisy = Math.max(0, gas + gaussianNoise(gasNoiseStdDev));
+      pubsub.publish('gas_reading', { ppm: noisy });
+    }, samplingRate * 1000);
+  }
+
+  function stopAgentLoop() {
+    if (agentInterval) {
+      clearInterval(agentInterval);
+      agentInterval = null;
+    }
+    if (movementUnsub) {
+      movementUnsub();
+      movementUnsub = null;
+    }
+    agentActive = false;
+  }
+
+  function resetRobot() {
+    stopAgentLoop();
+    robot.x = 0;
+    robot.y = 0;
+    robot.angle = 0;
+    step();
+  }
+
   return {
     robot,
     gasReadout,
+    startAgentLoop,
+    stopAgentLoop,
+    resetRobot,
+    get agentActive() { return agentActive; },
     moveForward: (d) => {
       moveForward(robot, d, mapSys.mapData.obstacles || []);
       step();
