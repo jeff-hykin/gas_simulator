@@ -36,6 +36,7 @@ const sim = createSimulator(mapSys, canvasSys);
 
 // ── Agent state ───────────────────────────────────────────────────────
 
+let pubsubFactory = null;
 let mainPubSub = null;
 let agent = null;
 const agentConfig = {
@@ -60,9 +61,10 @@ function updateAgentButtons() {
 function playAgent() {
   if (sim.agentActive) return;
 
-  if (!mainPubSub) {
+  if (!pubsubFactory) {
     const startPos = getStartPosition();
-    mainPubSub = createPubSub(); // No identity - allows simulator and agent to communicate
+    pubsubFactory = createPubSub();
+    mainPubSub = pubsubFactory("main");
 
     // Set up JSON state display (merges new data with current state)
     mainPubSub.subscribe('logJson', (data, publisher) => {
@@ -129,7 +131,7 @@ function playAgent() {
       canvasSys.render();
     });
 
-    agent = new GasAgent(mainPubSub, {
+    agent = new GasAgent(pubsubFactory, {
       decisionRate: agentConfig.decisionRate,
       samplingRate: agentConfig.samplingRate,
       moveSpeed: 3,
@@ -141,7 +143,7 @@ function playAgent() {
     sim.setRobotPosition(startPos.x, startPos.y, 0);
   }
 
-  sim.startAgentLoop(mainPubSub, { samplingRate: agentConfig.decisionRate, gasNoiseStdDev: agentConfig.gasNoiseStdDev });
+  sim.startAgentLoop(pubsubFactory, { samplingRate: agentConfig.decisionRate, gasNoiseStdDev: agentConfig.gasNoiseStdDev });
 
   const routes = mapSys.mapData.routes || [];
   if (routes.length > 0 && routes[0].points.length > 0) {
@@ -185,6 +187,7 @@ function resetAgent() {
   const startPos = getStartPosition();
   sim.resetRobot({ x: startPos.x, y: startPos.y, angle: 0 });
   agent = null;
+  pubsubFactory = null;
   mainPubSub = null;
 
   // Clear JSON state

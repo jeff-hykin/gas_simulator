@@ -4,14 +4,15 @@ import { vecDistance, vecSub, angleDifference } from "./math_helpers.js";
  * Create a local planner that listens for target waypoints and publishes movement commands.
  * Fully autonomous - subscribes to 'target_waypoint' and 'odom', publishes 'movement' and 'waypoint_reached'.
  *
- * @param {object} pubsub - pub/sub instance with subscribe/publish
+ * @param {Function} pubsubFactory - factory function that returns pubsub instance when called with identity
  * @param {object} [config]
  * @param {number} [config.maxLinearVelocity=100] meters/second
  * @param {number} [config.maxAngularVelocity=10*Math.PI] radians/second
  * @param {number} [config.waypointThreshold=10] meters
  * @param {number} [config.minAlignment=0.5] 0-1
  */
-export function createLocalPlanner(pubsub, config = {}) {
+export function createLocalPlanner(pubsubFactory, config = {}) {
+    const pubsub = pubsubFactory("local_planner");
     const maxLinearVelocity = config.maxLinearVelocity ?? 100;
     const maxAngularVelocity = config.maxAngularVelocity ?? 10 * Math.PI;
     const waypointThreshold = config.waypointThreshold ?? 10;

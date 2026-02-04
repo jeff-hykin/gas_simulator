@@ -11,28 +11,32 @@ import { GasAgent } from "./agent.js"
 
 function createPubSub() {
     const subs = {}
-    return {
-        subscribe(channel, cb) {
-            (subs[channel] ??= []).push(cb)
-            return () => {
-                const list = subs[channel]
-                if (!list) return
-                const idx = list.indexOf(cb)
-                if (idx !== -1) list.splice(idx, 1)
-            }
-        },
-        publish(channel, data) {
-            (subs[channel] ?? []).forEach(cb => cb(data, "test"))
-        },
+    return function(who) {
+        return {
+            subscribe(channel, cb) {
+                (subs[channel] ??= []).push(cb)
+                return () => {
+                    const list = subs[channel]
+                    if (!list) return
+                    const idx = list.indexOf(cb)
+                    if (idx !== -1) list.splice(idx, 1)
+                }
+            },
+            publish(channel, data) {
+                (subs[channel] ?? []).forEach(cb => cb(data, who))
+            },
+            who
+        }
     }
 }
 
 /**
- * Create a pubsub with automatic odometry simulation.
+ * Create a pubsub factory with automatic odometry simulation.
  * Tracks position/heading and publishes odom after each movement.
  */
 function createPubSubWithOdom(startPos = { x: 0, y: 0 }, startHeading = 0, decisionRate = 0.01) {
-    const ps = createPubSub()
+    const factory = createPubSub()
+    const ps = factory("test")
     const state = { x: startPos.x, y: startPos.y, heading: startHeading }
 
     // Auto-publish odom after each movement command (simulates perfect movement)
@@ -51,7 +55,7 @@ function createPubSubWithOdom(startPos = { x: 0, y: 0 }, startHeading = 0, decis
         ps.publish("odom", { ...state })
     })
 
-    return ps
+    return factory
 }
 
 function approx(a, b, eps = 1e-6) {

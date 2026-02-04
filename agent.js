@@ -17,14 +17,15 @@ import {
  *      returning to the route when interest fades
  *
  * @example
- *   const pubsub = createPubSub("agent")
- *   const agent = new GasAgent(pubsub, { decisionRate: 1 })
- *   pubsub.publish("route_update", { waypoints: [{x:0,y:0},{x:10,y:0}] })
- *   pubsub.publish("gas_reading", { ppm: 0.5 })
+ *   const pubsubFactory = createPubSub()
+ *   const agent = new GasAgent(pubsubFactory, { decisionRate: 1 })
+ *   const mainPubsub = pubsubFactory("main")
+ *   mainPubsub.publish("route_update", { waypoints: [{x:0,y:0},{x:10,y:0}] })
+ *   mainPubsub.publish("gas_reading", { ppm: 0.5 })
  */
 export class GasAgent {
     /**
-     * @param {object} pubsub - must have subscribe(channel, callback) and publish(channel, data)
+     * @param {Function} pubsubFactory - factory function that returns pubsub instance when called with identity
      * @param {object} [config]
      * @param {number} [config.minimumGasThreshold=0.1]   PPM — ignore readings below this
      * @param {number} [config.gasSensitivity=0.05]       PPM — min delta to record a memory entry
@@ -44,9 +45,9 @@ export class GasAgent {
      * @param {{x:number,y:number}} [config.startPosition={x:0,y:0}]
      * @param {number} [config.startHeading=0]             radians
      */
-    constructor(pubsub, config = {}) {
+    constructor(pubsubFactory, config = {}) {
         globalThis.agent = this // For debugging
-        this.pubsub = pubsub
+        this.pubsub = pubsubFactory("agent")
 
         // Parameters
         this.minimumGasThreshold = config.minimumGasThreshold ?? 0.1

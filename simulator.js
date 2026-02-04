@@ -311,19 +311,19 @@ export function createSimulator(mapSys, canvasSys, { maxLinearVelocity = 100, ma
    * Start the agent simulation loop. Publishes gas readings at the given
    * sampling rate and applies movement commands received via pubsub.
    *
-   * @param {object} pubsub - must have subscribe/publish
+   * @param {Function} pubsubFactory - factory function that returns pubsub instance when called with identity
    * @param {object} [opts]
    * @param {number} [opts.samplingRate=1]     seconds between gas readings
    * @param {number} [opts.gasNoiseStdDev=0]   Gaussian noise std-dev (PPM)
    * @param {number} [opts.timeSpeed=1.0]      Clock speed multiplier
    */
-  function startAgentLoop(pubsub, { samplingRate = 1, gasNoiseStdDev: noiseStdDev = 0, timeSpeed = 1.0 } = {}) {
+  function startAgentLoop(pubsubFactory, { samplingRate = 1, gasNoiseStdDev: noiseStdDev = 0, timeSpeed = 1.0 } = {}) {
     if (agentActive) return;
     agentActive = true;
-    agentPubSub = pubsub;
+    agentPubSub = pubsubFactory("simulator");
 
     // Create local planner with same velocity limits as simulator
-    localPlanner = createLocalPlanner(pubsub, {
+    localPlanner = createLocalPlanner(pubsubFactory, {
       maxLinearVelocity,
       maxAngularVelocity,
       waypointThreshold: 10,
