@@ -88,6 +88,7 @@ export class GasAgent {
         // Subscribe
         pubsub.subscribe("gas_reading", (data) => this._onGasReading(data))
         pubsub.subscribe("route_update", (data) => this._onRouteUpdate(data))
+        pubsub.subscribe("odom", (data) => this._onOdom(data))
     }
 
     /** Current simulation time in seconds. */
@@ -355,15 +356,21 @@ export class GasAgent {
     }
 
     /**
-     * Publish movement and update internal position/heading.
+     * Publish movement command. Actual position/heading will be updated via odom.
      * @param {number} forward  meters
      * @param {number} rotation radians
      */
     _publishMovement(forward, rotation) {
-        this.heading += rotation
-        this.position.x += forward * Math.cos(this.heading)
-        this.position.y += forward * Math.sin(this.heading)
-
         this.pubsub.publish("movement", { forward, rotation })
+    }
+
+    /**
+     * Update position/heading from odometry (actual robot pose after obstacle avoidance).
+     * @param {{x:number, y:number, heading:number}} data - robot pose
+     */
+    _onOdom(data) {
+        this.position.x = data.x
+        this.position.y = data.y
+        this.heading = data.heading
     }
 }

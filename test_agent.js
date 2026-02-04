@@ -17,6 +17,25 @@ function createPubSub() {
     }
 }
 
+/**
+ * Create a pubsub with automatic odometry simulation.
+ * Tracks position/heading and publishes odom after each movement.
+ */
+function createPubSubWithOdom(startPos = { x: 0, y: 0 }, startHeading = 0) {
+    const ps = createPubSub()
+    const state = { x: startPos.x, y: startPos.y, heading: startHeading }
+
+    // Auto-publish odom after each movement command (simulates perfect movement)
+    ps.subscribe("movement", ({ forward, rotation }) => {
+        state.heading += rotation
+        state.x += forward * Math.cos(state.heading)
+        state.y += forward * Math.sin(state.heading)
+        ps.publish("odom", { ...state })
+    })
+
+    return ps
+}
+
 function approx(a, b, eps = 1e-6) {
     return Math.abs(a - b) < eps
 }
@@ -205,7 +224,7 @@ Deno.test("nearestPointOnPolyline empty returns input", () => {
 // ── Sensor Cap ────────────────────────────────────────────────────────
 
 Deno.test("sensor reading only increases", () => {
-    const ps = createPubSub()
+    const ps = createPubSubWithOdom()
     const agent = new GasAgent(ps, { samplingRate: 1, minimumGasThreshold: 0 })
 
     ps.publish("gas_reading", { ppm: 1.0 })
@@ -224,7 +243,7 @@ Deno.test("sensor reading only increases", () => {
 // ── Gas Memory ────────────────────────────────────────────────────────
 
 Deno.test("gas memory records when above threshold and sensitivity", () => {
-    const ps = createPubSub()
+    const ps = createPubSubWithOdom()
     const agent = new GasAgent(ps, {
         samplingRate: 1,
         minimumGasThreshold: 0.5,
@@ -250,7 +269,7 @@ Deno.test("gas memory records when above threshold and sensitivity", () => {
 })
 
 Deno.test("gas memory respects maxBufferSize", () => {
-    const ps = createPubSub()
+    const ps = createPubSubWithOdom()
     const agent = new GasAgent(ps, {
         samplingRate: 1,
         minimumGasThreshold: 0,
@@ -267,7 +286,7 @@ Deno.test("gas memory respects maxBufferSize", () => {
 })
 
 Deno.test("gas memory stores position at time of reading", () => {
-    const ps = createPubSub()
+    const ps = createPubSubWithOdom()
     const agent = new GasAgent(ps, {
         samplingRate: 1,
         minimumGasThreshold: 0,
@@ -284,7 +303,7 @@ Deno.test("gas memory stores position at time of reading", () => {
 // ── Interest / Mode ───────────────────────────────────────────────────
 
 Deno.test("interest is 0 with fewer than 2 memory entries", () => {
-    const ps = createPubSub()
+    const ps = createPubSubWithOdom()
     const agent = new GasAgent(ps, { samplingRate: 1 })
     assertEquals(agent.computeInterest(), 0)
 
@@ -293,7 +312,7 @@ Deno.test("interest is 0 with fewer than 2 memory entries", () => {
 })
 
 Deno.test("interest reflects gradient steepness", () => {
-    const ps = createPubSub()
+    const ps = createPubSubWithOdom()
     const agent = new GasAgent(ps, {
         samplingRate: 1,
         gasSensitivity: 0.05,
@@ -315,7 +334,7 @@ Deno.test("interest reflects gradient steepness", () => {
 })
 
 Deno.test("mode is inactive when interest <= refocusPressure + 1", () => {
-    const ps = createPubSub()
+    const ps = createPubSubWithOdom()
     const agent = new GasAgent(ps, { samplingRate: 1 })
     // No gas memory → interest = 0, pressure = 0, 0 - 0 = 0 ≤ 1
     agent._updateMode()
@@ -323,7 +342,7 @@ Deno.test("mode is inactive when interest <= refocusPressure + 1", () => {
 })
 
 Deno.test("mode is explore when interest - refocusPressure > 1", () => {
-    const ps = createPubSub()
+    const ps = createPubSubWithOdom()
     const agent = new GasAgent(ps, {
         samplingRate: 1,
         gasSensitivity: 0.05,
@@ -344,7 +363,7 @@ Deno.test("mode is explore when interest - refocusPressure > 1", () => {
 })
 
 Deno.test("refocus pressure grows with explore time", () => {
-    const ps = createPubSub()
+    const ps = createPubSubWithOdom()
     const agent = new GasAgent(ps, { refocusRatio: 60 })
 
     agent.exploreTime = 0
@@ -360,7 +379,7 @@ Deno.test("refocus pressure grows with explore time", () => {
 // ── Route Following ───────────────────────────────────────────────────
 
 Deno.test("route following advances to next waypoint when close", () => {
-    const ps = createPubSub()
+    const ps = createPubSubWithOdom()
     const movements = []
     const agent = new GasAgent(ps, {
         samplingRate: 1,
@@ -379,7 +398,7 @@ Deno.test("route following advances to next waypoint when close", () => {
 })
 
 Deno.test("route following skips waypoint after patience exceeded", () => {
-    const ps = createPubSub()
+    const ps = createPubSubWithOdom()
     const agent = new GasAgent(ps, {
         samplingRate: 1,
         minimumGasThreshold: 999,
@@ -399,7 +418,7 @@ Deno.test("route following skips waypoint after patience exceeded", () => {
 })
 
 Deno.test("route following publishes movement messages", () => {
-    const ps = createPubSub()
+    const ps = createPubSubWithOdom()
     const movements = []
     const agent = new GasAgent(ps, {
         samplingRate: 1,
@@ -419,7 +438,7 @@ Deno.test("route following publishes movement messages", () => {
 // ── Route Update ──────────────────────────────────────────────────────
 
 Deno.test("route update overwrites route but preserves gas memory", () => {
-    const ps = createPubSub()
+    const ps = createPubSubWithOdom()
     const agent = new GasAgent(ps, {
         samplingRate: 1,
         minimumGasThreshold: 0,
@@ -442,7 +461,7 @@ Deno.test("route update overwrites route but preserves gas memory", () => {
 // ═══════════════════════════════════════════════════════════════════════
 
 Deno.test("integration: agent follows route with zero gas", () => {
-    const ps = createPubSub()
+    const ps = createPubSubWithOdom()
     const movements = []
     const agent = new GasAgent(ps, {
         samplingRate: 1,
@@ -467,7 +486,7 @@ Deno.test("integration: agent follows route with zero gas", () => {
 })
 
 Deno.test("integration: agent enters explore mode on steep gas gradient", () => {
-    const ps = createPubSub()
+    const ps = createPubSubWithOdom()
     const agent = new GasAgent(ps, {
         samplingRate: 1,
         minimumGasThreshold: 0,
@@ -499,7 +518,7 @@ Deno.test("integration: agent enters explore mode on steep gas gradient", () => 
 })
 
 Deno.test("integration: agent returns to inactive after explore time pressure", () => {
-    const ps = createPubSub()
+    const ps = createPubSubWithOdom()
     const agent = new GasAgent(ps, {
         samplingRate: 1,
         minimumGasThreshold: 0,
@@ -533,7 +552,7 @@ Deno.test("integration: agent returns to inactive after explore time pressure", 
 })
 
 Deno.test("integration: explore builds circle waypoints away from route", () => {
-    const ps = createPubSub()
+    const ps = createPubSubWithOdom()
     const agent = new GasAgent(ps, {
         samplingRate: 1,
         minimumGasThreshold: 0,
@@ -576,7 +595,7 @@ Deno.test("integration: explore builds circle waypoints away from route", () => 
 })
 
 Deno.test("integration: recalc delays one tick before rebuilding circle", () => {
-    const ps = createPubSub()
+    const ps = createPubSubWithOdom()
     const agent = new GasAgent(ps, {
         samplingRate: 1,
         minimumGasThreshold: 0,
@@ -618,7 +637,7 @@ Deno.test("integration: recalc delays one tick before rebuilding circle", () => 
 })
 
 Deno.test("integration: new route during exploration preserves explore state", () => {
-    const ps = createPubSub()
+    const ps = createPubSubWithOdom()
     const agent = new GasAgent(ps, {
         samplingRate: 1,
         minimumGasThreshold: 0,
@@ -646,7 +665,7 @@ Deno.test("integration: new route during exploration preserves explore state", (
 })
 
 Deno.test("integration: position updates correctly after movement", () => {
-    const ps = createPubSub()
+    const ps = createPubSubWithOdom()
     const agent = new GasAgent(ps, {
         samplingRate: 1,
         minimumGasThreshold: 999,

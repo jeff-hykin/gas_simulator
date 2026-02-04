@@ -269,6 +269,13 @@ export function createSimulator(mapSys, canvasSys) {
     if (agentInterval) return;
     agentActive = true;
 
+    // Publish initial odometry so agent knows its starting pose
+    pubsub.publish('odom', {
+      x: robot.x,
+      y: robot.y,
+      heading: robot.angle * (Math.PI / 180),
+    });
+
     movementUnsub = pubsub.subscribe('movement', ({ forward, rotation }) => {
       const obstacles = mapSys.mapData.obstacles || [];
       const deg = rotation * (180 / Math.PI);
@@ -277,6 +284,13 @@ export function createSimulator(mapSys, canvasSys) {
       if (forward >= 0) moveForward(robot, forward, obstacles);
       else moveBackward(robot, Math.abs(forward), obstacles);
       step();
+
+      // Publish actual robot pose after movement (including obstacle avoidance)
+      pubsub.publish('odom', {
+        x: robot.x,
+        y: robot.y,
+        heading: robot.angle * (Math.PI / 180), // Convert degrees to radians
+      });
     });
 
     agentInterval = setInterval(() => {
