@@ -119,14 +119,16 @@ export function obstacleAsCanvas(obstacle, styles) {
 
 export function gasNodeAsCanvas(node, styles) {
   const inherit = styles.gasNode;
+  const visualRadius = node.visualRadius ?? node.radius * 2;
+  const alpha = Math.max(0.15, Math.min(0.85, 0.2 + node.peak * 0.35));
   return [
     {
       type: 'radialGradient',
       x: node.x,
       y: node.y,
-      r: node.radius,
+      r: visualRadius,
       stops: node.stops || [
-        { offset: 0, color: 'rgba(34,197,94,0.5)' },
+        { offset: 0, color: `rgba(34,197,94,${alpha})` },
         { offset: 1, color: 'rgba(34,197,94,0)' },
       ],
       inherit,
@@ -173,6 +175,9 @@ export function createMapSystem(canvasSys) {
     mode: 'idle',
     pendingRoute: null,
     pendingObstacle: null,
+    pendingObstacleCanvas: null,
+    pendingGas: null,
+    pendingGasCanvas: null,
   };
 
   /**
@@ -255,6 +260,15 @@ export function createMapSystem(canvasSys) {
     ui.mode = mode;
     ui.pendingRoute = null;
     ui.pendingObstacle = null;
+    if (ui.pendingObstacleCanvas) {
+      canvasSys.removeFromWorld(ui.pendingObstacleCanvas);
+      ui.pendingObstacleCanvas = null;
+    }
+    ui.pendingGas = null;
+    if (ui.pendingGasCanvas) {
+      canvasSys.removeFromWorld(ui.pendingGasCanvas);
+      ui.pendingGasCanvas = null;
+    }
     updateModeUI();
   }
 
@@ -352,8 +366,35 @@ export function createMapSystem(canvasSys) {
         addMarker({ x: ev.worldX, y: ev.worldY, label: 'marker' });
         setMode('idle');
       } else if (ui.mode === 'add-gas') {
-        addGasNode({ x: ev.worldX, y: ev.worldY });
-        setMode('idle');
+        if (!ui.pendingGas) {
+          ui.pendingGas = { x: ev.worldX, y: ev.worldY };
+          const preview = {
+            x: ev.worldX,
+            y: ev.worldY,
+            radius: 1,
+            peak: 1,
+            visualRadius: 2,
+            stroke: '#86efac',
+            lineWidth: 2,
+            stops: [
+              { offset: 0, color: 'rgba(34,197,94,0.35)' },
+              { offset: 1, color: 'rgba(34,197,94,0)' },
+            ],
+          };
+          ui.pendingGasCanvas = gasNodeAsCanvas(preview, mapData.styles);
+          canvasSys.addToWorld(ui.pendingGasCanvas);
+        } else {
+          const dx = ev.worldX - ui.pendingGas.x;
+          const dy = ev.worldY - ui.pendingGas.y;
+          const radius = Math.max(1, Math.hypot(dx, dy));
+          addGasNode({ x: ui.pendingGas.x, y: ui.pendingGas.y, radius });
+          ui.pendingGas = null;
+          if (ui.pendingGasCanvas) {
+            canvasSys.removeFromWorld(ui.pendingGasCanvas);
+            ui.pendingGasCanvas = null;
+          }
+          setMode('idle');
+        }
       } else if (ui.mode === 'add-route') {
         if (!ui.pendingRoute) {
           ui.pendingRoute = addRoute([{ x: ev.worldX, y: ev.worldY }]);
@@ -365,6 +406,18 @@ export function createMapSystem(canvasSys) {
       } else if (ui.mode === 'add-obstacle') {
         if (!ui.pendingObstacle) {
           ui.pendingObstacle = { x: ev.worldX, y: ev.worldY };
+          const preview = {
+            x: ev.worldX,
+            y: ev.worldY,
+            w: 1,
+            h: 1,
+            angle: 0,
+            stroke: '#f472b6',
+            fill: 'rgba(244,114,182,0.15)',
+            lineWidth: 2,
+          };
+          ui.pendingObstacleCanvas = obstacleAsCanvas(preview, mapData.styles);
+          canvasSys.addToWorld(ui.pendingObstacleCanvas);
         } else {
           const x1 = ui.pendingObstacle.x;
           const y1 = ui.pendingObstacle.y;
@@ -376,8 +429,43 @@ export function createMapSystem(canvasSys) {
           const y = (y1 + y2) / 2;
           addObstacle({ x, y, w, h });
           ui.pendingObstacle = null;
+          if (ui.pendingObstacleCanvas) {
+            canvasSys.removeFromWorld(ui.pendingObstacleCanvas);
+            ui.pendingObstacleCanvas = null;
+          }
           setMode('idle');
         }
+      }
+    },
+    onPointerMove(ev) {
+      if (ui.mode === 'add-obstacle' && ui.pendingObstacle && ui.pendingObstacleCanvas) {
+        const x1 = ui.pendingObstacle.x;
+        const y1 = ui.pendingObstacle.y;
+        const x2 = ev.worldX;
+        const y2 = ev.worldY;
+        const w = Math.max(1, Math.abs(x2 - x1));
+        const h = Math.max(1, Math.abs(y2 - y1));
+        const x = (x1 + x2) / 2;
+        const y = (y1 + y2) / 2;
+        const rect = ui.pendingObstacleCanvas[0];
+        rect.x = x;
+        rect.y = y;
+        rect.w = w;
+        rect.h = h;
+        canvasSys.render();
+        return true;
+      }
+      if (ui.mode === 'add-gas' && ui.pendingGas && ui.pendingGasCanvas) {
+        const dx = ev.worldX - ui.pendingGas.x;
+        const dy = ev.worldY - ui.pendingGas.y;
+        const radius = Math.max(1, Math.hypot(dx, dy));
+        const gradient = ui.pendingGasCanvas[0];
+        gradient.r = radius * 2;
+        const point = ui.pendingGasCanvas[1];
+        point.x = ui.pendingGas.x;
+        point.y = ui.pendingGas.y;
+        canvasSys.render();
+        return true;
       }
     },
     onDblClick() {
