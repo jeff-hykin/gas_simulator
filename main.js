@@ -35,7 +35,7 @@ const sim = createSimulator(mapSys, canvasSys);
 let agentPubSub = null;
 let agent = null;
 const agentConfig = {
-  samplingRate: 1,
+  samplingRate: 0.1,
   gasNoiseStdDev: 0,
 };
 
