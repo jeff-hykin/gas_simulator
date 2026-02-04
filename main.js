@@ -8,6 +8,18 @@ const app = document.getElementById('app');
 
 const canvasSys = createCanvasSystem({ width: 900, height: 600 });
 
+// Centroid visualization for agent exploration
+const centroidCanvas = {
+  type: 'point',
+  x: 0,
+  y: 0,
+  r: 8,
+  stroke: '#f97316',
+  fill: 'rgba(249, 115, 22, 0.3)',
+  lineWidth: 3,
+};
+canvasSys.addToWorld(centroidCanvas);
+
 function getStartPosition() {
   const markers = mapSys.mapData.markers || [];
   const start = markers.find((m) => m.label && m.label.toLowerCase() === 'start');
@@ -35,7 +47,8 @@ const sim = createSimulator(mapSys, canvasSys);
 let agentPubSub = null;
 let agent = null;
 const agentConfig = {
-  samplingRate: 0.1,
+  decisionRate: 0.01,       // How often agent makes movement decisions (100 times per second)
+  samplingRate: 80,        // How often agent records gas samples (300 ticks = 3 seconds at current rate)
   gasNoiseStdDev: 0,
 };
 
@@ -59,15 +72,35 @@ function playAgent() {
     const startPos = getStartPosition();
     agentPubSub = createPubSub();
     agent = new GasAgent(agentPubSub, {
+      decisionRate: agentConfig.decisionRate,
       samplingRate: agentConfig.samplingRate,
       moveSpeed: 3,
       turnSpeed: 0.3,
+      circlingSize: 40,           // Much larger exploration circles
+      gradientProjection: 80,     // Extrapolate gradient further
       startPosition: startPos,
     });
     sim.setRobotPosition(startPos.x, startPos.y, 0);
   }
 
-  sim.startAgentLoop(agentPubSub, agentConfig);
+  sim.startAgentLoop(agentPubSub, { samplingRate: agentConfig.decisionRate, gasNoiseStdDev: agentConfig.gasNoiseStdDev });
+
+  // Update sensor readout display and centroid visualization
+  agentPubSub.subscribe('gas_reading', () => {
+    if (agent) {
+      agentSensorReadout.textContent = `Agent Sensor: ${agent.sensorReading.toFixed(3)}`;
+
+      // Update centroid visualization
+      if (agent.tempCentroid) {
+        centroidCanvas.x = agent.tempCentroid.x;
+        centroidCanvas.y = agent.tempCentroid.y;
+        centroidCanvas.r = 8;  // Visible
+      } else {
+        centroidCanvas.r = 0;  // Hidden when no centroid
+      }
+      canvasSys.render();
+    }
+  });
 
   const routes = mapSys.mapData.routes || [];
   if (routes.length > 0 && routes[0].points.length > 0) {
@@ -87,6 +120,9 @@ function resetAgent() {
   sim.resetRobot({ x: startPos.x, y: startPos.y, angle: 0 });
   agent = null;
   agentPubSub = null;
+  agentSensorReadout.textContent = 'Agent Sensor: 0.000';
+  centroidCanvas.r = 0;  // Hide centroid
+  canvasSys.render();
   updateAgentButtons();
 }
 
@@ -105,6 +141,10 @@ const agentLabel = document.createElement('div');
 agentLabel.className = 'mode-label';
 agentLabel.textContent = 'Agent';
 
+const agentSensorReadout = document.createElement('div');
+agentSensorReadout.className = 'gas-readout';
+agentSensorReadout.textContent = 'Agent Sensor: 0.000';
+
 const agentControls = document.createElement('div');
 agentControls.className = 'agent-controls';
 
@@ -116,7 +156,7 @@ btnReset.classList.add('full-width');
 agentControls.append(btnPlay, btnPause, btnReset);
 agentPanel.append(agentLabel, agentControls);
 
-rightPanel.append(mapSys.element, sim.gasReadout, agentPanel);
+rightPanel.append(mapSys.element, sim.gasReadout, agentSensorReadout, agentPanel);
 
 const layout = document.createElement('div');
 layout.className = 'layout';

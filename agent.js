@@ -18,7 +18,7 @@ import {
  *
  * @example
  *   const pubsub = createPubSub()
- *   const agent = new GasAgent(pubsub, { samplingRate: 1 })
+ *   const agent = new GasAgent(pubsub, { decisionRate: 1 })
  *   pubsub.publish("route_update", { waypoints: [{x:0,y:0},{x:10,y:0}] })
  *   pubsub.publish("gas_reading", { ppm: 0.5 })
  */
@@ -29,11 +29,13 @@ export class GasAgent {
      * @param {number} [config.minimumGasThreshold=0.1]   PPM — ignore readings below this
      * @param {number} [config.gasSensitivity=0.05]       PPM — min delta to record a memory entry
      * @param {number} [config.circlingSize=5]             meters — exploration circle radius
+     * @param {number} [config.gradientProjection]         meters — how far to extrapolate gradient (defaults to circlingSize)
      * @param {number} [config.attentionThreshold=0.1]    (sensitivity-units/min) — minimum gradient to explore
      * @param {number} [config.refocusRatio=60]            seconds — max explore time at baseline gradient
      * @param {number} [config.attentionSpan=2]            minutes — lookback window for gradient calc
      * @param {number} [config.maxBufferSize=500]          max gas_memory entries
-     * @param {number} [config.samplingRate=1]             seconds — interval between gas callbacks
+     * @param {number} [config.decisionRate=1]             seconds — interval between gas callbacks / movement decisions
+     * @param {number} [config.samplingRate=60]            ticks — interval between recording gas samples (in decision ticks)
      * @param {number} [config.waypointThreshold=2]        meters — "close enough" to a waypoint
      * @param {number} [config.waypointPatience=30]        ticks — skip waypoint if no progress
      * @param {number} [config.moveSpeed=1]                meters per tick
@@ -49,11 +51,13 @@ export class GasAgent {
         this.minimumGasThreshold = config.minimumGasThreshold ?? 0.1
         this.gasSensitivity      = config.gasSensitivity ?? 0.05
         this.circlingSize        = config.circlingSize ?? 5
+        this.gradientProjection  = config.gradientProjection ?? this.circlingSize
         this.attentionThreshold  = config.attentionThreshold ?? 0.1
         this.refocusRatio        = config.refocusRatio ?? 60
         this.attentionSpan       = config.attentionSpan ?? 2
         this.maxBufferSize       = config.maxBufferSize ?? 500
-        this.samplingRate        = config.samplingRate ?? 1
+        this.decisionRate        = config.decisionRate ?? 1
+        this.samplingRate        = config.samplingRate ?? 60
         this.waypointThreshold   = config.waypointThreshold ?? 2
         this.waypointPatience    = config.waypointPatience ?? 30
         this.moveSpeed           = config.moveSpeed ?? 1
@@ -84,6 +88,7 @@ export class GasAgent {
 
         // Time tracking
         this.tickCount = 0
+        this.lastSampleTick = 0
 
         // Subscribe
         pubsub.subscribe("gas_reading", (data) => this._onGasReading(data))
@@ -93,7 +98,7 @@ export class GasAgent {
 
     /** Current simulation time in seconds. */
     get currentTime() {
-        return this.tickCount * this.samplingRate
+        return this.tickCount * this.decisionRate
     }
 
     /** Current simulation time in minutes. */
@@ -141,7 +146,7 @@ export class GasAgent {
         }
 
         if (this.mode === "explore") {
-            this.exploreTime += this.samplingRate
+            this.exploreTime += this.decisionRate
             this._tickExplore()
         } else {
             this._tickRouteFollow()
@@ -152,9 +157,15 @@ export class GasAgent {
 
     /**
      * Record a gas memory entry if the reading passes minimum and
-     * sensitivity thresholds.
+     * sensitivity thresholds, and enough ticks have passed since last sample.
      */
     _updateGasMemory() {
+        // Only record samples at samplingRate intervals (measured in ticks)
+        const ticksSinceLastSample = this.tickCount - this.lastSampleTick
+        if (ticksSinceLastSample < this.samplingRate) {
+            return
+        }
+
         const lastPpm = this.gasMemory.length > 0
             ? this.gasMemory[this.gasMemory.length - 1].ppm
             : -Infinity
@@ -166,6 +177,7 @@ export class GasAgent {
                 time: this.currentTimeMinutes,
                 position: { x: this.position.x, y: this.position.y },
             })
+            this.lastSampleTick = this.tickCount
             if (this.gasMemory.length > this.maxBufferSize) {
                 this.gasMemory.shift()
             }
@@ -307,7 +319,8 @@ export class GasAgent {
         })))
         if (vecMagnitude(gradDir) < 1e-9) return false
 
-        this.tempCentroid = vecAdd(this.position, vecScale(gradDir, this.circlingSize))
+        // Project forward by gradientProjection distance to extrapolate source location
+        this.tempCentroid = vecAdd(this.position, vecScale(gradDir, this.gradientProjection))
 
         // Choose CW vs CCW: favor direction away from route
         const startAngle = Math.atan2(gradDir.y, gradDir.x)
