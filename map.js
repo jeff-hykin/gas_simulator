@@ -149,10 +149,11 @@ export function gasNodeAsCanvas(node, styles) {
 
 export function buildAsCanvas(mapData) {
   const out = [];
-  for (const marker of mapData.markers) out.push(marker.asCanvas || markerAsCanvas(marker, mapData.styles));
-  for (const route of mapData.routes) out.push(route.asCanvas || routeAsCanvas(route, mapData.styles));
-  for (const obstacle of mapData.obstacles) out.push(obstacle.asCanvas || obstacleAsCanvas(obstacle, mapData.styles));
+  // Render order: gas (bottom) → obstacles → routes → markers (top)
   for (const node of mapData.gasNodes) out.push(node.asCanvas || gasNodeAsCanvas(node, mapData.styles));
+  for (const obstacle of mapData.obstacles) out.push(obstacle.asCanvas || obstacleAsCanvas(obstacle, mapData.styles));
+  for (const route of mapData.routes) out.push(route.asCanvas || routeAsCanvas(route, mapData.styles));
+  for (const marker of mapData.markers) out.push(marker.asCanvas || markerAsCanvas(marker, mapData.styles));
   return out;
 }
 
