@@ -42,6 +42,9 @@ export class LocalPlanner {
                 console.warn("LocalPlanner: received same target waypoint twice. This is bad, only send a new target waypoint when the target changes")
                 return
             }
+            if (!data) {
+                throw Error(`LocalPlanner: received null target waypoint. This is bad, only send a new target waypoint when the target changes`)
+            }
             // clear prev odom points (they may have been going after a different target)
             this.reset()
             this.targetWaypoint = data
@@ -63,8 +66,8 @@ export class LocalPlanner {
 
             if (distance(this.odom, this.targetWaypoint) < this.closeEnoughToWaypoint) {
                 this.mode = "idle"
-                this.pubsub.publish('waypoint_reached', { waypoint: this.targetWaypoint })
                 this.targetWaypoint = null
+                this.pubsub.publish('waypoint_reached', { waypoint: this.targetWaypoint })
                 this.pubsub.publish('logJson', {
                     plannerMode: this.mode,
                 })
@@ -122,7 +125,7 @@ export class LocalPlanner {
                 }
             }
 
-            if (this.mode == "greedy") {
+            if (this.mode == "greedy" && this.targetWaypoint) {
                 // Calculate target angle to waypoint
                 const targetAngle = Math.atan2(this.targetWaypoint.y - this.odom.y, this.targetWaypoint.x - this.odom.x)
                 // Calculate angular difference (shortest rotation) from current heading to target
