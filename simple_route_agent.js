@@ -14,7 +14,8 @@ export class SimpleRouteAgent {
     constructor(pubsubFactory, config = {}) {
         this.pubsub = pubsubFactory("simple_agent")
         this.getTime = createGetTime(this.pubsub)
-
+        
+        this.disabledOutput = false
         // Route state
         this.routeWaypoints = []
         this.currentWaypointIndex = 0
@@ -58,6 +59,14 @@ export class SimpleRouteAgent {
         })
     }
 
+    disableOutput() {
+        this.disabledOutput = true
+    }
+
+    enableOutput() {
+        this.disabledOutput = false
+    }
+
     _publishCurrentWaypoint() {
         if (this.routeWaypoints.length === 0 ||
             this.currentWaypointIndex >= this.routeWaypoints.length) {
@@ -73,10 +82,12 @@ export class SimpleRouteAgent {
             this.currentPublishedWaypoint.y !== target.y) {
             this.currentPublishedWaypoint = { x: target.x, y: target.y }
             console.log(`SimpleAgent: publishing waypoint ${this.currentWaypointIndex + 1}/${this.routeWaypoints.length} at (${target.x.toFixed(1)}, ${target.y.toFixed(1)})`)
-            this.pubsub.publish('target_waypoint', { x: target.x, y: target.y })
-            this.pubsub.publish('logJson', {
-                waypoint: `${this.currentWaypointIndex + 1}/${this.routeWaypoints.length}`
-            })
+            if (!this.disabledOutput) {
+                this.pubsub.publish('target_waypoint', { x: target.x, y: target.y })
+                this.pubsub.publish('logJson', {
+                    waypoint: `${this.currentWaypointIndex + 1}/${this.routeWaypoints.length}`
+                })
+            }
 
             // Reset tracking for new waypoint
             this.waypointStartTime = this.getTime()
