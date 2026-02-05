@@ -1,4 +1,5 @@
 import { vecDistance, vecSub, angleDifference } from "./math_helpers.js";
+import { createGetTime } from "./time.js";
 
 /**
  * Create a local planner that listens for target waypoints and publishes movement commands.
@@ -13,6 +14,7 @@ import { vecDistance, vecSub, angleDifference } from "./math_helpers.js";
  */
 export function createLocalPlanner(pubsubFactory, config = {}) {
     const pubsub = pubsubFactory("local_planner");
+    const getTime = createGetTime(pubsub);
     const maxLinearVelocity = config.maxLinearVelocity ?? 100;
     const maxAngularVelocity = config.maxAngularVelocity ?? 10 * Math.PI;
     const waypointThreshold = config.waypointThreshold ?? 10;

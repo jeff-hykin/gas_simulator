@@ -4,6 +4,7 @@
 
 import { createPubSub } from './pubsub.js';
 import { createLocalPlanner } from './local_planner.js';
+import { GasAgent } from './agent.js';
 
 export function gaussianPeakAt(distance, radius, peak) {
   if (radius <= 0) return 0;
@@ -173,16 +174,19 @@ export function createSimulator(mapSys, canvasSys, { maxLinearVelocity = 100, ma
     clock.lastRealTime = realTime;
 
     // Check if it's time to publish gas reading
-    if (agentActive && agentPubSub && clock.virtualTime - lastGasSampleTime >= gasSamplingRate) {
+    if (agentActive && simulatorPubSub && clock.virtualTime - lastGasSampleTime >= gasSamplingRate) {
       const gas = maxGasAt(robot, mapSys.mapData.gasNodes || []);
       const noisy = Math.max(0, gas + gaussianNoise(gasNoiseStdDev));
-      agentPubSub.publish('gas_reading', { ppm: noisy });
+      simulatorPubSub.publish('gas_reading', { ppm: noisy });
       lastGasSampleTime = clock.virtualTime;
     }
 
-    // Publish odometry at regular intervals (every clock tick)
-    if (agentActive && agentPubSub) {
-      agentPubSub.publish('odom', {
+    // Publish time and odometry at regular intervals (every clock tick)
+    if (agentActive && simulatorPubSub) {
+      simulatorPubSub.publish('time', {
+        virtualTime: clock.virtualTime,
+      });
+      simulatorPubSub.publish('odom', {
         x: robot.x,
         y: robot.y,
         heading: robot.angle * (Math.PI / 180),
@@ -273,7 +277,8 @@ export function createSimulator(mapSys, canvasSys, { maxLinearVelocity = 100, ma
   }
 
   let agentActive = false;
-  let agentPubSub = null;
+  let simulatorPubSub = null;
+  let agent = null;
   let localPlanner = null;
   let movementUnsub = null;
   let lastGasSampleTime = 0; // Track last gas sample in virtual time
@@ -308,19 +313,18 @@ export function createSimulator(mapSys, canvasSys, { maxLinearVelocity = 100, ma
   setInterval(ensureRobotVisible, 3000);
 
   /**
-   * Start the agent simulation loop. Publishes gas readings at the given
-   * sampling rate and applies movement commands received via pubsub.
+   * Start the agent simulation loop. Creates the agent, local planner, and starts publishing sensor data.
    *
    * @param {Function} pubsubFactory - factory function that returns pubsub instance when called with identity
-   * @param {object} [opts]
-   * @param {number} [opts.samplingRate=1]     seconds between gas readings
-   * @param {number} [opts.gasNoiseStdDev=0]   Gaussian noise std-dev (PPM)
-   * @param {number} [opts.timeSpeed=1.0]      Clock speed multiplier
+   * @param {object} config - agent configuration
    */
-  function startAgentLoop(pubsubFactory, { samplingRate = 1, gasNoiseStdDev: noiseStdDev = 0, timeSpeed = 1.0 } = {}) {
+  function startAgentLoop(pubsubFactory, config = {}) {
     if (agentActive) return;
     agentActive = true;
-    agentPubSub = pubsubFactory("simulator");
+    simulatorPubSub = pubsubFactory("simulator");
+
+    // Create agent
+    agent = new GasAgent(pubsubFactory, config);
 
     // Create local planner with same velocity limits as simulator
     localPlanner = createLocalPlanner(pubsubFactory, {
@@ -331,23 +335,23 @@ export function createSimulator(mapSys, canvasSys, { maxLinearVelocity = 100, ma
     });
 
     // Store gas sampling parameters for clock tick handler
-    gasSamplingRate = samplingRate;
-    gasNoiseStdDev = noiseStdDev;
+    gasSamplingRate = config.decisionRate ?? 1;
+    gasNoiseStdDev = config.gasNoiseStdDev ?? 0;
 
     // Set clock speed and start clock
-    setTimeSpeed(timeSpeed);
+    setTimeSpeed(config.timeSpeed ?? 1.0);
     lastGasSampleTime = clock.virtualTime;
     lastMoveTime = clock.virtualTime;
     playClock();
 
     // Publish initial odometry so agent knows its starting pose
-    pubsub.publish('odom', {
+    simulatorPubSub.publish('odom', {
       x: robot.x,
       y: robot.y,
       heading: robot.angle * (Math.PI / 180),
     });
 
-    movementUnsub = pubsub.subscribe('movement', (data, publisher) => {
+    movementUnsub = simulatorPubSub.subscribe('movement', (data, publisher) => {
       // Accept velocity-based commands
       const linearVelocity = data.linearVelocity ?? 0;
       const angularVelocity = data.angularVelocity ?? 0;
@@ -362,6 +366,7 @@ export function createSimulator(mapSys, canvasSys, { maxLinearVelocity = 100, ma
       movementUnsub();
       movementUnsub = null;
     }
+    agent = null;
     localPlanner = null;
     pauseClock();
     agentActive = false;

@@ -1,0 +1,7 @@
+A simple 2D gas simulator (map maker and tester) that runs in the browser for testing different agent exploration strategies.
+
+Design notes:
+1. Most of the code is designed to run headless, and then only `main.js` generates all the visuals from the headless data. 
+2. `canvas.js` is made to be generic pad-and-zoom canvas system that renders a list of "world" objects. It is more than a JS canvas, it is a view on a 2D coordinate space that exists independently of what the user happens to be looking at. It has hooks for letting other things take control over click/drag/wheel events. Whatever is in the list of world objects will be rendered by the canvas (even as those objects get edited by various other systems).
+3. `map.js` is more specific/focused than canvas. It is a 2d coordinate system, but instead of generic things like lines and points it contains objects that are one of: gas cloud point, named marker, route (list of waypoints), or obstacle (rectangle). The map uses the canvas system to render these things. It makes sure the map can be serialized and deserialized, and edited in the UI.
+4. `simulator.js` is more narrow, it keeps track of things like the progression of time and the robotic agent that moves around a map. 

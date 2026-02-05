@@ -2,7 +2,6 @@ import { createCanvasSystem } from './canvas.js';
 import { createMapSystem, deserializeMap } from './map.js';
 import { createSimulator } from './simulator.js';
 import { createPubSub } from './pubsub.js';
-import { GasAgent } from './agent.js';
 
 const canvasSys = createCanvasSystem({ width: 1100, height: 830 });
 
@@ -22,10 +21,10 @@ function onMapLoaded() {
   // When a map is loaded, reset the robot to the start marker position
   const startPos = getStartPosition();
   sim.setRobotPosition(startPos.x, startPos.y, 0);
-  // If the agent is running, stop it and clear agent state
-  if (sim.agentActive || agent !== null) {
+  // If the agent is running, stop it and clear state
+  if (sim.agentActive) {
     sim.stopAgentLoop();
-    agent = null;
+    pubsubFactory = null;
     mainPubSub = null;
     updateAgentButtons();
   }
@@ -38,11 +37,14 @@ const sim = createSimulator(mapSys, canvasSys);
 
 let pubsubFactory = null;
 let mainPubSub = null;
-let agent = null;
 const agentConfig = {
   decisionRate: 0.01,       // How often agent makes movement decisions (100 times per second)
   samplingRate: 80,        // How often agent records gas samples (300 ticks = 3 seconds at current rate)
   gasNoiseStdDev: 0,
+  moveSpeed: 3,
+  turnSpeed: 0.3,
+  circlingSize: 40,
+  gradientProjection: 80,
 };
 
 function buildButton(label, onClick) {
@@ -130,20 +132,13 @@ function playAgent() {
 
       canvasSys.render();
     });
-
-    agent = new GasAgent(pubsubFactory, {
-      decisionRate: agentConfig.decisionRate,
-      samplingRate: agentConfig.samplingRate,
-      moveSpeed: 3,
-      turnSpeed: 0.3,
-      circlingSize: 40,           // Much larger exploration circles
-      gradientProjection: 80,     // Extrapolate gradient further
-      startPosition: startPos,
-    });
-    sim.setRobotPosition(startPos.x, startPos.y, 0);
   }
 
-  sim.startAgentLoop(pubsubFactory, { samplingRate: agentConfig.decisionRate, gasNoiseStdDev: agentConfig.gasNoiseStdDev });
+  const startPos = getStartPosition();
+  sim.startAgentLoop(pubsubFactory, {
+    ...agentConfig,
+    startPosition: startPos,
+  });
 
   const routes = mapSys.mapData.routes || [];
   if (routes.length > 0 && routes[0].points.length > 0) {
@@ -186,7 +181,6 @@ function updateJsonStateDisplay() {
 function resetAgent() {
   const startPos = getStartPosition();
   sim.resetRobot({ x: startPos.x, y: startPos.y, angle: 0 });
-  agent = null;
   pubsubFactory = null;
   mainPubSub = null;
 

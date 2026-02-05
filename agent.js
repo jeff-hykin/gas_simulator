@@ -3,6 +3,7 @@ import {
     angleDifference, linearRegressionSlope, fitGradient2D,
     circleWaypoints, nearestPointOnPolyline,
 } from "./math_helpers.js"
+import { createGetTime } from "./time.js"
 
 /**
  * Autonomous gas-sensing agent that follows routes and explores gas gradients.
@@ -32,13 +33,13 @@ export class GasAgent {
      * @param {number} [config.circlingSize=5]             meters — exploration circle radius
      * @param {number} [config.gradientProjection]         meters — how far to extrapolate gradient (defaults to circlingSize)
      * @param {number} [config.attentionThreshold=0.1]    (sensitivity-units/min) — minimum gradient to explore
-     * @param {number} [config.refocusRatio=6000]          ticks — max explore time at baseline gradient
-     * @param {number} [config.attentionSpan=12000]        ticks — lookback window for gradient calc
+     * @param {number} [config.refocusRatio=60]            seconds — max explore time at baseline gradient
+     * @param {number} [config.attentionSpan=120]          seconds — lookback window for gradient calc
      * @param {number} [config.maxBufferSize=500]          max gas_memory entries
      * @param {number} [config.decisionRate=1]             seconds — interval between gas callbacks / movement decisions
      * @param {number} [config.samplingRate=60]            ticks — interval between recording gas samples (in decision ticks)
-     * @param {number} [config.waypointThreshold=10]        meters — "close enough" to a waypoint
-     * @param {number} [config.waypointPatience=30]        ticks — skip waypoint if no progress
+     * @param {number} [config.waypointThreshold=10]       meters — "close enough" to a waypoint
+     * @param {number} [config.waypointPatience=0.3]       seconds — skip waypoint if no progress
      * @param {number} [config.moveSpeed=1]                meters per tick
      * @param {number} [config.turnSpeed=0.3]              radians per tick
      * @param {number} [config.circleWaypointCount=8]      waypoints per exploration circle
@@ -48,6 +49,7 @@ export class GasAgent {
     constructor(pubsubFactory, config = {}) {
         globalThis.agent = this // For debugging
         this.pubsub = pubsubFactory("agent")
+        this.getTime = createGetTime(this.pubsub)
 
         // Parameters
         this.minimumGasThreshold = config.minimumGasThreshold ?? 0.1
@@ -55,13 +57,13 @@ export class GasAgent {
         this.circlingSize        = config.circlingSize ?? 5
         this.gradientProjection  = config.gradientProjection ?? this.circlingSize
         this.attentionThreshold  = config.attentionThreshold ?? 0.1
-        this.refocusRatio        = config.refocusRatio ?? 6000
-        this.attentionSpan       = config.attentionSpan ?? 12000
+        this.refocusRatio        = config.refocusRatio ?? 60
+        this.attentionSpan       = config.attentionSpan ?? 120
         this.maxBufferSize       = config.maxBufferSize ?? 500
         this.decisionRate        = config.decisionRate ?? 1
         this.samplingRate        = config.samplingRate ?? 60
         this.waypointThreshold   = config.waypointThreshold ?? 10
-        this.waypointPatience    = config.waypointPatience ?? 30
+        this.waypointPatience    = config.waypointPatience ?? 0.3
         this.moveSpeed           = config.moveSpeed ?? 1
         this.turnSpeed           = config.turnSpeed ?? 0.3
         this.circleWaypointCount = config.circleWaypointCount ?? 8
@@ -77,42 +79,36 @@ export class GasAgent {
         this.routeWaypoints = []
         this.currentWaypointIndex = 0
         this.bestDistanceToWaypoint = Infinity
-        this.ticksAtWaypoint = 0
+        this.waypointStuckStartTime = 0
 
         // Gradient exploration state
         this.mode = "route-following"
         this.gasMemory = []
-        this.exploreTime = 0
+        this.exploreStartTime = 0
         this.tempWaypoints = []
         this.tempWaypointIndex = 0
         this.recalcPending = false
 
-        // Time tracking
-        this.tickCount = 0
-        this.lastSampleTick = 0
+        // Time tracking using clock system
+        this._lastSampleTime = 0
 
         // Track currently published waypoint to avoid redundant publications
         this.currentPublishedWaypoint = null
 
         // Subscribe
-        pubsub.subscribe("gas_reading", (data, publisher) => this._onGasReading(data))
-        pubsub.subscribe("route_update", (data, publisher) => this._onRouteUpdate(data))
-        pubsub.subscribe("odom", (data, publisher) => {
+        this.pubsub.subscribe("gas_reading", (data, publisher) => this._onGasReading(data))
+        this.pubsub.subscribe("route_update", (data, publisher) => this._onRouteUpdate(data))
+        this.pubsub.subscribe("odom", (data, publisher) => {
             this.position.x = data.x
             this.position.y = data.y
             this.heading = data.heading
         })
-        pubsub.subscribe("waypoint_reached", (data, publisher) => this._onWaypointReached(data))
+        this.pubsub.subscribe("waypoint_reached", (data, publisher) => this._onWaypointReached(data))
     }
 
-    /** Current simulation time in seconds. */
-    get currentTime() {
-        return this.tickCount * this.decisionRate
-    }
-
-    /** Current simulation time in minutes. */
-    get currentTimeMinutes() {
-        return this.currentTime / 60
+    /** Time spent exploring in seconds. */
+    get exploreTime() {
+        return this.mode === "explore" ? (this.getTime() - this.exploreStartTime) : 0
     }
 
     // ── Pub/Sub Handlers ──────────────────────────────────────────────
@@ -126,7 +122,7 @@ export class GasAgent {
         this.routeWaypoints = data.waypoints.map(w => ({ x: w.x, y: w.y }))
         this.currentWaypointIndex = 0
         this.bestDistanceToWaypoint = Infinity
-        this.ticksAtWaypoint = 0
+        this.waypointStuckStartTime = this.getTime()
     }
 
     /**
@@ -134,8 +130,6 @@ export class GasAgent {
      * @param {{ppm: number}} data
      */
     _onGasReading(data) {
-        this.tickCount++
-
         // Sensor can only go up
         if (data.ppm > this.sensorReading) {
             this.sensorReading = data.ppm
@@ -146,9 +140,14 @@ export class GasAgent {
         const prevMode = this.mode
         this._updateMode()
 
+        // Transition route-following → explore: start tracking explore time
+        if (prevMode === "route-following" && this.mode === "explore") {
+            this.exploreStartTime = this.getTime()
+        }
+
         // Transition explore → route-following: reset explore state
         if (prevMode === "explore" && this.mode === "route-following") {
-            this.exploreTime = 0
+            this.exploreStartTime = 0
             this.tempWaypoints = []
             this.tempWaypointIndex = 0
             this.recalcPending = false
@@ -162,7 +161,6 @@ export class GasAgent {
         }
 
         if (this.mode === "explore") {
-            this.exploreTime += 1  // Track in ticks, not seconds
             this._tickExplore()
         } else {
             this._tickRouteFollow()
@@ -194,17 +192,18 @@ export class GasAgent {
             console.log(`Agent: gas memory recorded at (${this.position.x.toFixed(1)}, ${this.position.y.toFixed(1)}): ${this.sensorReading.toFixed(3)} PPM (total: ${this.gasMemory.length + 1})`);
             this.gasMemory.push({
                 ppm: this.sensorReading,
-                time: this.currentTimeMinutes,
+                time: this.getTime() / 60,
                 position: { x: this.position.x, y: this.position.y },
             })
             if (this.gasMemory.length > this.maxBufferSize) {
                 this.gasMemory.shift()
             }
 
-            // Only trigger circle recalculation at samplingRate intervals
-            const ticksSinceLastSample = this.tickCount - this.lastSampleTick
-            if (ticksSinceLastSample >= this.samplingRate) {
-                this.lastSampleTick = this.tickCount
+            // Only trigger circle recalculation at samplingRate intervals (converted to seconds)
+            const timeSinceLastSample = this.getTime() - this._lastSampleTime
+            const samplingInterval = this.samplingRate * this.decisionRate
+            if (timeSinceLastSample >= samplingInterval) {
+                this._lastSampleTime = this.getTime()
                 // Signal recalculation if we're exploring
                 if (this.mode === "explore") {
                     this.recalcPending = true
@@ -221,9 +220,9 @@ export class GasAgent {
      * @returns {number}
      */
     computeInterest() {
-        // Convert attentionSpan from ticks to minutes for comparison with memory timestamps
-        const attentionSpanMinutes = (this.attentionSpan * this.decisionRate) / 60
-        const cutoff = this.currentTimeMinutes - attentionSpanMinutes
+        // Convert attentionSpan from seconds to minutes for comparison with memory timestamps
+        const attentionSpanMinutes = this.attentionSpan / 60
+        const cutoff = (this.getTime() / 60) - attentionSpanMinutes
         const recent = this.gasMemory.filter(e => e.time >= cutoff)
         if (recent.length < 2) return 0
         const slope = linearRegressionSlope(
@@ -235,12 +234,12 @@ export class GasAgent {
     }
 
     /**
-     * Refocus pressure: grows with exploration time (in ticks).
-     * Scaled to match interest range (reaches ~10 after refocusRatio ticks).
+     * Refocus pressure: grows with exploration time (in seconds).
+     * Scaled to match interest range (reaches ~10 after refocusRatio seconds).
      * @returns {number}
      */
     computeRefocusPressure() {
-        // exploreTime and refocusRatio are both in ticks
+        // exploreTime and refocusRatio are both in seconds
         return (this.exploreTime / this.refocusRatio) * 10
     }
 
@@ -291,13 +290,12 @@ export class GasAgent {
         // Track best distance for patience system
         if (distance < this.bestDistanceToWaypoint) {
             this.bestDistanceToWaypoint = distance
-            this.ticksAtWaypoint = 0
-        } else {
-            this.ticksAtWaypoint++
+            this.waypointStuckStartTime = this.getTime()
         }
 
         // Skip waypoint if stuck too long
-        if (this.ticksAtWaypoint >= this.waypointPatience) {
+        const timeStuck = this.getTime() - this.waypointStuckStartTime
+        if (timeStuck >= this.waypointPatience) {
             this._advanceWaypoint()
             return
         }
@@ -307,7 +305,7 @@ export class GasAgent {
         console.log(`Agent: advancing to waypoint ${this.currentWaypointIndex + 1}/${this.routeWaypoints.length} (patience timeout)`);
         this.currentWaypointIndex++
         this.bestDistanceToWaypoint = Infinity
-        this.ticksAtWaypoint = 0
+        this.waypointStuckStartTime = this.getTime()
     }
 
     // ── Gradient Exploration ──────────────────────────────────────────
@@ -461,7 +459,7 @@ export class GasAgent {
             console.log(`Agent: route waypoint ${this.currentWaypointIndex + 1}/${this.routeWaypoints.length} reached`);
             this.currentWaypointIndex++
             this.bestDistanceToWaypoint = Infinity
-            this.ticksAtWaypoint = 0
+            this.waypointStuckStartTime = this.getTime()
         }
     }
 
