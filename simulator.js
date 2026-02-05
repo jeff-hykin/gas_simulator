@@ -174,7 +174,7 @@ export function createSimulator(mapSys, canvasSys, { maxLinearVelocity = 100, ma
     clock.lastRealTime = realTime;
 
     // Check if it's time to publish gas reading
-    if (agentActive && simulatorPubSub && clock.virtualTime - lastGasSampleTime >= gasSamplingRate) {
+    if (simulatorPubSub && clock.virtualTime - lastGasSampleTime >= gasSamplingRate) {
       const gas = maxGasAt(robot, mapSys.mapData.gasNodes || []);
       const noisy = Math.max(0, gas + gaussianNoise(gasNoiseStdDev));
       simulatorPubSub.publish('gas_reading', { ppm: noisy });
@@ -182,7 +182,7 @@ export function createSimulator(mapSys, canvasSys, { maxLinearVelocity = 100, ma
     }
 
     // Publish time and odometry at regular intervals (every clock tick)
-    if (agentActive && simulatorPubSub) {
+    if (simulatorPubSub) {
       simulatorPubSub.publish('time', {
         virtualTime: clock.virtualTime,
       });
