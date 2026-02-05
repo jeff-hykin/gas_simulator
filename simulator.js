@@ -6,6 +6,7 @@ import { createPubSub } from './pubsub.js';
 import { LocalPlanner } from './local_planner.js';
 import { GasAgent } from './agent.js';
 import { SimpleRouteAgent } from './simple_route_agent.js';
+import { GradientAgent } from './gradient_agent.js';
 
 export function gaussianPeakAt(distance, radius, peak) {
   if (radius <= 0) return 0;
@@ -324,10 +325,12 @@ export function createSimulator(mapSys, canvasSys, { maxLinearVelocity = 100, ma
     agentActive = true;
     simulatorPubSub = pubsubFactory("simulator");
 
-    // Create agent (using SimpleRouteAgent for debugging)
-    agent = new SimpleRouteAgent(pubsubFactory, config);
-    // agent = new GasAgent(pubsubFactory, config);
-
+    // Create agent
+    // agent = new SimpleRouteAgent(pubsubFactory, config); // Simple route following (no gas)
+    agent = new GradientAgent(pubsubFactory, config); // Route + gradient exploration
+    // agent = new GasAgent(pubsubFactory, config); // Original implementation
+    globalThis.agent = agent;
+    
     // Create local planner
     localPlanner = new LocalPlanner(pubsubFactory, {
       closeEnoughToWaypoint: config.waypointThreshold ?? 10,
