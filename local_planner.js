@@ -9,7 +9,7 @@ export class LocalPlanner {
         randomMoveDistance = 45 /* map units, robot is 26 units long */,
         randomMoveTime = 2 /* timesteps: (roughly seconds) */,
         maxEvaluationPoints = 10,
-        movementSpeed = 50,
+        movementSpeed = 150,
     } = {}) {
         this.pubsub = pubsubFactory("localPlanner");
         this.getTime = createGetTime(this.pubsub);
@@ -21,6 +21,7 @@ export class LocalPlanner {
         this.timeBeforeRandomMove = timeBeforeRandomMove;
         this.randomMoveDistance = randomMoveDistance;
         this.randomMoveTime = randomMoveTime;
+        this.randomTargetAngle = null;
 
         // setup odom
         this.odom = null;
@@ -66,7 +67,6 @@ export class LocalPlanner {
                 this.targetWaypoint = null
                 this.pubsub.publish('logJson', {
                     plannerMode: this.mode,
-                    plannerProgress: 0
                 })
             }
             
@@ -87,10 +87,22 @@ export class LocalPlanner {
                     stallTime: timeSinceMeaningfulProgress.toFixed(0),
                 })
                 // enable random mode if no progress is being made for a while
-                if (timeSinceMeaningfulProgress > this.timeBeforeRandomMove) {
-                    this.activateRandomMode()
-                    return
-                } else if (this.mode === "random") {
+                if (this.mode != "random" && timeSinceMeaningfulProgress > this.timeBeforeRandomMove) {
+                    this.mode = "random"
+                    this.randomSwitchTime = this.getTime()
+                    this.randomSwitchOdom = this.odom
+                    this.randomTargetAngle = Math.random() * 2 * Math.PI;
+                    const angularVelocity = angleDifference(this.odom.heading, this.randomTargetAngle)
+                    this.pubsub.publish('movement', { linearVelocity: this.movementSpeed, angularVelocity: angleDifference(this.odom.heading, this.randomTargetAngle) });
+                    this.pubsub.publish('logJson', {
+                        plannerMode: this.mode,
+                    })
+                } 
+                
+                if (this.mode === "random") {
+                    // try to move in the pre-selected random direction
+                    this.pubsub.publish('movement', { linearVelocity: this.movementSpeed, angularVelocity: angleDifference(this.odom.heading, this.randomTargetAngle) })
+
                     // check if distance or time limit hit
                     const timeLimitHit = (time - this.randomSwitchTime) > this.randomMoveTime
                     const distanceLimitHit = distance(this.randomSwitchOdom, this.odom) > this.randomMoveDistance
@@ -99,9 +111,12 @@ export class LocalPlanner {
                         this.reset()
                         this.mode = "greedy"
                     } else if (timeLimitHit) {
-                        // didn't move far enough, try new random angle
-                        this.reset()
-                        this.activateRandomMode()
+                        // didn't move far enough, try new random angle, but keep the history
+                        this.randomSwitchTime = this.getTime()
+                        this.randomSwitchOdom = this.odom
+                        const randomTargetAngle = Math.random() * 2 * Math.PI;
+                        const angularVelocity = angleDifference(this.odom.heading, randomTargetAngle)
+                        this.pubsub.publish('movement', { linearVelocity: this.movementSpeed, angularVelocity });
                         return
                     }
                 }
@@ -127,18 +142,5 @@ export class LocalPlanner {
         this.randomSwitchOdom = null
         this.timeOfLastMeaningfulProgress = this.getTime()
         this.evaluationPoints = []; // [  [time, odom], [laterTime, odom] ] 
-    }
-
-    activateRandomMode() {
-        this.mode = "random"
-        this.randomSwitchTime = this.getTime()
-        this.randomSwitchOdom = this.odom
-        const randomTargetAngle = Math.random() * 2 * Math.PI;
-        const angularVelocity = angleDifference(this.odom.heading, randomTargetAngle)
-        this.pubsub.publish('movement', { linearVelocity: this.movementSpeed, angularVelocity });
-        this.pubsub.publish('logJson', {
-            plannerMode: this.mode,
-            plannerProgress: 0
-        })
     }
 }
