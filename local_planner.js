@@ -104,7 +104,11 @@ export class LocalPlanner {
                 
                 if (this.mode === "random") {
                     // try to move in the pre-selected random direction
-                    this.pubsub.publish('movement', { linearVelocity: this.movementSpeed, angularVelocity: angleDifference(this.odom.heading, this.randomTargetAngle) })
+                    const rawAngularDiff = angleDifference(this.odom.heading, this.randomTargetAngle)
+                    const angularGain = 20
+                    const maxAngularVelocity = 10 * Math.PI
+                    const angularVelocity = Math.sign(rawAngularDiff) * Math.min(Math.abs(rawAngularDiff) * angularGain, maxAngularVelocity)
+                    this.pubsub.publish('movement', { linearVelocity: this.movementSpeed, angularVelocity })
 
                     // check if distance or time limit hit
                     const timeLimitHit = (time - this.randomSwitchTime) > this.randomMoveTime
@@ -129,7 +133,14 @@ export class LocalPlanner {
                 // Calculate target angle to waypoint
                 const targetAngle = Math.atan2(this.targetWaypoint.y - this.odom.y, this.targetWaypoint.x - this.odom.x)
                 // Calculate angular difference (shortest rotation) from current heading to target
-                const angularVelocity = angleDifference(this.odom.heading, targetAngle)
+                const rawAngularDiff = angleDifference(this.odom.heading, targetAngle)
+
+                // Scale angular velocity - multiply by gain factor and cap at max
+                // The difference is in radians, but we need rad/s as velocity
+                const angularGain = 20 // Gain factor to make turning faster
+                const maxAngularVelocity = 10 * Math.PI // ~31.4 rad/s (matches simulator cap)
+                const angularVelocity = Math.sign(rawAngularDiff) * Math.min(Math.abs(rawAngularDiff) * angularGain, maxAngularVelocity)
+
                 this.pubsub.publish('movement', { linearVelocity: this.movementSpeed, angularVelocity })
                 this.pubsub.publish('logJson', {
                     plannerMode: this.mode,
