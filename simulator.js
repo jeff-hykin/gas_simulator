@@ -3,7 +3,7 @@
  */
 
 import { createPubSub } from './pubsub.js';
-import { createLocalPlanner } from './local_planner.js';
+import { LocalPlanner } from './local_planner.js';
 import { GasAgent } from './agent.js';
 
 export function gaussianPeakAt(distance, radius, peak) {
@@ -326,12 +326,10 @@ export function createSimulator(mapSys, canvasSys, { maxLinearVelocity = 100, ma
     // Create agent
     agent = new GasAgent(pubsubFactory, config);
 
-    // Create local planner with same velocity limits as simulator
-    localPlanner = createLocalPlanner(pubsubFactory, {
-      maxLinearVelocity,
-      maxAngularVelocity,
-      waypointThreshold: 10,
-      minAlignment: 0.9, // Require tight alignment for sharper turns
+    // Create local planner
+    localPlanner = new LocalPlanner(pubsubFactory, {
+      movementSpeed: config.moveSpeed ?? 1,
+      closeEnoughToWaypoint: config.waypointThreshold ?? 10,
     });
 
     // Store gas sampling parameters for clock tick handler

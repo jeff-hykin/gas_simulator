@@ -41,8 +41,7 @@ const agentConfig = {
   decisionRate: 0.01,       // How often agent makes movement decisions (100 times per second)
   samplingRate: 80,        // How often agent records gas samples (300 ticks = 3 seconds at current rate)
   gasNoiseStdDev: 0,
-  moveSpeed: 3,
-  turnSpeed: 0.3,
+  moveSpeed: 50,
   circlingSize: 40,
   gradientProjection: 80,
 };

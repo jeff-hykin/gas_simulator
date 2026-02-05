@@ -38,10 +38,6 @@ export class GasAgent {
      * @param {number} [config.maxBufferSize=500]          max gas_memory entries
      * @param {number} [config.decisionRate=1]             seconds — interval between gas callbacks / movement decisions
      * @param {number} [config.samplingRate=60]            ticks — interval between recording gas samples (in decision ticks)
-     * @param {number} [config.waypointThreshold=10]       meters — "close enough" to a waypoint
-     * @param {number} [config.waypointPatience=0.3]       seconds — skip waypoint if no progress
-     * @param {number} [config.moveSpeed=1]                meters per tick
-     * @param {number} [config.turnSpeed=0.3]              radians per tick
      * @param {number} [config.circleWaypointCount=8]      waypoints per exploration circle
      * @param {{x:number,y:number}} [config.startPosition={x:0,y:0}]
      * @param {number} [config.startHeading=0]             radians
@@ -62,10 +58,6 @@ export class GasAgent {
         this.maxBufferSize       = config.maxBufferSize ?? 500
         this.decisionRate        = config.decisionRate ?? 1
         this.samplingRate        = config.samplingRate ?? 60
-        this.waypointThreshold   = config.waypointThreshold ?? 10
-        this.waypointPatience    = config.waypointPatience ?? 0.3
-        this.moveSpeed           = config.moveSpeed ?? 1
-        this.turnSpeed           = config.turnSpeed ?? 0.3
         this.circleWaypointCount = config.circleWaypointCount ?? 8
 
         // Position / heading
@@ -78,8 +70,6 @@ export class GasAgent {
         // Route following state
         this.routeWaypoints = []
         this.currentWaypointIndex = 0
-        this.bestDistanceToWaypoint = Infinity
-        this.waypointStuckStartTime = 0
 
         // Gradient exploration state
         this.mode = "route-following"
@@ -121,8 +111,6 @@ export class GasAgent {
         console.log(`Agent: route updated with ${data.waypoints.length} waypoints`);
         this.routeWaypoints = data.waypoints.map(w => ({ x: w.x, y: w.y }))
         this.currentWaypointIndex = 0
-        this.bestDistanceToWaypoint = Infinity
-        this.waypointStuckStartTime = this.getTime()
     }
 
     /**
@@ -277,7 +265,7 @@ export class GasAgent {
 
     // ── Route Following ───────────────────────────────────────────────
 
-    /** Soft route following: move toward current waypoint, skip if stuck. */
+    /** Route following: move toward current waypoint. */
     _tickRouteFollow() {
         if (this.routeWaypoints.length === 0 ||
             this.currentWaypointIndex >= this.routeWaypoints.length) {
@@ -285,27 +273,7 @@ export class GasAgent {
         }
 
         const target = this.routeWaypoints[this.currentWaypointIndex]
-        const { distance } = this._navigateToWaypoint(target)
-
-        // Track best distance for patience system
-        if (distance < this.bestDistanceToWaypoint) {
-            this.bestDistanceToWaypoint = distance
-            this.waypointStuckStartTime = this.getTime()
-        }
-
-        // Skip waypoint if stuck too long
-        const timeStuck = this.getTime() - this.waypointStuckStartTime
-        if (timeStuck >= this.waypointPatience) {
-            this._advanceWaypoint()
-            return
-        }
-    }
-
-    _advanceWaypoint() {
-        console.log(`Agent: advancing to waypoint ${this.currentWaypointIndex + 1}/${this.routeWaypoints.length} (patience timeout)`);
-        this.currentWaypointIndex++
-        this.bestDistanceToWaypoint = Infinity
-        this.waypointStuckStartTime = this.getTime()
+        this._navigateToWaypoint(target)
     }
 
     // ── Gradient Exploration ──────────────────────────────────────────
@@ -440,10 +408,6 @@ export class GasAgent {
             this.currentPublishedWaypoint = { x: target.x, y: target.y }
             this.pubsub.publish('target_waypoint', { x: target.x, y: target.y })
         }
-
-        // Calculate distance for patience system
-        const distance = vecDistance(this.position, target)
-        return { distance }
     }
 
     /**
@@ -458,8 +422,6 @@ export class GasAgent {
         } else if (this.mode === "route-following" && this.routeWaypoints.length > 0) {
             console.log(`Agent: route waypoint ${this.currentWaypointIndex + 1}/${this.routeWaypoints.length} reached`);
             this.currentWaypointIndex++
-            this.bestDistanceToWaypoint = Infinity
-            this.waypointStuckStartTime = this.getTime()
         }
     }
 
