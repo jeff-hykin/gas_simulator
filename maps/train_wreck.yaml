@@ -61,18 +61,18 @@ routes:
 
 obstacles:
   # === Track bed (two parallel rails) ===
-  - id: obstacle-rail-r1
-    x: 700
-    y: -8
-    w: 1200
-    h: 6
-    angle: 0
-  - id: obstacle-rail-r2
-    x: 700
-    y: 8
-    w: 1200
-    h: 6
-    angle: 0
+#   - id: obstacle-rail-r1
+#     x: 700
+#     y: -8
+#     w: 1200
+#     h: 6
+#     angle: 0
+#   - id: obstacle-rail-r2
+#     x: 700
+#     y: 8
+#     w: 1200
+#     h: 6
+#     angle: 0
 
   # === Locomotive - front of train, barely off track ===
   - id: obstacle-loco

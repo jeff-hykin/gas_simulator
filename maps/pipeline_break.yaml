@@ -282,16 +282,23 @@ obstacles:
     angle: 0
 
 gasNodes:
-  # Main rupture leak - large plume
-  - id: gas-rupture
-    x: 0
-    y: -10
-    radius: 280
-    peak: 3.5
-
-  # Secondary leak from damaged valve station 1
-  - id: gas-valve1
-    x: -250
-    y: 100
-    radius: 120
-    peak: 1.2
+  - id: gas-75767n
+    x: -279.8666952740631
+    'y': 45.51630982890629
+    radius: 44.37250360236754
+    peak: 1
+  - id: gas-e8cbph
+    x: -346.64531870115
+    'y': 80.40964459260942
+    radius: 48.50328595907601
+    peak: 1
+  - id: gas-ewiq8m
+    x: -424.8545173094502
+    'y': 29.874470107246225
+    radius: 80.29173207183773
+    peak: 1
+  - id: gas-xscvfd
+    x: -421.2448619890671
+    'y': 97.25470275439716
+    radius: 58.07944259516908
+    peak: 1

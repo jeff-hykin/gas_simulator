@@ -24,10 +24,6 @@ markers:
     x: -500
     y: 620
     label: Start
-  - id: marker-gate
-    x: -500
-    y: 600
-    label: Main Gate
   - id: marker-admin
     x: -350
     y: 400
