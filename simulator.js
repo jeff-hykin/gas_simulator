@@ -330,7 +330,7 @@ export function createSimulator(mapSys, canvasSys, { maxLinearVelocity = 100, ma
     agent = new GradientAgent(pubsubFactory, config); // Route + gradient exploration
     // agent = new GasAgent(pubsubFactory, config); // Original implementation
     globalThis.agent = agent;
-    
+
     // Create local planner
     localPlanner = new LocalPlanner(pubsubFactory, {
       closeEnoughToWaypoint: config.waypointThreshold ?? 10,

@@ -142,7 +142,7 @@ export class GasAgent {
 
             // Remove visualization points
             this.pubsub.publish('visualizePoint', { id: 'centroid', remove: true })
-            const maxWaypoints = 16;
+            var maxWaypoints = 16;
             for (let i = 0; i < maxWaypoints; i++) {
                 this.pubsub.publish('visualizePoint', { id: `waypoint_${i}`, remove: true })
             }
@@ -363,7 +363,7 @@ export class GasAgent {
         }
 
         // Remove old waypoints that won't be replaced
-        const maxWaypoints = 16; // Should match what was in main.js
+        var maxWaypoints = 16; // Should match what was in main.js
         for (let i = this.tempWaypoints.length; i < maxWaypoints; i++) {
             this.pubsub.publish('visualizePoint', {
                 id: `waypoint_${i}`,
