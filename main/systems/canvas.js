@@ -23,6 +23,8 @@ export function createCanvasSystem({ width = 800, height = 600 } = {}) {
   ctx.scale(pixelRatio, pixelRatio);
 
   const world = [];
+  let backgroundImage = null;
+
   const state = {
     offsetX: 0,
     offsetY: 0,
@@ -192,11 +194,26 @@ export function createCanvasSystem({ width = 800, height = 600 } = {}) {
   function render() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.save();
+    if (backgroundImage) {
+      const screenW = backgroundImage.naturalWidth * state.scale;
+      const screenH = backgroundImage.naturalHeight * state.scale;
+      const center = worldToScreen({ x: 0, y: 0 });
+      ctx.drawImage(backgroundImage, center.x - screenW / 2, center.y - screenH / 2, screenW, screenH);
+    }
     const items = flattenWorld(world);
     for (const item of items) {
       renderItem(item);
     }
     ctx.restore();
+  }
+
+  function setBackground(src) {
+    const img = new Image();
+    img.onload = () => {
+      backgroundImage = img;
+      render();
+    };
+    img.src = src;
   }
 
   /**
@@ -372,5 +389,6 @@ export function createCanvasSystem({ width = 800, height = 600 } = {}) {
     takeControl,
     releaseControl,
     render,
+    setBackground,
   };
 }

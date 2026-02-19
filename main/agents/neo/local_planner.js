@@ -163,7 +163,7 @@ export function createLocalPlanner({
         return {state, outputs}
     }
     return {
-        initialState,
+        initialArg,
         update,
     }
 }

@@ -4,6 +4,7 @@ import { createSimulator } from './main/systems/simulator.js';
 import { createPubSub } from './main/tooling/pubsub.js';
 
 const canvasSys = createCanvasSystem({ width: 1100, height: 830 });
+canvasSys.setBackground('./maps/train.jpeg');
 
 // Visualization points by ID (for debugging/analysis)
 const visualizationPointsById = new Map();
@@ -247,7 +248,7 @@ document.body.append(sidebar);
 
 // ── Load default map on startup ───────────────────────────────────────
 
-fetch('./maps/chemical_plant.yaml')
+fetch('./maps/train_real.yaml')
   .then((response) => response.text())
   .then((yamlText) => {
     mapSys.loadMapText(yamlText, 'chemical_plant');
