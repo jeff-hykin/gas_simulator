@@ -1,9 +1,9 @@
-import { createGetTime } from './time.js'
+import { createGetTime } from '../tooling/time.js'
 import {
     vecAdd, vecScale, vecDistance, vecMagnitude,
     linearRegressionSlope, fitGradient2D,
     circleWaypoints, nearestPointOnPolyline
-} from './math_helpers.js'
+} from '../tooling/math_helpers.js'
 
 /**
  * Gradient-following agent that combines route following with gas gradient exploration.

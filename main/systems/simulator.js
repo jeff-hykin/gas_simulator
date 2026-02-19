@@ -2,11 +2,11 @@
  * @typedef {{x:number,y:number}} Point
  */
 
-import { createPubSub } from './pubsub.js';
-import { LocalPlanner } from './local_planner.js';
-import { GasAgent } from './agent.js';
-import { SimpleRouteAgent } from './simple_route_agent.js';
-import { GradientAgent } from './gradient_agent.js';
+import { createPubSub } from '../tooling/pubsub.js';
+import { LocalPlanner } from '../agents/local_planner.js';
+import { GasAgent } from '../agents/agent.js';
+import { SimpleRouteAgent } from '../agents/simple_route_agent.js';
+import { GradientAgent } from '../agents/gradient_agent.old.js';
 
 export function gaussianPeakAt(distance, radius, peak) {
   if (radius <= 0) return 0;

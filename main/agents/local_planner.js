@@ -1,5 +1,5 @@
-import { vecDistance as distance, vecSub, angleDifference } from "./math_helpers.js";
-import { createGetTime } from "./time.js";
+import { vecDistance as distance, vecSub, angleDifference } from "../tooling/math_helpers.js";
+import { createGetTime } from "../tooling/time.js";
 
 export class LocalPlanner {
     constructor(pubsubFactory, {

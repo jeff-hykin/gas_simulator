@@ -1,7 +1,7 @@
-import { createCanvasSystem } from './canvas.js';
-import { createMapSystem, deserializeMap } from './map.js';
-import { createSimulator } from './simulator.js';
-import { createPubSub } from './pubsub.js';
+import { createCanvasSystem } from './main/systems/canvas.js';
+import { createMapSystem, deserializeMap } from './main/systems/map.js';
+import { createSimulator } from './main/systems/simulator.js';
+import { createPubSub } from './main/tooling/pubsub.js';
 
 const canvasSys = createCanvasSystem({ width: 1100, height: 830 });
 

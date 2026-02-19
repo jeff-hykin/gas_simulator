@@ -1,11 +1,13 @@
-import { createGetTime } from './time.js'
-import { vecDistance } from './math_helpers.js'
+import { createGetTime } from "../../time.js"
+import { vecDistance } from "../tooling/math_helpers.js"
+import { SimpleRouteAgent } from "../../simple_route_agent.js"
+
 
 /**
  * Simple route-following agent for debugging the local planner.
  * Just follows waypoints in sequence without any gas sensing or exploration.
  */
-export class SimpleRouteAgent {
+export class CustomAgent {
     /**
      * @param {Function} pubsubFactory - factory function that returns pubsub instance
      * @param {object} [config]
@@ -15,7 +17,9 @@ export class SimpleRouteAgent {
         this.pubsub = pubsubFactory("simple_agent")
         this.getTime = createGetTime(this.pubsub)
         
-        this.disabledOutput = false
+        // create a waypoint follower agent
+        this.routeFollower = new SimpleRouteAgent(pubsubFactory, config)
+
         // Route state
         this.routeWaypoints = []
         this.currentWaypointIndex = 0
@@ -41,8 +45,8 @@ export class SimpleRouteAgent {
 
         // Subscribe to route updates
         this.pubsub.subscribe("route_update", (data, publisher) => {
-            console.log(`SimpleAgent: route updated with ${data.waypoints.length} waypoints`);
-            this.routeWaypoints = data.waypoints.map(w => ({ x: w.x, y: w.y }))
+            console.log(`SimpleAgent: route updated with ${data.waypoints.length} waypoints`)
+            this.routeWaypoints = data.waypoints.map((w) => ({ x: w.x, y: w.y }))
             this.currentWaypointIndex = 0
             this.currentPublishedWaypoint = null
             // Immediately publish first waypoint
@@ -51,43 +55,47 @@ export class SimpleRouteAgent {
 
         // Subscribe to waypoint reached events
         this.pubsub.subscribe("waypoint_reached", (data, publisher) => {
-            console.log(`SimpleAgent: waypoint ${this.currentWaypointIndex + 1}/${this.routeWaypoints.length} reached`);
+            console.log(`SimpleAgent: waypoint ${this.currentWaypointIndex + 1}/${this.routeWaypoints.length} reached`)
             this.currentWaypointIndex++
             this.currentPublishedWaypoint = null
             // Publish next waypoint
             this._publishCurrentWaypoint()
         })
-    }
 
-    disableOutput() {
-        this.disabledOutput = true
-    }
+        this.pubsub.subscribe("waypoint_reached", (data, publisher) => {
+            console.log(`SimpleAgent: waypoint ${this.currentWaypointIndex + 1}/${this.routeWaypoints.length} reached`)
+            this.currentWaypointIndex++
+            this.currentPublishedWaypoint = null
+            // Publish next waypoint
+            this._publishCurrentWaypoint()
+        })
 
-    enableOutput() {
-        this.disabledOutput = false
+        //
+        // main loop
+        //
+        let mode = "route-following"
+        this.pubsub.subscribe("time", ({ virtualTime }, publisher) => {
+            let time = virtualTime
+
+        })
     }
 
     _publishCurrentWaypoint() {
-        if (this.routeWaypoints.length === 0 ||
-            this.currentWaypointIndex >= this.routeWaypoints.length) {
-            console.log('SimpleAgent: route completed')
+        if (this.routeWaypoints.length === 0 || this.currentWaypointIndex >= this.routeWaypoints.length) {
+            console.log("SimpleAgent: route completed")
             return
         }
 
         const target = this.routeWaypoints[this.currentWaypointIndex]
 
         // Only publish if waypoint changed
-        if (!this.currentPublishedWaypoint ||
-            this.currentPublishedWaypoint.x !== target.x ||
-            this.currentPublishedWaypoint.y !== target.y) {
+        if (!this.currentPublishedWaypoint || this.currentPublishedWaypoint.x !== target.x || this.currentPublishedWaypoint.y !== target.y) {
             this.currentPublishedWaypoint = { x: target.x, y: target.y }
             console.log(`SimpleAgent: publishing waypoint ${this.currentWaypointIndex + 1}/${this.routeWaypoints.length} at (${target.x.toFixed(1)}, ${target.y.toFixed(1)})`)
-            if (!this.disabledOutput) {
-                this.pubsub.publish('target_waypoint', { x: target.x, y: target.y })
-                this.pubsub.publish('logJson', {
-                    waypoint: `${this.currentWaypointIndex + 1}/${this.routeWaypoints.length}`
-                })
-            }
+            this.pubsub.publish("target_waypoint", { x: target.x, y: target.y })
+            this.pubsub.publish("logJson", {
+                waypoint: `${this.currentWaypointIndex + 1}/${this.routeWaypoints.length}`,
+            })
 
             // Reset tracking for new waypoint
             this.waypointStartTime = this.getTime()
@@ -98,8 +106,7 @@ export class SimpleRouteAgent {
     }
 
     _checkWaypointProgress() {
-        if (this.routeWaypoints.length === 0 ||
-            this.currentWaypointIndex >= this.routeWaypoints.length) {
+        if (this.routeWaypoints.length === 0 || this.currentWaypointIndex >= this.routeWaypoints.length) {
             return
         }
 

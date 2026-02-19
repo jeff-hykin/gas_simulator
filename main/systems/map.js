@@ -1,4 +1,4 @@
-import { load, dump } from './deps/js-yaml.js';
+import { load, dump } from '../../deps/js-yaml.js';
 
 /**
  * @typedef {{x:number,y:number}} Point

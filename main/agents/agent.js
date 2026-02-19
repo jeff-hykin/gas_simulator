@@ -2,8 +2,8 @@ import {
     vecAdd, vecSub, vecScale, vecMagnitude, vecDistance,
     angleDifference, linearRegressionSlope, fitGradient2D,
     circleWaypoints, nearestPointOnPolyline,
-} from "./math_helpers.js"
-import { createGetTime } from "./time.js"
+} from "../tooling/math_helpers.js"
+import { createGetTime } from "../tooling/time.js"
 
 /**
  * Autonomous gas-sensing agent that follows routes and explores gas gradients.

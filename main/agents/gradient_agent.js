@@ -1,19 +1,20 @@
-import { createGetTime } from './time.js'
-import { vecDistance } from './math_helpers.js'
+import { createGetTime } from '../../time.js'
+import { Computed } from '../tooling/pubsub.js'
+import { vecDistance } from '../tooling/math_helpers.js'
 
 /**
  * Simple route-following agent for debugging the local planner.
  * Just follows waypoints in sequence without any gas sensing or exploration.
  */
-export class SimpleRouteAgent {
+export class GradientAgent {
     /**
      * @param {Function} pubsubFactory - factory function that returns pubsub instance
      * @param {object} [config]
      * @param {{x:number,y:number}} [config.startPosition={x:0,y:0}]
      */
     constructor(pubsubFactory, config = {}) {
-        this.pubsub = pubsubFactory("simple_agent")
-        this.getTime = createGetTime(this.pubsub)
+        const pubsub = this.pubsub = pubsubFactory("simple_agent")
+        const getTime = this.getTime = createGetTime(this.pubsub)
         
         this.disabledOutput = false
         // Route state
@@ -56,6 +57,107 @@ export class SimpleRouteAgent {
             this.currentPublishedWaypoint = null
             // Publish next waypoint
             this._publishCurrentWaypoint()
+        })
+
+        // base values
+        let gasValue = -Infinity
+        const gasReadingComputed = new Computed({initValue:null, pubsub, topics:{gas_reading:null}}, ({gas_reading}, key, who)=>{
+        const odomComputed = new Computed({initValue:null, pubsub, topics:{odom:null}}, (values, key, who)=>values.odom)
+            return gasValue = Math.max(gasValue, gas_reading)
+        })
+        let gasMemoryMaxDuration = 30
+        const gasMemoryComputed = new Computed({initValue:[], pubsub, topics:{gasReadingComputed}}, ({gasReadingComputed}, key, who)=>{
+            const now = this.getTime()
+            gasMemory.push({time:now, value:gasReadingComputed, position:odomComputed.value})
+            return gasMemoryComputed.value.filter(each=>now-each.time<gasMemoryMaxDuration)
+        })
+        const gradientComputed = new Computed({initValue:null, pubsub, topics:{gasMemoryComputed}}, ({gasMemoryComputed}, key, who)=>{
+            if (gasMemoryComputed.length < 3) {
+                return 0
+            }
+            const { time: startTime, value: startConcentration, position: startPosition } = gasMemoryComputed.at(0)
+            const { time: endTime, value: endConcentration, position: endPosition } = gasMemoryComputed.at(-1)
+            const duration = endTime - startTime
+            const gasChange = endConcentration - startConcentration
+            if (gasChange < this.threshold) {
+                return 0
+            }
+            return gasChange / duration
+        })
+        
+
+        const boredomBehavior = {
+            stampData: { "time": null, gasReadingComputed, odomComputed, },
+            init() {
+
+            },
+            behaviorSwitcher: [
+                { gradientComputed },
+                ({ gradientComputed })=>{
+                    if (gradientComputed.value < this.threshold) {
+                        return explorationBehavior
+                    }
+                }
+            ]
+        }
+        const explorationBehavior = {
+            stampData: { "time": null, gasReadingComputed, odomComputed, },
+            computed: (stampData)=>({
+                refocusPressure: new Computed({initValue:null, pubsub, topics:{gasReadingComputed}}, ({gasReadingComputed}, key, who)=>{
+                    const startTime = stampData.time
+                    const now = getTime()
+                    const duration = now - startTime
+                    return duration / 
+                })
+            })
+            init(stampData) {
+                // clear out old values
+                gasReadingComputed.value = []
+                this.refocusPressure = new Computed({initValue:null, pubsub, topics:{gasReadingComputed}}, ({gasReadingComputed}, key, who)=>{
+
+                })
+            },
+            behaviorSwitcher: [
+                { gradientComputed },
+                ({ gradientComputed })=>{
+                    if (gradientComputed.value < this.threshold) {
+                        return explorationBehavior
+                    }
+                }
+            ]
+        }
+
+        // main loop
+            // events:
+                // init
+                    // trigger: external
+                // overwhelmed by boredom
+                    // trigger: buffer large and insufficient gradient
+                    // action:
+                        // passively record gas values
+                // exploration start
+                    // trigger: external, init, from overwhelmed by boredom
+                    // action:
+                        // trigger a centroid
+                        // listen to gas values
+                        // calculate refocus pressure
+                // centroid creation
+                    // triggers:
+                        // 1. no centroid and exploration
+                        // 2. time since previous centroid is large enough to draw new gradient
+                        // 3. all waypoints of centroid have been explored
+                    // action:
+                        // calculate the gradient direction
+                        // 
+                    
+                
+            // continuous values:
+                // gas gradient slope: how fast the concentration of gas has been increasing in the recent window
+                // gas gradient direction: the best relative angle towards what appears to be the gas source
+                // refocus pressure: based on duration and ratio, how much pressure has built up
+
+        this.pubsub.subscribe("time", ({virtualTime}, publisher) => {
+            
         })
     }
 
