@@ -23,3 +23,21 @@ export function createGetTime(pubsub) {
         return currentTime
     }
 }
+
+export function timer({duration, getTime, data}) {
+    return {
+        atStart: data,
+        startTime: getTime(),
+        endTime: getTime() + duration,
+        isRunning: true,
+        get done() {
+            return getTime() >= this.endTime
+        },
+        get count() {
+            return this.endTime - this.startTime
+        },
+        get remaining() {
+            return this.endTime - getTime()
+        },
+    }
+}
