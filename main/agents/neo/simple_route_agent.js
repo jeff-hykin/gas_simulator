@@ -111,7 +111,7 @@ function create({}) {
         
         return { state: s, outputs: { targetWaypoint, logJson } }
     }
-    return { initialArg, update }
+    return { initialArg, info, update }
 }
 
 export default { info, create }

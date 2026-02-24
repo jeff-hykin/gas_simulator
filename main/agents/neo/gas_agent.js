@@ -99,7 +99,7 @@ function create({
 
         return { state, outputs }
     }
-    return { initialArg, update }
+    return { initialArg, info, update }
 }
 
 export default { info, create }
