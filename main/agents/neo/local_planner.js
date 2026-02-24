@@ -1,5 +1,5 @@
-import { vecDistance as distance, vecSub, angleDifference } from "../tooling/math_helpers.js";
-import { timer } from "../tooling/time.js";
+import { vecDistance as distance, vecSub, angleDifference } from "../../tooling/math_helpers.js";
+import { timer } from "../../tooling/time.js";
 
 export const info = {
     inputs: ["odom", "targetWaypoint"],
@@ -13,7 +13,7 @@ export function createLocalPlanner({
     randomMoveTime = 2 /* timesteps: (roughly seconds) */,
     maxEvaluationPoints = 10,
     movementSpeed = 150,
-    angularGain = 20 // Gain factor to make turning faster
+    angularGain = 20, // Gain factor to make turning faster
     maxAngularVelocity = 10 * Math.PI, // ~31.4 rad/s (matches simulator cap)
 }) {
     const initialArg = Object.freeze({
