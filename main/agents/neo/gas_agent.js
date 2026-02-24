@@ -1,13 +1,13 @@
 import { vecDistance } from '../../tooling/math_helpers.js'
-import { timer } from "../tooling/time.js";
+import { timer } from "../../tooling/time.js";
 
-import { createSimpleRouteAgent } from './simple_route_agent.js'
+import simpleRouteAgent from './simple_route_agent.js'
 
-export const info = {
+const info = {
     inputs: ["position", "routeUpdate", "waypointReached", "gasReading"],
     outputs: ["targetWaypoint", "logJson"],
 }
-export function createGasAgent({
+function create({
     gasThreshold = 0.1, // PPM
     bufferSize = 20, // timesteps
     switchingCooldown = 30, // timesteps
@@ -38,7 +38,7 @@ export function createGasAgent({
             logJson: null,
         }
     }
-    const routeAgent = createSimpleRouteAgent(routeAgentConfig)
+    const routeAgent = simpleRouteAgent.create(routeAgentConfig)
     function update(getTime, { state, updated }) {
         const { time, routeWaypoints, position, waypointReached, gasReading } = state
         const outputs = {}
@@ -101,3 +101,5 @@ export function createGasAgent({
     }
     return { initialArg, update }
 }
+
+export default { info, create }

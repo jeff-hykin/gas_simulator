@@ -1,11 +1,11 @@
 import { vecDistance as distance, vecSub, angleDifference } from "../../tooling/math_helpers.js";
 import { timer } from "../../tooling/time.js";
 
-export const info = {
+const info = {
     inputs: ["odom", "targetWaypoint"],
     outputs: ["movement", "waypointReached", "logJson"],
 }
-export function createLocalPlanner({
+function create({
     minimumDistanceThatIsProgress = 0.1,
     closeEnoughToWaypoint = 0.1,
     timeBeforeRandomMove = 3 /* timesteps: (roughly seconds) */,
@@ -111,6 +111,7 @@ export function createLocalPlanner({
 
             // switch to random mode
             if (state.mode != "random" && state.decisionTimer.done) {
+                state.prevOdom = state.odom  // snapshot position at start of random move (used for distance limit check)
                 state.decisionTimer = timer({ duration: timeBeforeRandomMove, getTime, data: structuredClone(state) })
                 state.mode = "random"
                 state.randomTargetAngle = Math.random() * 2 * Math.PI
@@ -162,8 +163,7 @@ export function createLocalPlanner({
 
         return {state, outputs}
     }
-    return {
-        initialArg,
-        update,
-    }
+    return { initialArg, update }
 }
+
+export default { info, create }

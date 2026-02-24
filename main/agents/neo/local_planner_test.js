@@ -1,4 +1,5 @@
-import { createLocalPlanner } from './local_planner.js'
+import localPlanner from './local_planner.js'
+const { create: createLocalPlanner } = localPlanner
 
 function assert(condition, message) {
     if (!condition) throw new Error(message)

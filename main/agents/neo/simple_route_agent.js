@@ -1,10 +1,10 @@
 import { vecDistance } from '../../tooling/math_helpers.js'
 
-export const info = {
+const info = {
     inputs: ["position", "routeUpdate", "waypointReached"],
     outputs: ["targetWaypoint", "logJson"],
 }
-export function createSimpleRouteAgent({}) {
+function create({}) {
     const initialArg = {
         updated: {},
         state: {
@@ -113,3 +113,5 @@ export function createSimpleRouteAgent({}) {
     }
     return { initialArg, update }
 }
+
+export default { info, create }
