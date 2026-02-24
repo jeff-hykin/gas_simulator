@@ -7,12 +7,12 @@ import { vecDistance } from '../tooling/math_helpers.js'
  */
 export class SimpleRouteAgent {
     /**
-     * @param {Function} pubsubFactory - factory function that returns pubsub instance
+     * @param {object} pubsub - pubsub instance { subscribe, publish }
      * @param {object} [config]
      * @param {{x:number,y:number}} [config.startPosition={x:0,y:0}]
      */
-    constructor(pubsubFactory, config = {}) {
-        this.pubsub = pubsubFactory("simple_agent")
+    constructor(pubsub, config = {}) {
+        this.pubsub = pubsub
         this.getTime = createGetTime(this.pubsub)
         
         this.disabledOutput = false

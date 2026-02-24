@@ -9,8 +9,8 @@ import {
  * Gradient-following agent that combines route following with gas gradient exploration.
  */
 export class GradientAgent {
-    constructor(pubsubFactory, config = {}) {
-        this.pubsub = pubsubFactory("gradient_agent")
+    constructor(pubsub, config = {}) {
+        this.pubsub = pubsub
         this.getTime = createGetTime(this.pubsub)
 
         // Parameters

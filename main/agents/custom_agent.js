@@ -9,16 +9,16 @@ import { SimpleRouteAgent } from "../../simple_route_agent.js"
  */
 export class CustomAgent {
     /**
-     * @param {Function} pubsubFactory - factory function that returns pubsub instance
+     * @param {object} pubsub - pubsub instance { subscribe, publish }
      * @param {object} [config]
      * @param {{x:number,y:number}} [config.startPosition={x:0,y:0}]
      */
-    constructor(pubsubFactory, config = {}) {
-        this.pubsub = pubsubFactory("simple_agent")
+    constructor(pubsub, config = {}) {
+        this.pubsub = pubsub
         this.getTime = createGetTime(this.pubsub)
-        
+
         // create a waypoint follower agent
-        this.routeFollower = new SimpleRouteAgent(pubsubFactory, config)
+        this.routeFollower = new SimpleRouteAgent(pubsub, config)
 
         // Route state
         this.routeWaypoints = []

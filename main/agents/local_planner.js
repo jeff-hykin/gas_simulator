@@ -2,7 +2,7 @@ import { vecDistance as distance, vecSub, angleDifference } from "../tooling/mat
 import { createGetTime } from "../tooling/time.js";
 
 export class LocalPlanner {
-    constructor(pubsubFactory, {
+    constructor(pubsub, {
         minimumDistanceThatIsProgress = 0.1,
         closeEnoughToWaypoint = 0.1,
         timeBeforeRandomMove = 3 /* timesteps: (roughly seconds) */,
@@ -11,7 +11,7 @@ export class LocalPlanner {
         maxEvaluationPoints = 10,
         movementSpeed = 150,
     } = {}) {
-        this.pubsub = pubsubFactory("localPlanner");
+        this.pubsub = pubsub;
         this.getTime = createGetTime(this.pubsub);
 
         // Store config

@@ -1,66 +1,49 @@
 #!/usr/bin/env -S deno run --allow-all
 
 /**
- * Create a publish/subscribe message bus factory with publisher identity tracking.
- * Returns a function that requires an identity and returns a pubsub object.
- * Prevents callbacks from being triggered by own publications.
+ * Create a simple publish/subscribe message bus.
  *
  * @example
- *   const pubsubFactory = createPubSub()
- *   const agentPubsub = pubsubFactory("agent")
- *   const unsub = agentPubsub.subscribe("gas_reading", (data, publisher) => console.log(data, publisher))
- *   agentPubsub.publish("gas_reading", { ppm: 1.5 })  // won't trigger own callback
- *   unsub()  // stop listening
+ *   const pubsub = createPubSub()
+ *   const unsub = pubsub.subscribe("gas_reading", (data) => console.log(data))
+ *   pubsub.publish("gas_reading", { ppm: 1.5 })
+ *   unsub()
  *
- * @returns {(who: string) => { subscribe: Function, publish: Function, who: string }}
+ * @returns {{ subscribe: Function, publish: Function }}
  */
 export function createPubSub() {
     const subs = {}
 
-    return function pubsubFactory(who) {
-        if (!who) throw new Error("pubsub requires an identity (who parameter)")
-
-        /**
-         * Subscribe to a channel. Returns an unsubscribe function.
-         * Callback receives (data, publisher) and only fires if publisher !== this.who
-         * @param {string} channel
-         * @param {Function} callback - (data, publisher) => void
-         * @returns {Function} unsubscribe
-         */
-        function subscribe(channel, callback) {
-            const entry = { callback, subscriber: who }
-            ;(subs[channel] ??= []).push(entry)
-            return () => {
-                const list = subs[channel]
-                if (!list) return
-                const idx = list.indexOf(entry)
-                if (idx !== -1) list.splice(idx, 1)
-            }
-        }
-
-        /**
-         * Publish data to all subscribers on a channel (except self).
-         * @param {string} channel
-         * @param {*} data
-         */
-        function publish(channel, data) {
+    /**
+     * Subscribe to a channel. Returns an unsubscribe function.
+     * @param {string} channel
+     * @param {Function} callback - (data) => void
+     * @returns {Function} unsubscribe
+     */
+    function subscribe(channel, callback) {
+        ;(subs[channel] ??= []).push(callback)
+        return () => {
             const list = subs[channel]
             if (!list) return
-            for (const entry of list) {
-                // Only call callback if publisher is different from subscriber
-                // if (entry.subscriber !== who) {
-                    entry.callback(data, who)
-                // }
-            }
+            const idx = list.indexOf(callback)
+            if (idx !== -1) list.splice(idx, 1)
         }
-
-        return { subscribe, publish, who, new: pubsubFactory }
     }
+
+    /**
+     * Publish data to all subscribers on a channel.
+     * @param {string} channel
+     * @param {*} data
+     */
+    function publish(channel, data) {
+        for (const cb of (subs[channel] ?? [])) cb(data)
+    }
+
+    return { subscribe, publish }
 }
 
 export class Computed {
-    constructor({pubsub, initValue, topics, name}, callback) {
-        this.pubsub = pubsub.new(`computed-${name}`)
+    constructor({pubsub, initValue, topics}, callback) {
         this.value = initValue
         const activeArg = {}
         this.subscribers = []
@@ -86,10 +69,9 @@ export class Computed {
                 )
             } else {
                 this.unsubs.push(
-                    pubsub.subscribe(key, (value, who)=>{
-                        console.log(`received ${value} from ${who}`)
+                    pubsub.subscribe(key, (value)=>{
                         activeArg[key] = value
-                        wrappedCallback(activeArg, key, who)
+                        wrappedCallback(activeArg, key)
                     })
                 )
             }

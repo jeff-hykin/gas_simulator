@@ -11,36 +11,32 @@ import { GasAgent } from "./agent.js"
 
 function createPubSub() {
     const subs = {}
-    return function(who) {
-        return {
-            subscribe(channel, cb) {
-                (subs[channel] ??= []).push(cb)
-                return () => {
-                    const list = subs[channel]
-                    if (!list) return
-                    const idx = list.indexOf(cb)
-                    if (idx !== -1) list.splice(idx, 1)
-                }
-            },
-            publish(channel, data) {
-                (subs[channel] ?? []).forEach(cb => cb(data, who))
-            },
-            who
-        }
+    return {
+        subscribe(channel, cb) {
+            (subs[channel] ??= []).push(cb)
+            return () => {
+                const list = subs[channel]
+                if (!list) return
+                const idx = list.indexOf(cb)
+                if (idx !== -1) list.splice(idx, 1)
+            }
+        },
+        publish(channel, data) {
+            for (const cb of (subs[channel] ?? [])) cb(data)
+        },
     }
 }
 
 /**
- * Create a pubsub factory with automatic odometry simulation.
+ * Create a pubsub with automatic odometry simulation.
  * Tracks position/heading and publishes odom after each movement.
  */
 function createPubSubWithOdom(startPos = { x: 0, y: 0 }, startHeading = 0, decisionRate = 0.01) {
-    const factory = createPubSub()
-    const ps = factory("test")
+    const ps = createPubSub()
     const state = { x: startPos.x, y: startPos.y, heading: startHeading }
 
     // Auto-publish odom after each movement command (simulates perfect movement)
-    ps.subscribe("movement", (data, publisher) => {
+    ps.subscribe("movement", (data) => {
         // Handle velocity-based commands
         const linearVelocity = data.linearVelocity ?? 0
         const angularVelocity = data.angularVelocity ?? 0
@@ -55,7 +51,7 @@ function createPubSubWithOdom(startPos = { x: 0, y: 0 }, startHeading = 0, decis
         ps.publish("odom", { ...state })
     })
 
-    return factory
+    return ps
 }
 
 function approx(a, b, eps = 1e-6) {
@@ -737,10 +733,8 @@ Deno.test("agent publishes logJson with scalar values only", () => {
     })
 })
 
-// TODO: Fix pubsub identity issue in test - agent and test share same pubsub so messages filtered
 Deno.test.ignore("agent publishes visualizePoint with IDs for add/remove", () => {
     const decisionRate = 0.01
-    // Create pubsub without identity so agent and test can both receive messages
     const ps = createPubSub()
 
     // Add odom simulation manually

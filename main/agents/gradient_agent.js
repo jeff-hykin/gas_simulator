@@ -8,12 +8,12 @@ import { vecDistance } from '../tooling/math_helpers.js'
  */
 export class GradientAgent {
     /**
-     * @param {Function} pubsubFactory - factory function that returns pubsub instance
+     * @param {object} pubsub - pubsub instance { subscribe, publish }
      * @param {object} [config]
      * @param {{x:number,y:number}} [config.startPosition={x:0,y:0}]
      */
-    constructor(pubsubFactory, config = {}) {
-        const pubsub = this.pubsub = pubsubFactory("simple_agent")
+    constructor(pubsub, config = {}) {
+        this.pubsub = pubsub
         const getTime = this.getTime = createGetTime(this.pubsub)
         
         this.disabledOutput = false

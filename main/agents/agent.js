@@ -18,15 +18,14 @@ import { createGetTime } from "../tooling/time.js"
  *      returning to the route when interest fades
  *
  * @example
- *   const pubsubFactory = createPubSub()
- *   const agent = new GasAgent(pubsubFactory, { decisionRate: 1 })
- *   const mainPubsub = pubsubFactory("main")
- *   mainPubsub.publish("route_update", { waypoints: [{x:0,y:0},{x:10,y:0}] })
- *   mainPubsub.publish("gas_reading", { ppm: 0.5 })
+ *   const pubsub = createPubSub()
+ *   const agent = new GasAgent(pubsub, { decisionRate: 1 })
+ *   pubsub.publish("route_update", { waypoints: [{x:0,y:0},{x:10,y:0}] })
+ *   pubsub.publish("gas_reading", { ppm: 0.5 })
  */
 export class GasAgent {
     /**
-     * @param {Function} pubsubFactory - factory function that returns pubsub instance when called with identity
+     * @param {object} pubsub - pubsub instance { subscribe, publish }
      * @param {object} [config]
      * @param {number} [config.minimumGasThreshold=0.1]   PPM — ignore readings below this
      * @param {number} [config.gasSensitivity=0.05]       PPM — min delta to record a memory entry
@@ -42,9 +41,9 @@ export class GasAgent {
      * @param {{x:number,y:number}} [config.startPosition={x:0,y:0}]
      * @param {number} [config.startHeading=0]             radians
      */
-    constructor(pubsubFactory, config = {}) {
+    constructor(pubsub, config = {}) {
         globalThis.agent = this // For debugging
-        this.pubsub = pubsubFactory("agent")
+        this.pubsub = pubsub
         this.getTime = createGetTime(this.pubsub)
 
         // Parameters

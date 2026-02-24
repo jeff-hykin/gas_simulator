@@ -24,7 +24,6 @@ function onMapLoaded() {
   // If the agent is running, stop it and clear state
   if (sim.agentActive) {
     sim.stopAgentLoop();
-    pubsubFactory = null;
     mainPubSub = null;
     updateAgentButtons();
   }
@@ -35,7 +34,6 @@ const sim = createSimulator(mapSys, canvasSys);
 
 // ── Agent state ───────────────────────────────────────────────────────
 
-let pubsubFactory = null;
 let mainPubSub = null;
 const agentConfig = {
   decisionRate: 0.01,       // How often agent makes movement decisions (100 times per second)
@@ -62,13 +60,11 @@ function updateAgentButtons() {
 function playAgent() {
   if (sim.agentActive) return;
 
-  if (!pubsubFactory) {
-    const startPos = getStartPosition();
-    pubsubFactory = createPubSub();
-    mainPubSub = pubsubFactory("main");
+  if (!mainPubSub) {
+    mainPubSub = createPubSub();
 
     // Set up JSON state display (merges new data with current state)
-    mainPubSub.subscribe('logJson', (data, publisher) => {
+    mainPubSub.subscribe('logJson', (data) => {
       // Merge new data into current state
       Object.assign(currentJsonState, data);
 
@@ -77,7 +73,7 @@ function playAgent() {
     });
 
     // Set up visualization point channel (ID-based add/remove system)
-    mainPubSub.subscribe('visualizePoint', (data, publisher) => {
+    mainPubSub.subscribe('visualizePoint', (data) => {
       const { id, remove = false } = data;
 
       if (!id) {
@@ -134,7 +130,7 @@ function playAgent() {
   }
 
   const startPos = getStartPosition();
-  sim.startAgentLoop(pubsubFactory, {
+  sim.startAgentLoop(mainPubSub, {
     ...agentConfig,
     startPosition: startPos,
   });
@@ -180,7 +176,6 @@ function updateJsonStateDisplay() {
 function resetAgent() {
   const startPos = getStartPosition();
   sim.resetRobot({ x: startPos.x, y: startPos.y, angle: 0 });
-  pubsubFactory = null;
   mainPubSub = null;
 
   // Clear JSON state

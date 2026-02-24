@@ -317,22 +317,22 @@ export function createSimulator(mapSys, canvasSys, { maxLinearVelocity = 100, ma
   /**
    * Start the agent simulation loop. Creates the agent, local planner, and starts publishing sensor data.
    *
-   * @param {Function} pubsubFactory - factory function that returns pubsub instance when called with identity
+   * @param {object} pubsub - pubsub instance { subscribe, publish }
    * @param {object} config - agent configuration
    */
-  function startAgentLoop(pubsubFactory, config = {}) {
+  function startAgentLoop(pubsub, config = {}) {
     if (agentActive) return;
     agentActive = true;
-    simulatorPubSub = pubsubFactory("simulator");
+    simulatorPubSub = pubsub;
 
     // Create agent
-    // agent = new SimpleRouteAgent(pubsubFactory, config); // Simple route following (no gas)
-    agent = new GradientAgent(pubsubFactory, config); // Route + gradient exploration
-    // agent = new GasAgent(pubsubFactory, config); // Original implementation
+    // agent = new SimpleRouteAgent(pubsub, config); // Simple route following (no gas)
+    agent = new GradientAgent(pubsub, config); // Route + gradient exploration
+    // agent = new GasAgent(pubsub, config); // Original implementation
     globalThis.agent = agent;
 
     // Create local planner
-    localPlanner = new LocalPlanner(pubsubFactory, {
+    localPlanner = new LocalPlanner(pubsub, {
       closeEnoughToWaypoint: config.waypointThreshold ?? 10,
     });
 
