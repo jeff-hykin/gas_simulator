@@ -1,3 +1,4 @@
+background: maps/train.jpeg
 styles:
   marker:
     r: 5

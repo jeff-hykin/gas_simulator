@@ -208,10 +208,20 @@ export function createCanvasSystem({ width = 800, height = 600 } = {}) {
   }
 
   function setBackground(src) {
+    console.log('[canvas] setBackground called with:', src);
+    if (!src) {
+      backgroundImage = null;
+      render();
+      return;
+    }
     const img = new Image();
     img.onload = () => {
+      console.log('[canvas] background image loaded:', src);
       backgroundImage = img;
       render();
+    };
+    img.onerror = (e) => {
+      console.warn('[canvas] background image failed to load:', src, e);
     };
     img.src = src;
   }

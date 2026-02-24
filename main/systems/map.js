@@ -17,6 +17,7 @@ function makeId(prefix) {
 
 export function createMapData() {
   return {
+    background: null,
     styles: JSON.parse(JSON.stringify(DEFAULT_STYLES)),
     markers: [],
     routes: [],
@@ -27,6 +28,7 @@ export function createMapData() {
 
 export function serializeMap(mapData) {
   const clean = {
+    ...(mapData.background ? { background: mapData.background } : {}),
     styles: mapData.styles,
     markers: mapData.markers.map(({ asCanvas, ...rest }) => rest),
     routes: mapData.routes.map(({ asCanvas, ...rest }) => rest),
@@ -43,6 +45,7 @@ export function deserializeMap(yamlText) {
   return {
     ...data,
     ...parsed,
+    background: parsed.background || null,
     styles: { ...data.styles, ...(parsed.styles || {}) },
   };
 }
@@ -215,6 +218,9 @@ export function createMapSystem(canvasSys, { onMapLoaded } = {}) {
   }
 
   function applyMapData(loaded) {
+    mapData.background = loaded.background || null;
+    console.log('[map] applyMapData background:', mapData.background);
+    canvasSys.setBackground(mapData.background);
     mapData.styles = loaded.styles;
     mapData.markers = (loaded.markers || []).map((marker) => ({
       ...marker,
