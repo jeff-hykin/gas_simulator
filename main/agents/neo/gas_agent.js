@@ -3,7 +3,7 @@ import simpleRouteAgent from './simple_route_agent.js'
 
 const info = {
     inputs: ["position", "routeUpdate", "waypointReached", "gasReading"],
-    outputs: ["targetWaypoint", "logJson"],
+    outputs: ["targetWaypoint", "logJson", "visualizePoints"],
 }
 
 /**
@@ -83,7 +83,7 @@ export function waypointsAlongGradient(position, angle, stepDist, count) {
 }
 
 function create({
-    gasThreshold = 0.1,           // PPM — minimum reading to trigger gas follow
+    gasThreshold = 0.4,           // PPM — minimum reading to trigger gas follow
     bufferSize = 20,              // max number of {time, gasReading, location} entries
     switchingCooldown = 30,       // seconds between mode switches
     routeAgentConfig = {},
@@ -107,6 +107,7 @@ function create({
             routeUpdate:           null,
             waypointReached:       null,
             gasReading:            null,
+            maxGasReading:         0,
             cooldown:              null,
             gasFollowRecalculate:  null,
             gasBuffer:             [],
@@ -119,17 +120,19 @@ function create({
         outputs: {
             targetWaypoint: null,
             logJson:        null,
+            visualizePoints: null,
         },
     }
 
     function update(getTime, { state, updated }) {
-        const { position, routeUpdate, waypointReached, gasReading } = state
-        let outputs = { targetWaypoint: null, logJson: null }
+        const { position, routeUpdate, waypointReached } = state
+        let outputs = { targetWaypoint: null, logJson: null, visualizePoints: null }
         state = { ...state }
 
         // ── Accumulate gas buffer ─────────────────────────────────────
-        if (updated.gasReading && gasReading != null && position != null) {
-            state.gasBuffer = [...state.gasBuffer, { time: getTime(), gasReading, location: position }]
+        if (updated.gasReading && state.gasReading != null && position != null) {
+            state.maxGasReading = Math.max(state.maxGasReading, state.gasReading)
+            state.gasBuffer = [...state.gasBuffer, { time: getTime(), gasReading: state.maxGasReading, location: position }]
             if (state.gasBuffer.length > bufferSize) {
                 state.gasBuffer = state.gasBuffer.slice(-bufferSize)
             }
@@ -186,17 +189,20 @@ function create({
             if (go.logJson        != null) outputs.logJson = { ...outputs.logJson, ...go.logJson }
         }
 
+        // ── Always compute and log gradient ──────────────────────────
+        const gradient = position != null
+            ? gasGradient(position, state.gasBuffer)
+            : { angle: 0, slope: 0 }
+        outputs.logJson = { ...outputs.logJson, gradientAngle: gradient.angle.toFixed(1), gradientSlope: gradient.slope.toFixed(2) }
+
         // ── Mode switching (after cooldown expires) ───────────────────
         if (state.cooldown != null && state.cooldown.done) {
-            const gradient = position != null
-                ? gasGradient(position, state.gasBuffer)
-                : { angle: 0, slope: 0 }
             const interest = gradient.slope
 
             if (state.mode !== "gasFollow") {
                 // Enter gas follow if reading is strong and gradient is rising
                 if (state.gasBuffer.length >= 3
-                        && gasReading != null && gasReading > gasThreshold
+                        && state.maxGasReading > gasThreshold
                         && interest > gasRateIncreaseRatio) {
                     state.gasWaypoints         = waypointsAlongGradient(position, gradient.angle, gradientStepDist, gradientStepCount)
                     state.gasFollowState       = structuredClone(gasFollowAgent.initialArg.state)
@@ -205,6 +211,7 @@ function create({
                     state.gasFollowRecalculate = timer({ duration: gasMoveOnTime, getTime, data: null })
                     state.cooldown             = timer({ duration: switchingCooldown, getTime, data: null })
                     outputs.logJson = { ...outputs.logJson, gasAgent: `entering gas follow (slope=${interest.toFixed(3)})` }
+                    outputs.visualizePoints = state.gasWaypoints.map((wp, i) => ({ id: `gasWp_${i}`, x: wp.x, y: wp.y, color: '#ffaa00', r: 8, label: `G${i+1}` }))
                 }
             } else {
                 if (interest < gasRateIncreaseRatio) {
@@ -213,6 +220,7 @@ function create({
                     state.routeFollowState = structuredClone(routeAgent.initialArg.state)
                     state.cooldown         = timer({ duration: switchingCooldown, getTime, data: null })
                     outputs.logJson = { ...outputs.logJson, gasAgent: `returning to route follow (slope=${interest.toFixed(3)})` }
+                    outputs.visualizePoints = Array.from({ length: gradientStepCount }, (_, i) => ({ id: `gasWp_${i}`, remove: true }))
                 } else if (state.gasFollowRecalculate != null && state.gasFollowRecalculate.done) {
                     // Recalculate waypoints along updated gradient direction
                     state.gasWaypoints          = waypointsAlongGradient(position, gradient.angle, gradientStepDist, gradientStepCount)
@@ -220,9 +228,12 @@ function create({
                     state.gasFollowPendingRoute = { waypoints: state.gasWaypoints }
                     state.gasFollowRecalculate  = timer({ duration: gasMoveOnTime, getTime, data: null })
                     outputs.logJson = { ...outputs.logJson, gasAgent: `recalculating gas waypoints (slope=${interest.toFixed(3)})` }
+                    outputs.visualizePoints = state.gasWaypoints.map((wp, i) => ({ id: `gasWp_${i}`, x: wp.x, y: wp.y, color: '#ffaa00', r: 8, label: `G${i+1}` }))
                 }
             }
         }
+
+        outputs.logJson = { maxGasReading: state.maxGasReading.toFixed(2), ...outputs.logJson }
 
         return { state, outputs }
     }

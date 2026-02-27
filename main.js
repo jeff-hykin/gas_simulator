@@ -73,7 +73,10 @@ function playAgent() {
     });
 
     // Set up visualization point channel (ID-based add/remove system)
-    mainPubSub.subscribe('visualizePoint', (data) => {
+    mainPubSub.subscribe('visualizePoints', (points) => {
+      for (const data of points) handleVisualizePoint(data)
+    })
+    function handleVisualizePoint(data) {
       const { id, remove = false } = data;
 
       if (!id) {
@@ -126,7 +129,7 @@ function playAgent() {
       }
 
       canvasSys.render();
-    });
+    }
   }
 
   const startPos = getStartPosition();

@@ -56,10 +56,7 @@ function create({
                 const remainingDistance = vecDistance(s.position, target)
                 const timeSinceWaypoint = time - s.currentWaypointStartTime
                 const progress = timeSinceWaypoint > 0 ? (s.currentWaypointInitialDistance - remainingDistance) / timeSinceWaypoint : 0
-                logJson = {
-                    progress: progress.toFixed(2),
-                    timeSinceWaypoint: timeSinceWaypoint.toFixed(1),
-                }
+                logJson = { progress: progress.toFixed(2) }
 
                 if (timeSinceWaypoint > gracePeriod && progress < minProgress) {
                     console.log(`SimpleAgent: skipping waypoint ${s.currentWaypointIndex + 1}/${s.routeWaypoints.length} (progress=${progress.toFixed(2)}, t=${timeSinceWaypoint.toFixed(1)}s)`)

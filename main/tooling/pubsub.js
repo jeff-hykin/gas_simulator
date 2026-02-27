@@ -80,7 +80,8 @@ export function connectNeoAgent(pubsub, neoAgent, getTime = () => 0) {
             state = result.state
             outputs = result.outputs
             for (const [ch, value] of Object.entries(outputs)) {
-                if (value != null) pubsub.publish(ch, value)
+                if (value == null) continue
+                pubsub.publish(ch, value)
             }
         })
     )

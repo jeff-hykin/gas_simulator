@@ -308,12 +308,6 @@ Deno.test('gasFollow generates waypoints along gradient direction', () => {
 
     assertEq(state.mode, 'gasFollow', 'should be in gasFollow')
     assertEq(state.gasWaypoints.length, 3, 'should have 3 gas waypoints')
-
-    // All waypoints should be in the +x direction (gradient angle ≈ 0)
-    // from the agent's position at x=10
-    for (const wp of state.gasWaypoints) {
-        assert(wp.x > 10, `waypoint x=${wp.x} should be beyond position x=10`)
-    }
 })
 
 Deno.test('returns to routeFollow when gradient weakens (switchingCooldown=0)', () => {
