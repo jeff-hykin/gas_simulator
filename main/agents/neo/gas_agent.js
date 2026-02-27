@@ -84,7 +84,7 @@ export function waypointsAlongGradient(position, angle, stepDist, count) {
 
 function create({
     gasThreshold = 0.4,           // PPM — minimum reading to trigger gas follow
-    bufferSize = 20,              // max number of {time, gasReading, location} entries
+    bufferSize = 80,              // max number of {time, gasReading, location} entries
     switchingCooldown = 30,       // seconds between mode switches
     routeAgentConfig = {},
     gasMoveOnTime = 20,           // seconds between gas-waypoint recalculations
