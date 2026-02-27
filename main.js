@@ -53,15 +53,21 @@ function buildButton(label, onClick) {
 }
 
 function updateAgentButtons() {
-  const running = sim.agentActive;
+  const running = sim.isClockRunning;
   btnToggle.textContent = running ? 'Pause' : 'Play';
   btnToggle.classList.toggle('is-active', running);
 }
 
 function playAgent() {
-  if (sim.agentActive) return;
+  if (sim.isClockRunning) return;
 
-  if (!mainPubSub) {
+  if (mainPubSub) {
+    sim.play();
+    updateAgentButtons();
+    return;
+  }
+
+  {
     mainPubSub = createPubSub();
 
     // Set up JSON state display (merges new data with current state)
@@ -160,24 +166,24 @@ function playAgent() {
       }
       canvasSys.render();
     })
-  }
 
-  const startPos = getStartPosition();
-  sim.startAgentLoop(mainPubSub, {
-    ...agentConfig,
-    startPosition: startPos,
-  });
+    const startPos = getStartPosition();
+    sim.startAgentLoop(mainPubSub, {
+      ...agentConfig,
+      startPosition: startPos,
+    });
 
-  const routes = mapSys.mapData.routes || [];
-  if (routes.length > 0 && routes[0].points.length > 0) {
-    mainPubSub.publish('route_update', { waypoints: routes[0].points });
+    const routes = mapSys.mapData.routes || [];
+    if (routes.length > 0 && routes[0].points.length > 0) {
+      mainPubSub.publish('route_update', { waypoints: routes[0].points });
+    }
   }
 
   updateAgentButtons();
 }
 
 function pauseAgent() {
-  sim.stopAgentLoop();
+  sim.pause();
   updateAgentButtons();
 }
 
@@ -245,7 +251,7 @@ const agentControls = document.createElement('div');
 agentControls.className = 'agent-controls';
 
 function toggleAgent() {
-  if (sim.agentActive) {
+  if (sim.isClockRunning) {
     pauseAgent();
   } else {
     playAgent();

@@ -84,13 +84,13 @@ export function waypointsAlongGradient(position, angle, stepDist, count) {
 
 function create({
     gasThreshold = 0.4,           // PPM — minimum reading to trigger gas follow
-    bufferSize = 80,              // max number of {time, gasReading, location} entries
+    bufferSize = 500,              // max number of {time, gasReading, location} entries
     switchingCooldown = 30,       // seconds between mode switches
     routeAgentConfig = {},
     gasMoveOnTime = 20,           // seconds between gas-waypoint recalculations
-    gasRateIncreaseRatio = 0.05,  // gradient slope threshold to enter/exit gas follow
+    gasRateIncreaseRatio = 0.02,  // gradient slope threshold to enter/exit gas follow
     gradientStepDist = 30,        // map units between gas-follow waypoints
-    gradientStepCount = 3,        // number of gas-follow waypoints to generate
+    gradientStepCount = 8,        // number of gas-follow waypoints to generate
 } = {}) {
     const routeAgent     = simpleRouteAgent.create(routeAgentConfig)
     const gasFollowAgent = simpleRouteAgent.create({})
@@ -193,7 +193,7 @@ function create({
         const gradient = position != null
             ? gasGradient(position, state.gasBuffer)
             : { angle: 0, slope: 0 }
-        outputs.logJson = { ...outputs.logJson, gradientAngle: gradient.angle.toFixed(1), gradientSlope: gradient.slope.toFixed(2) }
+        outputs.logJson = { ...outputs.logJson, gradientAngle: gradient.angle.toFixed(1), gradientSlope: gradient.slope.toFixed(4) }
         if (position != null) {
             const lineLen = 40
             outputs.visualizeLines = [{ id: 'gradientDir', x1: position.x, y1: position.y, x2: position.x + Math.cos(gradient.angle) * lineLen, y2: position.y + Math.sin(gradient.angle) * lineLen, color: '#00ffcc', lineWidth: 2 }]
