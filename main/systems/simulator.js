@@ -2,11 +2,9 @@
  * @typedef {{x:number,y:number}} Point
  */
 
-import { createPubSub } from '../tooling/pubsub.js';
-import { LocalPlanner } from '../agents/local_planner.js';
-import { GasAgent } from '../agents/agent.js';
-import { SimpleRouteAgent } from '../agents/simple_route_agent.js';
-import { GradientAgent } from '../agents/gradient_agent.old.js';
+import { createPubSub, connectNeoAgent } from '../tooling/pubsub.js';
+import simpleRouteAgent from '../agents/neo/simple_route_agent.js';
+import localPlannerAgent from '../agents/neo/local_planner.js';
 
 export function gaussianPeakAt(distance, radius, peak) {
   if (radius <= 0) return 0;
@@ -280,8 +278,7 @@ export function createSimulator(mapSys, canvasSys, { maxLinearVelocity = 100, ma
 
   let agentActive = false;
   let simulatorPubSub = null;
-  let agent = null;
-  let localPlanner = null;
+  let agentUnsubs = [];
   let movementUnsub = null;
   let lastGasSampleTime = 0; // Track last gas sample in virtual time
   let gasSamplingRate = 1; // Seconds between gas readings
@@ -325,16 +322,22 @@ export function createSimulator(mapSys, canvasSys, { maxLinearVelocity = 100, ma
     agentActive = true;
     simulatorPubSub = pubsub;
 
-    // Create agent
-    // agent = new SimpleRouteAgent(pubsub, config); // Simple route following (no gas)
-    agent = new GradientAgent(pubsub, config); // Route + gradient exploration
-    // agent = new GasAgent(pubsub, config); // Original implementation
-    globalThis.agent = agent;
+    const getTime = () => clock.virtualTime;
 
-    // Create local planner
-    localPlanner = new LocalPlanner(pubsub, {
-      closeEnoughToWaypoint: config.waypointThreshold ?? 10,
-    });
+    // Bridge channel names: simulator publishes 'odom', main.js publishes 'route_update'
+    // but the neo simple_route_agent expects 'position' and 'routeUpdate'
+    const unsubBridgePosition = pubsub.subscribe('odom', (data) => pubsub.publish('position', data));
+    const unsubBridgeRoute = pubsub.subscribe('route_update', (data) => pubsub.publish('routeUpdate', data));
+
+    // Connect neo agents
+    agentUnsubs = [
+      unsubBridgePosition,
+      unsubBridgeRoute,
+      connectNeoAgent(pubsub, simpleRouteAgent.create({}), getTime),
+      connectNeoAgent(pubsub, localPlannerAgent.create({
+        closeEnoughToWaypoint: config.waypointThreshold ?? 10,
+      }), getTime),
+    ];
 
     // Store gas sampling parameters for clock tick handler
     gasSamplingRate = config.decisionRate ?? 1;
@@ -353,23 +356,21 @@ export function createSimulator(mapSys, canvasSys, { maxLinearVelocity = 100, ma
       heading: robot.angle * (Math.PI / 180),
     });
 
-    movementUnsub = simulatorPubSub.subscribe('movement', (data, publisher) => {
-      // Accept velocity-based commands
+    movementUnsub = simulatorPubSub.subscribe('movement', (data) => {
       const linearVelocity = data.linearVelocity ?? 0;
       const angularVelocity = data.angularVelocity ?? 0;
-
       move(linearVelocity, angularVelocity);
       step();
     });
   }
 
   function stopAgentLoop() {
+    for (const unsub of agentUnsubs) unsub();
+    agentUnsubs = [];
     if (movementUnsub) {
       movementUnsub();
       movementUnsub = null;
     }
-    agent = null;
-    localPlanner = null;
     pauseClock();
     agentActive = false;
   }

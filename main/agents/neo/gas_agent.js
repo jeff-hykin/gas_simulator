@@ -1,104 +1,232 @@
-import { vecDistance } from '../../tooling/math_helpers.js'
-import { timer } from "../../tooling/time.js";
-
+import { timer } from "../../tooling/time.js"
 import simpleRouteAgent from './simple_route_agent.js'
 
 const info = {
     inputs: ["position", "routeUpdate", "waypointReached", "gasReading"],
     outputs: ["targetWaypoint", "logJson"],
 }
+
+/**
+ * Fit a plane  gas = a·x + b·y + c  to samples using weighted least-squares
+ * (samples closer to `position` receive higher weight).  Returns the gradient
+ * of that plane as { angle, slope } where:
+ *   - slope  = magnitude of [a, b]  (steepness of the fitted surface)
+ *   - angle  = Math.atan2(b, a)     (direction of steepest ascent, radians)
+ *
+ * @param {{x:number, y:number}} position
+ * @param {{time:any, gasReading:number, location:{x:number,y:number}}[]} samples
+ * @returns {{ angle:number, slope:number }}
+ */
+export function gasGradient(position, samples) {
+    const pts = []
+    for (const s of samples) {
+        if (s.location != null && s.gasReading != null) {
+            pts.push({ x: s.location.x, y: s.location.y, v: s.gasReading })
+        }
+    }
+    if (pts.length < 3) return { angle: 0, slope: 0 }
+
+    // Weighted least-squares: weight = 1 / (distance + 1)
+    let sw = 0, swx = 0, swy = 0, swv = 0
+    let swxx = 0, swyy = 0, swxy = 0, swxv = 0, swyv = 0
+    for (const p of pts) {
+        const d = Math.hypot(p.x - position.x, p.y - position.y)
+        const w = 1 / (d + 1)
+        sw   += w
+        swx  += w * p.x
+        swy  += w * p.y
+        swv  += w * p.v
+        swxx += w * p.x * p.x
+        swyy += w * p.y * p.y
+        swxy += w * p.x * p.y
+        swxv += w * p.x * p.v
+        swyv += w * p.y * p.v
+    }
+
+    // Solve 3×3 weighted normal equations via Cramer's rule:
+    // | swxx swxy swx | | a |   | swxv |
+    // | swxy swyy swy | | b | = | swyv |
+    // | swx  swy  sw  | | c |   | swv  |
+    const det = swxx * (swyy * sw   - swy  * swy)
+              - swxy * (swxy * sw   - swy  * swx)
+              + swx  * (swxy * swy  - swyy * swx)
+    if (Math.abs(det) < 1e-15) return { angle: 0, slope: 0 }
+
+    const a = (swxv * (swyy * sw  - swy  * swy)
+             - swxy * (swyv * sw  - swy  * swv)
+             + swx  * (swyv * swy - swyy * swv)) / det
+    const b = (swxx * (swyv * sw  - swy  * swv)
+             - swxv * (swxy * sw  - swy  * swx)
+             + swx  * (swxy * swv - swyv * swx)) / det
+
+    return { angle: Math.atan2(b, a), slope: Math.hypot(a, b) }
+}
+
+/**
+ * Generate `count` waypoints stepping from `position` in direction `angle`,
+ * each `stepDist` apart.
+ *
+ * @param {{x:number,y:number}} position
+ * @param {number} angle - radians
+ * @param {number} stepDist - distance between waypoints
+ * @param {number} count
+ * @returns {{x:number,y:number}[]}
+ */
+export function waypointsAlongGradient(position, angle, stepDist, count) {
+    const dx = Math.cos(angle) * stepDist
+    const dy = Math.sin(angle) * stepDist
+    const pts = []
+    for (let i = 1; i <= count; i++) {
+        pts.push({ x: position.x + dx * i, y: position.y + dy * i })
+    }
+    return pts
+}
+
 function create({
-    gasThreshold = 0.1, // PPM
-    bufferSize = 20, // timesteps
-    switchingCooldown = 30, // timesteps
+    gasThreshold = 0.1,           // PPM — minimum reading to trigger gas follow
+    bufferSize = 20,              // max number of {time, gasReading, location} entries
+    switchingCooldown = 30,       // seconds between mode switches
     routeAgentConfig = {},
-    gasMoveOnTime = 20, // timesteps
-    gasThreshold = 0.1, // PPM
-    gasRateIncreaseRatio = 0.05, // PPM/timestep
-}) {
+    gasMoveOnTime = 20,           // seconds between gas-waypoint recalculations
+    gasRateIncreaseRatio = 0.05,  // gradient slope threshold to enter/exit gas follow
+    gradientStepDist = 30,        // map units between gas-follow waypoints
+    gradientStepCount = 3,        // number of gas-follow waypoints to generate
+} = {}) {
+    const routeAgent     = simpleRouteAgent.create(routeAgentConfig)
+    const gasFollowAgent = simpleRouteAgent.create({})
+
     const initialArg = {
         updated: {
-            time: false,
-            routeWaypoints: false,
+            position:        false,
+            routeUpdate:     false,
+            waypointReached: false,
+            gasReading:      false,
         },
         state: {
-            time: null,
-            routeWaypoints: [],
-            cooldown: null,
-            gasFollowRecalculate: null,
-            gasBuffer: [],
-            gasValueHistory: [],
-            gasWaypoints: [],
-            mode: "idle",
-            routeFollowState: {},
-            gasFollowState: {},
+            position:              null,
+            routeUpdate:           null,
+            waypointReached:       null,
+            gasReading:            null,
+            cooldown:              null,
+            gasFollowRecalculate:  null,
+            gasBuffer:             [],
+            gasWaypoints:          [],
+            gasFollowPendingRoute: null,   // fed to gasFollowAgent on next tick
+            mode:                  "idle",
+            routeFollowState:      structuredClone(routeAgent.initialArg.state),
+            gasFollowState:        structuredClone(gasFollowAgent.initialArg.state),
         },
         outputs: {
             targetWaypoint: null,
-            logJson: null,
-        }
+            logJson:        null,
+        },
     }
-    const routeAgent = simpleRouteAgent.create(routeAgentConfig)
+
     function update(getTime, { state, updated }) {
-        const { time, routeWaypoints, position, waypointReached, gasReading } = state
-        const outputs = {}
-        if (updated.routeWaypoints) {
+        const { position, routeUpdate, waypointReached, gasReading } = state
+        let outputs = { targetWaypoint: null, logJson: null }
+        state = { ...state }
+
+        // ── Accumulate gas buffer ─────────────────────────────────────
+        if (updated.gasReading && gasReading != null && position != null) {
+            state.gasBuffer = [...state.gasBuffer, { time: getTime(), gasReading, location: position }]
+            if (state.gasBuffer.length > bufferSize) {
+                state.gasBuffer = state.gasBuffer.slice(-bufferSize)
+            }
+        }
+
+        // ── New route received → enter routeFollow ───────────────────
+        if (updated.routeUpdate && routeUpdate != null) {
             state.mode = "routeFollow"
-            state.routeFollowState = routeAgent.initialArg
-            state.cooldown = timer({ duration: switchingCooldown, getTime, data: structuredClone(state) })
+            state.routeFollowState = structuredClone(routeAgent.initialArg.state)
+            if (state.cooldown == null) {
+                state.cooldown = timer({ duration: switchingCooldown, getTime, data: null })
+            }
         }
 
-        if (mode === "routeFollow") {
-            const { outputs: routeOutputs, state: routeState } = routeAgent.update(getTime, { state: {...state.routeFollowState, time, routeWaypoints, position, waypointReached }, updated })
-            state.routeFollowState = routeState
-            outputs.targetWaypoint = routeOutputs.targetWaypoint
-            outputs.logJson = routeOutputs.logJson
+        // ── Delegate to route-follow sub-agent ───────────────────────
+        if (state.mode === "routeFollow") {
+            const { outputs: ro, state: rs } = routeAgent.update(getTime, {
+                state: {
+                    ...state.routeFollowState,
+                    position,
+                    routeUpdate:     updated.routeUpdate     ? routeUpdate     : null,
+                    waypointReached: updated.waypointReached ? waypointReached : null,
+                },
+                updated: {
+                    position:        updated.position,
+                    routeUpdate:     updated.routeUpdate,
+                    waypointReached: updated.waypointReached,
+                },
+            })
+            state.routeFollowState = rs
+            if (ro.targetWaypoint != null) outputs.targetWaypoint = ro.targetWaypoint
+            if (ro.logJson        != null) outputs.logJson = { ...outputs.logJson, ...ro.logJson }
         }
 
-        if (mode === "gasFollow") {
-            const { outputs: gasFollowOutputs, state: gasFollowState } = gasFollowAgent.update(getTime, { state: {...state.gasFollowState, time, routeWaypoints: state.gasWaypoints, position, waypointReached }, updated })
-            state.gasFollowState = gasFollowState
-            outputs.targetWaypoint = gasFollowOutputs.targetWaypoint
-            outputs.logJson = gasFollowOutputs.logJson
+        // ── Delegate to gas-follow sub-agent ─────────────────────────
+        if (state.mode === "gasFollow") {
+            const pendingRoute = state.gasFollowPendingRoute
+            state = { ...state, gasFollowPendingRoute: null }
+            const { outputs: go, state: gs } = gasFollowAgent.update(getTime, {
+                state: {
+                    ...state.gasFollowState,
+                    position,
+                    routeUpdate:     pendingRoute,
+                    waypointReached: updated.waypointReached ? waypointReached : null,
+                },
+                updated: {
+                    position:        updated.position,
+                    routeUpdate:     pendingRoute != null,
+                    waypointReached: updated.waypointReached,
+                },
+            })
+            state.gasFollowState = gs
+            if (go.targetWaypoint != null) outputs.targetWaypoint = go.targetWaypoint
+            if (go.logJson        != null) outputs.logJson = { ...outputs.logJson, ...go.logJson }
         }
-        
-        state.gasBuffer.push({ time, gasReading })
-        if (state.gasBuffer.length > bufferSize) {
-            state.gasBuffer.shift()
-        }
-        
-        if (cooldown.done) {
-            if (mode != "gasFollow") {
-                // FIXME: gradientOf
-                // starting gas follow
-                const smallBufferGradient = gradientOf(state.gasBuffer)
-                if (state.gasBuffer.length > 2 && state.gasReading > gasThreshold && smallBufferGradient > gasRateIncreaseRatio) {
-                    state.gasFollowState = gasFollowAgent.initialArg
-                    state.mode = "gasFollow"
-                    state.gasFollowRecalculate = timer({ duration: gasMoveOnTime, getTime, data: structuredClone(state) })
-                    state.cooldown = timer({ duration: switchingCooldown, getTime, data: structuredClone(state) })
-                    // FIXME: generate waypoints based on gradient
-                    state.gasWaypoints = []
+
+        // ── Mode switching (after cooldown expires) ───────────────────
+        if (state.cooldown != null && state.cooldown.done) {
+            const gradient = position != null
+                ? gasGradient(position, state.gasBuffer)
+                : { angle: 0, slope: 0 }
+            const interest = gradient.slope
+
+            if (state.mode !== "gasFollow") {
+                // Enter gas follow if reading is strong and gradient is rising
+                if (state.gasBuffer.length >= 3
+                        && gasReading != null && gasReading > gasThreshold
+                        && interest > gasRateIncreaseRatio) {
+                    state.gasWaypoints         = waypointsAlongGradient(position, gradient.angle, gradientStepDist, gradientStepCount)
+                    state.gasFollowState       = structuredClone(gasFollowAgent.initialArg.state)
+                    state.gasFollowPendingRoute = { waypoints: state.gasWaypoints }
+                    state.mode                 = "gasFollow"
+                    state.gasFollowRecalculate = timer({ duration: gasMoveOnTime, getTime, data: null })
+                    state.cooldown             = timer({ duration: switchingCooldown, getTime, data: null })
+                    outputs.logJson = { ...outputs.logJson, gasAgent: `entering gas follow (slope=${interest.toFixed(3)})` }
                 }
             } else {
-                // FIXME: calculate interest and refocusPressure
-                // go back to normal follow
-                if (interest < refocusPressure) {
-                    state.mode = "routeFollow"
-                    state.routeFollowState = routeAgent.initialArg
-                    state.cooldown = timer({ duration: switchingCooldown, getTime, data: structuredClone(state) })
-                }
-                // do another round of gas reading
-                if (gasFollowRecalculate.done) {
-                    state.gasFollowRecalculate = timer({ duration: gasMoveOnTime, getTime, data: structuredClone(state) })
-                    // FIXME: generate waypoints based on gradient
-                    state.gasWaypoints = []
+                if (interest < gasRateIncreaseRatio) {
+                    // Gradient too weak → return to route follow
+                    state.mode             = "routeFollow"
+                    state.routeFollowState = structuredClone(routeAgent.initialArg.state)
+                    state.cooldown         = timer({ duration: switchingCooldown, getTime, data: null })
+                    outputs.logJson = { ...outputs.logJson, gasAgent: `returning to route follow (slope=${interest.toFixed(3)})` }
+                } else if (state.gasFollowRecalculate != null && state.gasFollowRecalculate.done) {
+                    // Recalculate waypoints along updated gradient direction
+                    state.gasWaypoints          = waypointsAlongGradient(position, gradient.angle, gradientStepDist, gradientStepCount)
+                    state.gasFollowState        = structuredClone(gasFollowAgent.initialArg.state)
+                    state.gasFollowPendingRoute = { waypoints: state.gasWaypoints }
+                    state.gasFollowRecalculate  = timer({ duration: gasMoveOnTime, getTime, data: null })
+                    outputs.logJson = { ...outputs.logJson, gasAgent: `recalculating gas waypoints (slope=${interest.toFixed(3)})` }
                 }
             }
         }
 
         return { state, outputs }
     }
+
     return { initialArg, info, update }
 }
 

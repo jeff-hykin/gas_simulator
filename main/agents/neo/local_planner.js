@@ -53,13 +53,9 @@ function create({
             }
         }
 
-        // not enough data => idle
+        // not enough data => idle (preserve received inputs so they accumulate)
         if (state.targetWaypoint == null || state.odom == null) {
-            state = {
-                ...initialArg.state,
-                mode: "idle",
-            }
-            return { state, outputs }
+            return { state, outputs: initialArg.outputs }
         }
 
         // switch to greedy mode from idle

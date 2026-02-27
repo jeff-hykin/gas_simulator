@@ -23,13 +23,14 @@ function create({}) {
         }
     }
     function update(getTime, { state, updated }) {
-        const { time, position, waypointReached, routeUpdate } = state
+        const time = getTime()
+        const { position, waypointReached, routeUpdate } = state
         let s = { ...state }
         let targetWaypoint = null
         let logJson = null
         
         // 1. Apply routeUpdate (resets everything)
-        if (routeUpdate) {
+        if (updated.routeUpdate) {
             console.log(`SimpleAgent: route updated with ${routeUpdate.waypoints.length} waypoints`)
             s = {
                 ...s,
@@ -40,7 +41,7 @@ function create({}) {
         }
         
         // 2. Apply waypointReached
-        if (waypointReached) {
+        if (updated.waypointReached) {
             console.log(`SimpleAgent: waypoint ${s.currentWaypointIndex + 1}/${s.routeWaypoints.length} reached`)
             s = { ...s, currentWaypointIndex: s.currentWaypointIndex + 1, currentPublishedWaypoint: null }
         }

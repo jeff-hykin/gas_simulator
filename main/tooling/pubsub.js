@@ -42,6 +42,52 @@ export function createPubSub() {
     return { subscribe, publish }
 }
 
+/**
+ * Connect a neoAgent ({ initialArg, info, update }) to a pubsub instance.
+ *
+ * Subscribes to every channel listed in info.inputs. Whenever one fires:
+ *   - state.<channel> is set to the published value
+ *   - updated is a fresh object with only that channel set to true
+ *   - neoAgent.update(getTime, { state, updated, outputs }) is called
+ *   - any non-null value in the returned outputs is published back to pubsub
+ *
+ * @example
+ *   import LocalPlanner from './neo/local_planner.js'
+ *   const pubsub = createPubSub()
+ *   const planner = LocalPlanner.create({ closeEnoughToWaypoint: 10 })
+ *   const unsub = connectNeoAgent(pubsub, planner, getTime)
+ *   unsub() // detach
+ *
+ * @param {object} pubsub    - { subscribe, publish }
+ * @param {object} neoAgent  - { initialArg, info, update }
+ * @param {Function} getTime - returns current virtual time (passed through to update)
+ * @returns {Function} unsubscribe
+ */
+export function connectNeoAgent(pubsub, neoAgent, getTime = () => 0) {
+    const { initialArg, info, update } = neoAgent
+
+    let state = structuredClone(initialArg.state)
+    let outputs = structuredClone(initialArg.outputs)
+
+    // Template for updated: all inputs false, reset on every tick
+    const zeroUpdated = Object.fromEntries(info.inputs.map(name => [name, false]))
+
+    const unsubs = info.inputs.map(channel =>
+        pubsub.subscribe(channel, (data) => {
+            state = { ...state, [channel]: data }
+            const updated = { ...zeroUpdated, [channel]: true }
+            const result = update(getTime, { state, updated, outputs })
+            state = result.state
+            outputs = result.outputs
+            for (const [ch, value] of Object.entries(outputs)) {
+                if (value != null) pubsub.publish(ch, value)
+            }
+        })
+    )
+
+    return () => { for (const unsub of unsubs) unsub() }
+}
+
 export class Computed {
     constructor({pubsub, initValue, topics}, callback) {
         this.value = initValue

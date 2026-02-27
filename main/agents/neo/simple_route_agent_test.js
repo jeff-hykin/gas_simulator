@@ -18,7 +18,11 @@ function assertNotNull(v, message) {
 function step(agent, state, { time = 0, routeUpdate = null, position = null, waypointReached = null } = {}) {
     const { state: nextState, outputs } = agent.update(() => time, {
         state: { ...state, time, routeUpdate, position, waypointReached },
-        updated: {},
+        updated: {
+            routeUpdate: routeUpdate != null,
+            waypointReached: waypointReached != null,
+            position: position != null,
+        },
     })
     return { state: nextState, targetWaypoint: outputs.targetWaypoint, logJson: outputs.logJson }
 }
