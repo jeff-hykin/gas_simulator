@@ -95,7 +95,7 @@ function create({
     gasMoveOnTime = 20,           // seconds between gas-waypoint recalculations
     gasRateIncreaseRatio = 0.002,  // gradient slope threshold to enter/exit gas follow
     gradientCenterDist = 50,      // map units from position to circle center (along gradient)
-    gradientCircleRadius = 30,    // radius of the sampling circle
+    gradientCircleRadius = 60,    // radius of the sampling circle
     gradientStepCount = 8,        // number of waypoints around the circle
 } = {}) {
     const routeAgent     = simpleRouteAgent.create(routeAgentConfig)
@@ -245,6 +245,20 @@ function create({
                     const center1 = { x: position.x + Math.cos(gradient.angle) * gradientCenterDist, y: position.y + Math.sin(gradient.angle) * gradientCenterDist }
                     outputs.visualizePoints = [{ id: 'gasCenter', x: center1.x, y: center1.y, color: '#ff4400', r: 5, label: 'C' }, ...state.gasWaypoints.map((wp, i) => ({ id: `gasWp_${i}`, x: wp.x, y: wp.y, color: '#ffaa00', r: 8, label: `G${i+1}` }))]
                 }
+            }
+        }
+
+        // ── Circle complete → start new circle immediately ────────────
+        if (state.mode === "gasFollow" && state.gasFollowPendingRoute == null && position != null) {
+            const { routeWaypoints, currentWaypointIndex } = state.gasFollowState
+            if (routeWaypoints.length > 0 && currentWaypointIndex >= routeWaypoints.length) {
+                state.gasWaypoints         = circleWaypointsAroundGradient(position, gradient.angle, gradientCenterDist, gradientCircleRadius, gradientStepCount)
+                state.gasFollowState       = structuredClone(gasFollowAgent.initialArg.state)
+                state.gasFollowPendingRoute = { waypoints: state.gasWaypoints }
+                state.gasFollowRecalculate  = timer({ duration: gasMoveOnTime, getTime, data: null })
+                outputs.logJson = { ...outputs.logJson, gasAgent: `new circle (slope=${gradient.slope.toFixed(3)})` }
+                const centerC = { x: position.x + Math.cos(gradient.angle) * gradientCenterDist, y: position.y + Math.sin(gradient.angle) * gradientCenterDist }
+                outputs.visualizePoints = [{ id: 'gasCenter', x: centerC.x, y: centerC.y, color: '#ff4400', r: 5, label: 'C' }, ...state.gasWaypoints.map((wp, i) => ({ id: `gasWp_${i}`, x: wp.x, y: wp.y, color: '#ffaa00', r: 8, label: `G${i+1}` }))]
             }
         }
 
