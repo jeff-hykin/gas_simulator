@@ -63,21 +63,26 @@ export function gasGradient(position, samples) {
 }
 
 /**
- * Generate `count` waypoints stepping from `position` in direction `angle`,
- * each `stepDist` apart.
+ * Generate `count` waypoints in a circle around a center point that lies
+ * `centerDist` units from `position` in the gradient `angle` direction.
+ * The center point itself is not a waypoint — it is only used as the orbit center.
  *
  * @param {{x:number,y:number}} position
- * @param {number} angle - radians
- * @param {number} stepDist - distance between waypoints
- * @param {number} count
+ * @param {number} angle - radians, direction of steepest ascent
+ * @param {number} centerDist - distance from position to circle center
+ * @param {number} circleRadius - radius of the sampling circle
+ * @param {number} count - number of waypoints around the circle
  * @returns {{x:number,y:number}[]}
  */
-export function waypointsAlongGradient(position, angle, stepDist, count) {
-    const dx = Math.cos(angle) * stepDist
-    const dy = Math.sin(angle) * stepDist
+export function circleWaypointsAroundGradient(position, angle, centerDist, circleRadius, count) {
+    const center = {
+        x: position.x + Math.cos(angle) * centerDist,
+        y: position.y + Math.sin(angle) * centerDist,
+    }
     const pts = []
-    for (let i = 1; i <= count; i++) {
-        pts.push({ x: position.x + dx * i, y: position.y + dy * i })
+    for (let i = 0; i < count; i++) {
+        const a = (2 * Math.PI * i) / count
+        pts.push({ x: center.x + Math.cos(a) * circleRadius, y: center.y + Math.sin(a) * circleRadius })
     }
     return pts
 }
@@ -89,8 +94,9 @@ function create({
     routeAgentConfig = {},
     gasMoveOnTime = 20,           // seconds between gas-waypoint recalculations
     gasRateIncreaseRatio = 0.002,  // gradient slope threshold to enter/exit gas follow
-    gradientStepDist = 30,        // map units between gas-follow waypoints
-    gradientStepCount = 8,        // number of gas-follow waypoints to generate
+    gradientCenterDist = 50,      // map units from position to circle center (along gradient)
+    gradientCircleRadius = 30,    // radius of the sampling circle
+    gradientStepCount = 8,        // number of waypoints around the circle
 } = {}) {
     const routeAgent     = simpleRouteAgent.create(routeAgentConfig)
     const gasFollowAgent = simpleRouteAgent.create({})
@@ -212,14 +218,15 @@ function create({
                 if (state.gasBuffer.length >= 3
                         && state.maxGasReading > gasThreshold
                         && interest > gasRateIncreaseRatio) {
-                    state.gasWaypoints         = waypointsAlongGradient(position, gradient.angle, gradientStepDist, gradientStepCount)
+                    state.gasWaypoints         = circleWaypointsAroundGradient(position, gradient.angle, gradientCenterDist, gradientCircleRadius, gradientStepCount)
                     state.gasFollowState       = structuredClone(gasFollowAgent.initialArg.state)
                     state.gasFollowPendingRoute = { waypoints: state.gasWaypoints }
                     state.mode                 = "gasFollow"
                     state.gasFollowRecalculate = timer({ duration: gasMoveOnTime, getTime, data: null })
                     state.cooldown             = timer({ duration: switchingCooldown, getTime, data: null })
                     outputs.logJson = { ...outputs.logJson, gasAgent: `entering gas follow (slope=${interest.toFixed(3)})` }
-                    outputs.visualizePoints = state.gasWaypoints.map((wp, i) => ({ id: `gasWp_${i}`, x: wp.x, y: wp.y, color: '#ffaa00', r: 8, label: `G${i+1}` }))
+                    const center0 = { x: position.x + Math.cos(gradient.angle) * gradientCenterDist, y: position.y + Math.sin(gradient.angle) * gradientCenterDist }
+                    outputs.visualizePoints = [{ id: 'gasCenter', x: center0.x, y: center0.y, color: '#ff4400', r: 5, label: 'C' }, ...state.gasWaypoints.map((wp, i) => ({ id: `gasWp_${i}`, x: wp.x, y: wp.y, color: '#ffaa00', r: 8, label: `G${i+1}` }))]
                 }
             } else {
                 if (interest < gasRateIncreaseRatio) {
@@ -227,15 +234,16 @@ function create({
                     state.mode     = "routeFollow"
                     state.cooldown = timer({ duration: switchingCooldown, getTime, data: null })
                     outputs.logJson = { ...outputs.logJson, gasAgent: `returning to route follow (slope=${interest.toFixed(3)})` }
-                    outputs.visualizePoints = Array.from({ length: gradientStepCount }, (_, i) => ({ id: `gasWp_${i}`, remove: true }))
+                    outputs.visualizePoints = [{ id: 'gasCenter', remove: true }, ...Array.from({ length: gradientStepCount }, (_, i) => ({ id: `gasWp_${i}`, remove: true }))]
                 } else if (state.gasFollowRecalculate != null && state.gasFollowRecalculate.done) {
                     // Recalculate waypoints along updated gradient direction
-                    state.gasWaypoints          = waypointsAlongGradient(position, gradient.angle, gradientStepDist, gradientStepCount)
+                    state.gasWaypoints          = circleWaypointsAroundGradient(position, gradient.angle, gradientCenterDist, gradientCircleRadius, gradientStepCount)
                     state.gasFollowState        = structuredClone(gasFollowAgent.initialArg.state)
                     state.gasFollowPendingRoute = { waypoints: state.gasWaypoints }
                     state.gasFollowRecalculate  = timer({ duration: gasMoveOnTime, getTime, data: null })
                     outputs.logJson = { ...outputs.logJson, gasAgent: `recalculating gas waypoints (slope=${interest.toFixed(3)})` }
-                    outputs.visualizePoints = state.gasWaypoints.map((wp, i) => ({ id: `gasWp_${i}`, x: wp.x, y: wp.y, color: '#ffaa00', r: 8, label: `G${i+1}` }))
+                    const center1 = { x: position.x + Math.cos(gradient.angle) * gradientCenterDist, y: position.y + Math.sin(gradient.angle) * gradientCenterDist }
+                    outputs.visualizePoints = [{ id: 'gasCenter', x: center1.x, y: center1.y, color: '#ff4400', r: 5, label: 'C' }, ...state.gasWaypoints.map((wp, i) => ({ id: `gasWp_${i}`, x: wp.x, y: wp.y, color: '#ffaa00', r: 8, label: `G${i+1}` }))]
                 }
             }
         }
