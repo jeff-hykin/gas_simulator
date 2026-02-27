@@ -5,7 +5,8 @@ const info = {
     outputs: ["targetWaypoint", "logJson"],
 }
 function create({
-    minProgress = 10,  // units/sec below which the waypoint is skipped
+    minProgress = 10,   // units/sec below which the waypoint is skipped
+    gracePeriod = 0.5,  // seconds before the progress check kicks in
 } = {}) {
     const initialArg = {
         updated: {},
@@ -60,7 +61,7 @@ function create({
                     timeSinceWaypoint: timeSinceWaypoint.toFixed(1),
                 }
 
-                if (timeSinceWaypoint > 0 && progress < minProgress) {
+                if (timeSinceWaypoint > gracePeriod && progress < minProgress) {
                     console.log(`SimpleAgent: skipping waypoint ${s.currentWaypointIndex + 1}/${s.routeWaypoints.length} (progress=${progress.toFixed(2)}, t=${timeSinceWaypoint.toFixed(1)}s)`)
                     s = {
                         ...s,
