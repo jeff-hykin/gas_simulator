@@ -142,7 +142,6 @@ function create({
         // ── New route received → enter routeFollow ───────────────────
         if (updated.routeUpdate && routeUpdate != null) {
             state.mode = "routeFollow"
-            state.routeFollowState = structuredClone(routeAgent.initialArg.state)
             if (state.cooldown == null) {
                 state.cooldown = timer({ duration: switchingCooldown, getTime, data: null })
             }
@@ -221,9 +220,8 @@ function create({
             } else {
                 if (interest < gasRateIncreaseRatio) {
                     // Gradient too weak → return to route follow
-                    state.mode             = "routeFollow"
-                    state.routeFollowState = structuredClone(routeAgent.initialArg.state)
-                    state.cooldown         = timer({ duration: switchingCooldown, getTime, data: null })
+                    state.mode     = "routeFollow"
+                    state.cooldown = timer({ duration: switchingCooldown, getTime, data: null })
                     outputs.logJson = { ...outputs.logJson, gasAgent: `returning to route follow (slope=${interest.toFixed(3)})` }
                     outputs.visualizePoints = Array.from({ length: gradientStepCount }, (_, i) => ({ id: `gasWp_${i}`, remove: true }))
                 } else if (state.gasFollowRecalculate != null && state.gasFollowRecalculate.done) {
