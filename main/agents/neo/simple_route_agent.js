@@ -4,7 +4,9 @@ const info = {
     inputs: ["position", "routeUpdate", "waypointReached"],
     outputs: ["targetWaypoint", "logJson"],
 }
-function create({}) {
+function create({
+    minProgress = 10,  // units/sec below which the waypoint is skipped
+} = {}) {
     const initialArg = {
         updated: {},
         state: {
@@ -12,10 +14,8 @@ function create({}) {
             currentWaypointIndex: 0,
             currentPublishedWaypoint: null,
             position: { x: 0, y: 0 },
-            waypointStartTime: 0,
-            lastDistanceCheck: null,
-            lastDistanceCheckTime: 0,
-            negativeVelocityStartTime: null,
+            currentWaypointStartTime: null,
+            currentWaypointInitialDistance: null,
         },
         outputs: {
             targetWaypoint: null,
@@ -28,7 +28,7 @@ function create({}) {
         let s = { ...state }
         let targetWaypoint = null
         let logJson = null
-        
+
         // 1. Apply routeUpdate (resets everything)
         if (updated.routeUpdate) {
             console.log(`SimpleAgent: route updated with ${routeUpdate.waypoints.length} waypoints`)
@@ -39,47 +39,37 @@ function create({}) {
                 currentPublishedWaypoint: null,
             }
         }
-        
+
         // 2. Apply waypointReached
         if (updated.waypointReached) {
             console.log(`SimpleAgent: waypoint ${s.currentWaypointIndex + 1}/${s.routeWaypoints.length} reached`)
             s = { ...s, currentWaypointIndex: s.currentWaypointIndex + 1, currentPublishedWaypoint: null }
         }
-        
-        // 3. Apply position update and check progress toward current waypoint
-        if (position) {
+
+        // 3. On position update, compute and log progress metrics; skip if time exceeded
+        if (updated.position) {
             s = { ...s, position: { x: position.x, y: position.y } }
 
-            if (s.routeWaypoints.length > 0 && s.currentWaypointIndex < s.routeWaypoints.length) {
+            if (s.routeWaypoints.length > 0 && s.currentWaypointIndex < s.routeWaypoints.length && s.currentWaypointStartTime !== null) {
                 const target = s.routeWaypoints[s.currentWaypointIndex]
-                const currentDistance = vecDistance(s.position, target)
-
-                if (s.lastDistanceCheck !== null) {
-                    const deltaDistance = s.lastDistanceCheck - currentDistance // positive = moving closer
-                    const deltaTime = time - s.lastDistanceCheckTime
-                    const velocity = deltaDistance / deltaTime
-
-                    if (velocity < 0) {
-                        if (s.negativeVelocityStartTime === null) {
-                            console.log(`SimpleAgent: negative velocity detected (${velocity.toFixed(2)} units/s)`)
-                            s = { ...s, negativeVelocityStartTime: time }
-                        } else {
-                            const negativeVelocityDuration = time - s.negativeVelocityStartTime
-                            if (negativeVelocityDuration > 1.0) {
-                                s = {
-                                    ...s,
-                                    currentWaypointIndex: s.currentWaypointIndex + 1,
-                                    currentPublishedWaypoint: null,
-                                    negativeVelocityStartTime: null,
-                                }
-                            }
-                        }
-                    } else {
-                        s = { ...s, negativeVelocityStartTime: null }
-                    }
+                const remainingDistance = vecDistance(s.position, target)
+                const timeSinceWaypoint = time - s.currentWaypointStartTime
+                const progress = timeSinceWaypoint > 0 ? (s.currentWaypointInitialDistance - remainingDistance) / timeSinceWaypoint : 0
+                logJson = {
+                    progress: progress.toFixed(2),
+                    timeSinceWaypoint: timeSinceWaypoint.toFixed(1),
                 }
 
-                s = { ...s, lastDistanceCheck: currentDistance, lastDistanceCheckTime: time }
+                if (timeSinceWaypoint > 0 && progress < minProgress) {
+                    console.log(`SimpleAgent: skipping waypoint ${s.currentWaypointIndex + 1}/${s.routeWaypoints.length} (progress=${progress.toFixed(2)}, t=${timeSinceWaypoint.toFixed(1)}s)`)
+                    s = {
+                        ...s,
+                        currentWaypointIndex: s.currentWaypointIndex + 1,
+                        currentPublishedWaypoint: null,
+                        currentWaypointStartTime: null,
+                        currentWaypointInitialDistance: null,
+                    }
+                }
             }
         }
 
@@ -102,14 +92,12 @@ function create({}) {
                 s = {
                     ...s,
                     currentPublishedWaypoint: { x: target.x, y: target.y },
-                    waypointStartTime: time,
-                    lastDistanceCheck: null,
-                    lastDistanceCheckTime: 0,
-                    negativeVelocityStartTime: null,
+                    currentWaypointStartTime: time,
+                    currentWaypointInitialDistance: s.position != null ? vecDistance(s.position, target) : 0,
                 }
             }
         }
-        
+
         return { state: s, outputs: { targetWaypoint, logJson } }
     }
     return { initialArg, info, update }

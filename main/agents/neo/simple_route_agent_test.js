@@ -95,41 +95,30 @@ Deno.test('position update is stored in state', () => {
     assertEq(s2.position.y, 3, 'position y stored')
 })
 
-Deno.test('negative velocity for >1s skips waypoint', () => {
-    const agent = createSimpleRouteAgent({})
+Deno.test('skips waypoint when progress drops below minProgress', () => {
+    const agent = createSimpleRouteAgent({ minProgress: 10 })
     let { state } = step(agent, agent.initialArg.state, {
         time: 0,
-        routeUpdate: { waypoints: [{ x: 10, y: 0 }, { x: 20, y: 0 }] },
+        routeUpdate: { waypoints: [{ x: 100, y: 0 }, { x: 200, y: 0 }] },
+        position: { x: 0, y: 0 },
     })
-    // approach then retreat
-    ;({ state } = step(agent, state, { time: 1, position: { x: 7, y: 0 } }))
-    ;({ state } = step(agent, state, { time: 2, position: { x: 9, y: 0 } })) // moving toward
-    ;({ state } = step(agent, state, { time: 3, position: { x: 7, y: 0 } })) // moving away
-    assertNotNull(state.negativeVelocityStartTime, 'negative velocity timer should be set')
-
-    // < 1s elapsed since negative velocity started
-    const { state: s4, targetWaypoint: tw4 } = step(agent, state, { time: 3.5, position: { x: 6, y: 0 } })
-    assertEq(s4.currentWaypointIndex, 0, 'should not skip before 1s of negative velocity')
-    assertNull(tw4, 'no new waypoint emitted yet')
-
-    // > 1s elapsed since negative velocity started → skip
-    const { state: s5, targetWaypoint: tw5 } = step(agent, s4, { time: 4.1, position: { x: 5, y: 0 } })
-    assertEq(s5.currentWaypointIndex, 1, 'waypoint skipped after 1s negative velocity')
-    assertNotNull(tw5, 'new waypoint emitted after skip')
-    assertEq(tw5.x, 20, 'skipped to second waypoint x')
+    // at t=3 robot has not moved: progress = (100 - 100) / 3 = 0 < 10 → skip
+    const { state: s2, targetWaypoint } = step(agent, state, { time: 3, position: { x: 0, y: 0 } })
+    assertEq(s2.currentWaypointIndex, 1, 'waypoint skipped when progress below minProgress')
+    assertNotNull(targetWaypoint, 'second waypoint emitted after skip')
+    assertEq(targetWaypoint.x, 200, 'skipped to second waypoint')
 })
 
-Deno.test('negative velocity timer resets when moving toward target again', () => {
-    const agent = createSimpleRouteAgent({})
+Deno.test('does not skip when making good progress', () => {
+    const agent = createSimpleRouteAgent({ minProgress: 10 })
     let { state } = step(agent, agent.initialArg.state, {
         time: 0,
-        routeUpdate: { waypoints: [{ x: 10, y: 0 }] },
+        routeUpdate: { waypoints: [{ x: 100, y: 0 }] },
+        position: { x: 0, y: 0 },
     })
-    ;({ state } = step(agent, state, { time: 1, position: { x: 7, y: 0 } })) // baseline
-    ;({ state } = step(agent, state, { time: 2, position: { x: 5, y: 0 } })) // moving away
-    assert(state.negativeVelocityStartTime !== null, 'neg velocity timer set')
-    ;({ state } = step(agent, state, { time: 3, position: { x: 8, y: 0 } })) // moving toward
-    assertNull(state.negativeVelocityStartTime, 'neg velocity timer cleared when moving toward target')
+    // at t=5 robot closed 55 of 100 units: progress = 55/5 = 11 > 10 → no skip
+    ;({ state } = step(agent, state, { time: 5, position: { x: 55, y: 0 } }))
+    assertEq(state.currentWaypointIndex, 0, 'should not skip when making good progress')
 })
 
 Deno.test('new routeUpdate resets index and re-emits first waypoint', () => {

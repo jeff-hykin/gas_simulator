@@ -241,7 +241,7 @@ sidebar.append(
 document.body.append(sidebar);
 
 // ── Load default map on startup ───────────────────────────────────────
-let defaultMap = './maps/train_real.yaml';
+let defaultMap = './maps/chemical_plant.yaml';
 fetch(defaultMap)
   .then((response) => response.text())
   .then((yamlText) => {

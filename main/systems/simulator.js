@@ -3,7 +3,7 @@
  */
 
 import { createPubSub, connectNeoAgent } from '../tooling/pubsub.js';
-import simpleRouteAgent from '../agents/neo/simple_route_agent.js';
+import gasAgent from '../agents/neo/gas_agent.js';
 import localPlannerAgent from '../agents/neo/local_planner.js';
 
 export function gaussianPeakAt(distance, radius, peak) {
@@ -324,16 +324,17 @@ export function createSimulator(mapSys, canvasSys, { maxLinearVelocity = 100, ma
 
     const getTime = () => clock.virtualTime;
 
-    // Bridge channel names: simulator publishes 'odom', main.js publishes 'route_update'
-    // but the neo simple_route_agent expects 'position' and 'routeUpdate'
+    // Bridge channel names to what the neo agents expect
     const unsubBridgePosition = pubsub.subscribe('odom', (data) => pubsub.publish('position', data));
     const unsubBridgeRoute = pubsub.subscribe('route_update', (data) => pubsub.publish('routeUpdate', data));
+    const unsubBridgeGas = pubsub.subscribe('gas_reading', (data) => pubsub.publish('gasReading', data.ppm));
 
     // Connect neo agents
     agentUnsubs = [
       unsubBridgePosition,
       unsubBridgeRoute,
-      connectNeoAgent(pubsub, simpleRouteAgent.create({}), getTime),
+      unsubBridgeGas,
+      connectNeoAgent(pubsub, gasAgent.create({}), getTime),
       connectNeoAgent(pubsub, localPlannerAgent.create({
         closeEnoughToWaypoint: config.waypointThreshold ?? 10,
       }), getTime),
