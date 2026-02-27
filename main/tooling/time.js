@@ -34,7 +34,7 @@ export function timer({duration, getTime, data}) {
             return getTime() >= this.endTime
         },
         get count() {
-            return this.endTime - this.startTime
+            return getTime() - this.startTime
         },
         get remaining() {
             return this.endTime - getTime()

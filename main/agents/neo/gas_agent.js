@@ -85,10 +85,10 @@ export function waypointsAlongGradient(position, angle, stepDist, count) {
 function create({
     gasThreshold = 0.4,           // PPM — minimum reading to trigger gas follow
     bufferSize = 500,              // max number of {time, gasReading, location} entries
-    switchingCooldown = 30,       // seconds between mode switches
+    switchingCooldown = 2,       // seconds between mode switches
     routeAgentConfig = {},
     gasMoveOnTime = 20,           // seconds between gas-waypoint recalculations
-    gasRateIncreaseRatio = 0.02,  // gradient slope threshold to enter/exit gas follow
+    gasRateIncreaseRatio = 0.002,  // gradient slope threshold to enter/exit gas follow
     gradientStepDist = 30,        // map units between gas-follow waypoints
     gradientStepCount = 8,        // number of gas-follow waypoints to generate
 } = {}) {
@@ -203,6 +203,10 @@ function create({
         if (state.cooldown != null && state.cooldown.done) {
             const interest = gradient.slope
 
+            if (interest > gasRateIncreaseRatio) {
+                console.log(`GasAgent: interest=${interest.toFixed(3)} > threshold=${gasRateIncreaseRatio}, mode=${state.mode}, maxGas=${state.maxGasReading.toFixed(2)}`)
+            }
+
             if (state.mode !== "gasFollow") {
                 // Enter gas follow if reading is strong and gradient is rising
                 if (state.gasBuffer.length >= 3
@@ -236,7 +240,7 @@ function create({
             }
         }
 
-        outputs.logJson = { maxGasReading: state.maxGasReading.toFixed(2), mode: state.mode, ...outputs.logJson }
+        outputs.logJson = { maxGasReading: state.maxGasReading.toFixed(2), mode: state.mode, cooldown: state.cooldown == null ? "none" : state.cooldown.done ? "done" : state.cooldown.count.toFixed(1), ...outputs.logJson }
 
         return { state, outputs }
     }
