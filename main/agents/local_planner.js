@@ -86,9 +86,6 @@ export class LocalPlanner {
                 }
                 
                 const timeSinceMeaningfulProgress = time - this.timeOfLastMeaningfulProgress
-                this.pubsub.publish('logJson', {
-                    stallTime: timeSinceMeaningfulProgress.toFixed(0),
-                })
                 // enable random mode if no progress is being made for a while
                 if (this.mode != "random" && timeSinceMeaningfulProgress > this.timeBeforeRandomMove) {
                     this.mode = "random"

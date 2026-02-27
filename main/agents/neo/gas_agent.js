@@ -3,7 +3,7 @@ import simpleRouteAgent from './simple_route_agent.js'
 
 const info = {
     inputs: ["position", "routeUpdate", "waypointReached", "gasReading"],
-    outputs: ["targetWaypoint", "logJson", "visualizePoints"],
+    outputs: ["targetWaypoint", "logJson", "visualizePoints", "visualizeLines"],
 }
 
 /**
@@ -118,15 +118,16 @@ function create({
             gasFollowState:        structuredClone(gasFollowAgent.initialArg.state),
         },
         outputs: {
-            targetWaypoint: null,
-            logJson:        null,
+            targetWaypoint:  null,
+            logJson:         null,
             visualizePoints: null,
+            visualizeLines:  null,
         },
     }
 
     function update(getTime, { state, updated }) {
         const { position, routeUpdate, waypointReached } = state
-        let outputs = { targetWaypoint: null, logJson: null, visualizePoints: null }
+        let outputs = { targetWaypoint: null, logJson: null, visualizePoints: null, visualizeLines: null }
         state = { ...state }
 
         // ── Accumulate gas buffer ─────────────────────────────────────
@@ -194,6 +195,10 @@ function create({
             ? gasGradient(position, state.gasBuffer)
             : { angle: 0, slope: 0 }
         outputs.logJson = { ...outputs.logJson, gradientAngle: gradient.angle.toFixed(1), gradientSlope: gradient.slope.toFixed(2) }
+        if (position != null) {
+            const lineLen = 40
+            outputs.visualizeLines = [{ id: 'gradientDir', x1: position.x, y1: position.y, x2: position.x + Math.cos(gradient.angle) * lineLen, y2: position.y + Math.sin(gradient.angle) * lineLen, color: '#00ffcc', lineWidth: 2 }]
+        }
 
         // ── Mode switching (after cooldown expires) ───────────────────
         if (state.cooldown != null && state.cooldown.done) {
@@ -233,7 +238,7 @@ function create({
             }
         }
 
-        outputs.logJson = { maxGasReading: state.maxGasReading.toFixed(2), ...outputs.logJson }
+        outputs.logJson = { maxGasReading: state.maxGasReading.toFixed(2), mode: state.mode, ...outputs.logJson }
 
         return { state, outputs }
     }

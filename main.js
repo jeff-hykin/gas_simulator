@@ -7,6 +7,7 @@ const canvasSys = createCanvasSystem({ width: 1100, height: 830 });
 
 // Visualization points by ID (for debugging/analysis)
 const visualizationPointsById = new Map();
+const visualizationLinesById = new Map();
 
 // Current JSON state (merged from all logJson publishes)
 const currentJsonState = {};
@@ -130,6 +131,35 @@ function playAgent() {
 
       canvasSys.render();
     }
+
+    // Set up visualization line channel (ID-based add/remove system)
+    mainPubSub.subscribe('visualizeLines', (lines) => {
+      for (const data of lines) {
+        const { id, remove = false } = data;
+        if (!id) { console.warn('visualizeLines requires an id'); continue }
+        if (remove) {
+          const existing = visualizationLinesById.get(id);
+          if (existing) {
+            canvasSys.removeFromWorld(existing);
+            visualizationLinesById.delete(id);
+          }
+          continue;
+        }
+        const { x1, y1, x2, y2, color = '#ffffff', lineWidth = 2, opacity = 1 } = data;
+        let line = visualizationLinesById.get(id);
+        if (line) {
+          line.points = [{ x: x1, y: y1 }, { x: x2, y: y2 }];
+          line.color = color;
+          line.lineWidth = lineWidth;
+          line.opacity = opacity;
+        } else {
+          line = { type: 'line', points: [{ x: x1, y: y1 }, { x: x2, y: y2 }], color, lineWidth, opacity };
+          visualizationLinesById.set(id, line);
+          canvasSys.addToWorld(line);
+        }
+      }
+      canvasSys.render();
+    })
   }
 
   const startPos = getStartPosition();

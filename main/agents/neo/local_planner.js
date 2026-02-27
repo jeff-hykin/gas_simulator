@@ -103,7 +103,6 @@ function create({
             if (changeInDistance >= minimumDistanceThatIsProgress) {
                 state.decisionTimer = timer({ duration: timeBeforeRandomMove, getTime, data: structuredClone(state) })
             }
-            outputs.logJson.stallTime = state.decisionTimer.count.toFixed(0)
 
             // switch to random mode
             if (state.mode != "random" && state.decisionTimer.done) {
