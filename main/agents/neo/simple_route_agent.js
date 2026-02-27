@@ -5,7 +5,7 @@ const info = {
     outputs: ["targetWaypoint", "logJson"],
 }
 function create({
-    minProgress = 10,   // units/sec below which the waypoint is skipped
+    minProgress = 20,   // units/sec below which the waypoint is skipped
     gracePeriod = 0.5,  // seconds before the progress check kicks in
 } = {}) {
     const initialArg = {
