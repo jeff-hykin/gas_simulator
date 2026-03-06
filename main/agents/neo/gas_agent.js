@@ -88,9 +88,9 @@ export function circleWaypointsAroundGradient(position, angle, centerDist, circl
 }
 
 function create({
-    gasThreshold = 0.4,           // PPM — minimum reading to trigger gas follow
-    bufferSize = 500,              // max number of {time, gasReading, location} entries
-    switchingCooldown = 2,       // seconds between mode switches
+    gasThreshold = 0.4,          // PPM — minimum reading to trigger gas follow
+    bufferSize = 200,            // max number of {time, gasReading, location} entries
+    switchingCooldown = 10,      // ticks between mode switches
     routeAgentConfig = {},
     gasMoveOnTime = 20,           // seconds between gas-waypoint recalculations
     gasRateIncreaseRatio = 0.002,  // gradient slope threshold to enter/exit gas follow
@@ -140,12 +140,9 @@ function create({
         // ── Accumulate gas buffer ─────────────────────────────────────
         if (updated.gasReading && state.gasReading != null && position != null) {
             state.maxGasReading = Math.max(state.maxGasReading, state.gasReading)
-            const lastEntry = state.gasBuffer.length > 0 ? state.gasBuffer[state.gasBuffer.length - 1] : null
-            if (lastEntry == null || state.maxGasReading !== lastEntry.gasReading) {
-                state.gasBuffer = [...state.gasBuffer, { time: getTime(), gasReading: state.maxGasReading, location: position }]
-                if (state.gasBuffer.length > bufferSize) {
-                    state.gasBuffer = state.gasBuffer.slice(-bufferSize)
-                }
+            state.gasBuffer = [...state.gasBuffer, { time: getTime(), gasReading: state.maxGasReading, location: position }]
+            if (state.gasBuffer.length > bufferSize) {
+                state.gasBuffer = state.gasBuffer.slice(-bufferSize)
             }
         }
 
