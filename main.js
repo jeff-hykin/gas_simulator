@@ -37,7 +37,7 @@ const sim = createSimulator(mapSys, canvasSys);
 
 let mainPubSub = null;
 const agentConfig = {
-  decisionRate: 0.01,       // How often agent makes movement decisions (100 times per second)
+  decisionRate: 0.05,        // How often agent makes movement decisions (5 times per second)
   samplingRate: 80,        // How often agent records gas samples (300 ticks = 3 seconds at current rate)
   gasNoiseStdDev: 0,
   maxMoveSpeed: 200,

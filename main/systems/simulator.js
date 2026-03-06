@@ -124,7 +124,7 @@ function moveWithAvoidance(robot, distance, obstacles) {
  * const sim = createSimulator(mapSys, canvasSys);
  * sim.startAgentLoop(pubsub);
  */
-export function createSimulator(mapSys, canvasSys, { maxLinearVelocity = 100, maxAngularVelocity = 10 * Math.PI } = {}) {
+export function createSimulator(mapSys, canvasSys, { maxLinearVelocity = 20, maxAngularVelocity = Math.PI } = {}) {
 
   const robot = createRobot({ x: 0, y: 0, w: 26, h: 18, angle: 0 });
   const robotCanvas = {
@@ -141,7 +141,6 @@ export function createSimulator(mapSys, canvasSys, { maxLinearVelocity = 100, ma
 
   canvasSys.addToWorld(robotCanvas);
 
-  let lastMoveTime = 0; // Virtual time of last movement command
 
   const gasReadout = document.createElement('div');
   gasReadout.className = 'gas-readout';
@@ -181,8 +180,8 @@ export function createSimulator(mapSys, canvasSys, { maxLinearVelocity = 100, ma
       lastGasSampleTime = clock.virtualTime;
     }
 
-    // Publish time and odometry at regular intervals (every clock tick)
-    if (simulatorPubSub) {
+    // Publish time and odometry at the tick rate
+    if (simulatorPubSub && clock.virtualTime - lastTickTime >= tickRate) {
       simulatorPubSub.publish('time', {
         virtualTime: clock.virtualTime,
       });
@@ -191,6 +190,7 @@ export function createSimulator(mapSys, canvasSys, { maxLinearVelocity = 100, ma
         y: robot.y,
         heading: robot.angle * (Math.PI / 180),
       });
+      lastTickTime = clock.virtualTime;
     }
 
     clock.rafId = requestAnimationFrame(clockTick);
@@ -254,19 +254,14 @@ export function createSimulator(mapSys, canvasSys, { maxLinearVelocity = 100, ma
    * @param {number} angularVelocity - desired rotation velocity in radians/second
    */
   function move(linearVelocity, angularVelocity) {
-    const currentTime = clock.virtualTime;
-    const deltaTime = currentTime - lastMoveTime;
-    lastMoveTime = currentTime;
-
-    // Cap velocities to robot maximums
-    const cappedLinearVel = Math.max(-maxLinearVelocity, Math.min(linearVelocity, maxLinearVelocity));
-    const cappedAngularVel = Math.max(-maxAngularVelocity, Math.min(angularVelocity, maxAngularVelocity));
-
-    // Calculate actual movement from capped velocities and time delta
-    const linearDistance = cappedLinearVel * deltaTime;
-    const angularDistance = cappedAngularVel * deltaTime; // radians
+    // Treat inputs as per-tick displacement, not velocity.
+    // The tick rate controls how many decisions per second (slow motion effect).
+    const linearDistance = Math.max(-maxLinearVelocity, Math.min(linearVelocity, maxLinearVelocity));
+    const angularDistance = Math.max(-maxAngularVelocity, Math.min(angularVelocity, maxAngularVelocity));
 
     const obstacles = mapSys.mapData.obstacles || [];
+
+    const beforeX = robot.x, beforeY = robot.y, beforeAngle = robot.angle;
 
     // Apply rotation (inline from rotateLeft/rotateRight)
     const angularDeg = angularDistance * (180 / Math.PI);
@@ -274,6 +269,8 @@ export function createSimulator(mapSys, canvasSys, { maxLinearVelocity = 100, ma
 
     // Apply linear movement (inline from moveForward/moveWithAvoidance)
     moveWithAvoidance(robot, linearDistance, obstacles);
+
+    console.log(`[MOVE] linDist=${linearDistance.toFixed(2)} angDist=${angularDistance.toFixed(2)}rad(${(angularDistance*180/Math.PI).toFixed(1)}°) before=(${beforeX.toFixed(1)},${beforeY.toFixed(1)},${beforeAngle.toFixed(1)}°) after=(${robot.x.toFixed(1)},${robot.y.toFixed(1)},${robot.angle.toFixed(1)}°)`);
   }
 
   let agentActive = false;
@@ -281,7 +278,9 @@ export function createSimulator(mapSys, canvasSys, { maxLinearVelocity = 100, ma
   let agentUnsubs = [];
   let movementUnsub = null;
   let lastGasSampleTime = 0; // Track last gas sample in virtual time
+  let lastTickTime = 0; // Track last agent tick in virtual time
   let gasSamplingRate = 1; // Seconds between gas readings
+  let tickRate = 1; // Seconds between agent ticks (odom/time publishing)
   let gasNoiseStdDev = 0; // Gaussian noise std-dev
 
   const keyState = new Set();
@@ -325,7 +324,10 @@ export function createSimulator(mapSys, canvasSys, { maxLinearVelocity = 100, ma
     const getTime = () => clock.virtualTime;
 
     // Bridge channel names to what the neo agents expect
-    const unsubBridgePosition = pubsub.subscribe('odom', (data) => pubsub.publish('position', data));
+    const unsubBridgePosition = pubsub.subscribe('odom', (data) => {
+      console.log(`[SIM-BRIDGE] odom→position x=${data.x.toFixed(1)} y=${data.y.toFixed(1)} heading=${data.heading.toFixed(2)}rad (${(data.heading * 180 / Math.PI).toFixed(1)}°)`);
+      pubsub.publish('position', data);
+    });
     const unsubBridgeRoute = pubsub.subscribe('route_update', (data) => pubsub.publish('routeUpdate', data));
     const unsubBridgeGas = pubsub.subscribe('gas_reading', (data) => pubsub.publish('gasReading', data.ppm));
 
@@ -341,13 +343,14 @@ export function createSimulator(mapSys, canvasSys, { maxLinearVelocity = 100, ma
     ];
 
     // Store gas sampling parameters for clock tick handler
+    tickRate = config.decisionRate ?? 1;
     gasSamplingRate = config.decisionRate ?? 1;
     gasNoiseStdDev = config.gasNoiseStdDev ?? 0;
 
     // Set clock speed and start clock
     setTimeSpeed(config.timeSpeed ?? 1.0);
     lastGasSampleTime = clock.virtualTime;
-    lastMoveTime = clock.virtualTime;
+    lastTickTime = clock.virtualTime;
     playClock();
 
     // Publish initial odometry so agent knows its starting pose
@@ -358,9 +361,7 @@ export function createSimulator(mapSys, canvasSys, { maxLinearVelocity = 100, ma
     });
 
     movementUnsub = simulatorPubSub.subscribe('movement', (data) => {
-      const linearVelocity = data.linearVelocity ?? 0;
-      const angularVelocity = data.angularVelocity ?? 0;
-      move(linearVelocity, angularVelocity);
+      move(data.linearVelocity ?? 0, data.angularVelocity ?? 0);
       step();
     });
   }

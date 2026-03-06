@@ -135,13 +135,17 @@ function create({
         const { position, routeUpdate, waypointReached } = state
         let outputs = { targetWaypoint: null, logJson: null, visualizePoints: null, visualizeLines: null }
         state = { ...state }
+        console.log(`[GAS] update: mode=${state.mode} updated=${JSON.stringify(updated)} pos=${position ? `(${position.x.toFixed(1)},${position.y.toFixed(1)})` : 'null'} maxGas=${state.maxGasReading.toFixed(2)} bufLen=${state.gasBuffer.length}`)
 
         // ── Accumulate gas buffer ─────────────────────────────────────
         if (updated.gasReading && state.gasReading != null && position != null) {
             state.maxGasReading = Math.max(state.maxGasReading, state.gasReading)
-            state.gasBuffer = [...state.gasBuffer, { time: getTime(), gasReading: state.maxGasReading, location: position }]
-            if (state.gasBuffer.length > bufferSize) {
-                state.gasBuffer = state.gasBuffer.slice(-bufferSize)
+            const lastEntry = state.gasBuffer.length > 0 ? state.gasBuffer[state.gasBuffer.length - 1] : null
+            if (lastEntry == null || state.maxGasReading !== lastEntry.gasReading) {
+                state.gasBuffer = [...state.gasBuffer, { time: getTime(), gasReading: state.maxGasReading, location: position }]
+                if (state.gasBuffer.length > bufferSize) {
+                    state.gasBuffer = state.gasBuffer.slice(-bufferSize)
+                }
             }
         }
 
@@ -169,6 +173,7 @@ function create({
                 },
             })
             state.routeFollowState = rs
+            console.log(`[GAS-ROUTE] routeAgent output: targetWaypoint=${ro.targetWaypoint ? `(${ro.targetWaypoint.x.toFixed(1)},${ro.targetWaypoint.y.toFixed(1)})` : 'null'} logJson=${JSON.stringify(ro.logJson)}`)
             if (ro.targetWaypoint != null) outputs.targetWaypoint = ro.targetWaypoint
             if (ro.logJson        != null) outputs.logJson = { ...outputs.logJson, ...ro.logJson }
         }
@@ -264,6 +269,7 @@ function create({
 
         outputs.logJson = { maxGasReading: state.maxGasReading.toFixed(2), mode: state.mode, cooldown: state.cooldown == null ? "none" : state.cooldown.done ? "done" : state.cooldown.count.toFixed(1), ...outputs.logJson }
 
+        console.log(`[GAS-OUT] targetWaypoint=${outputs.targetWaypoint ? `(${outputs.targetWaypoint.x.toFixed(1)},${outputs.targetWaypoint.y.toFixed(1)})` : 'null'} mode=${state.mode}`)
         return { state, outputs }
     }
 
