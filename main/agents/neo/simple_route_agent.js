@@ -5,9 +5,9 @@ const info = {
     outputs: ["targetWaypoint", "logJson"],
 }
 function create({
-    minProgress = 20,   // units/sec below which the waypoint is skipped
+    minProgress = 10,   // units/sec below which the waypoint is skipped
     gracePeriod = 0.5,  // seconds before the progress check kicks in
-    minTicksPerWaypoint = 20, // minimum ticks before advancing to next waypoint
+    minTicksPerWaypoint = 40, // minimum ticks before advancing to next waypoint
 } = {}) {
     const initialArg = {
         updated: {},
@@ -44,8 +44,8 @@ function create({
             }
         }
 
-        // 2. Apply waypointReached (only if cooldown has elapsed)
-        if (updated.waypointReached && s.ticksOnCurrentWaypoint >= minTicksPerWaypoint) {
+        // 2. Apply waypointReached (always advance when actually reached)
+        if (updated.waypointReached) {
             console.log(`SimpleAgent: waypoint ${s.currentWaypointIndex + 1}/${s.routeWaypoints.length} reached`)
             s = { ...s, currentWaypointIndex: s.currentWaypointIndex + 1, currentPublishedWaypoint: null, ticksOnCurrentWaypoint: 0 }
         }
