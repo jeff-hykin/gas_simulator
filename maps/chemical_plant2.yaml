@@ -1,0 +1,254 @@
+styles:
+  marker:
+    r: 5
+    stroke: '#f2f2f2'
+    fill: '#0ea5e9'
+    lineWidth: 2
+    font: 12px monospace
+    color: '#f2f2f2'
+  route:
+    stroke: '#fbbf24'
+    lineWidth: 2
+    r: 3
+    fill: '#fbbf24'
+  obstacle:
+    stroke: '#e11d48'
+    fill: rgba(225,29,72,0.2)
+    lineWidth: 2
+  gasNode:
+    stroke: '#22c55e'
+    lineWidth: 2
+
+markers:
+  - id: marker-start
+    x: -500
+    y: 620
+    label: Start
+  - id: marker-admin
+    x: -350
+    y: 400
+    label: Admin
+  - id: marker-reactor
+    x: 0
+    y: 0
+    label: Reactor Bldg
+  - id: marker-storage
+    x: 450
+    y: -50
+    label: Tank Farm
+  - id: marker-leak1
+    x: 500
+    y: -150
+    label: Leak A
+  - id: marker-proc
+    x: -300
+    y: -200
+    label: Processing
+  - id: marker-leak2
+    x: -250
+    y: -350
+    label: Leak B
+  - id: marker-warehouse
+    x: 300
+    y: 350
+    label: Warehouse
+  - id: marker-cooling
+    x: -50
+    y: -450
+    label: Cooling Tower
+  - id: marker-flare
+    x: 600
+    y: -400
+    label: Flare Stack
+
+routes:
+  # Perimeter patrol route
+  - id: route-patrol
+    points:
+    #   - {x: -500, y: 650}
+      - {x: -200, y: 550}
+      - {x: 250, y: 500}
+      - {x: 550, y: 400}
+      - {x: 650, y: 150}
+      - {x: 650, y: -200}
+      - {x: 600, y: -500}
+      - {x: 300, y: -550}
+      - {x: -100, y: -550}
+      - {x: -400, y: -450}
+      - {x: -500, y: -200}
+      - {x: -500, y: 200}
+      - {x: -500, y: 550}
+
+obstacles:
+  # === Perimeter fence (4 walls) ===
+  - id: obstacle-fence-n
+    x: 50
+    y: 650
+    w: 1300
+    h: 10
+    angle: 0
+  - id: obstacle-fence-s
+    x: 50
+    y: -580
+    w: 1300
+    h: 10
+    angle: 0
+  - id: obstacle-fence-w
+    x: -600
+    y: 30
+    w: 10
+    h: 1240
+    angle: 0
+  - id: obstacle-fence-e
+    x: 700
+    y: 30
+    w: 10
+    h: 1240
+    angle: 0
+
+  # === Admin building (near gate) ===
+  - id: obstacle-admin
+    x: -350
+    y: 420
+    w: 200
+    h: 120
+    angle: 0
+
+  # === Main reactor building (large, central) ===
+  - id: obstacle-reactor
+    x: 0
+    y: 0
+    w: 280
+    h: 240
+    angle: 0
+
+  # === Processing hall (west side) ===
+  - id: obstacle-proc-main
+    x: -300
+    y: -180
+    w: 220
+    h: 160
+    angle: 0
+  # Processing annex
+  - id: obstacle-proc-annex
+    x: -300
+    y: -320
+    w: 140
+    h: 100
+    angle: 0
+
+  # === Tank farm - cluster of storage tanks (east side) ===
+  # Large tank 1
+  - id: obstacle-tank1
+    x: 400
+    y: -50
+    w: 100
+    h: 100
+    angle: 0
+  # Large tank 2
+  - id: obstacle-tank2
+    x: 550
+    y: -50
+    w: 100
+    h: 100
+    angle: 0
+  # Large tank 3
+  - id: obstacle-tank3
+    x: 400
+    y: -180
+    w: 100
+    h: 100
+    angle: 0
+  # Large tank 4 (leaking)
+  - id: obstacle-tank4
+    x: 550
+    y: -180
+    w: 100
+    h: 100
+    angle: 0
+
+  # === Warehouse (northeast) ===
+  - id: obstacle-warehouse
+    x: 300
+    y: 350
+    w: 300
+    h: 140
+    angle: 0
+
+  # === Cooling tower (south central) ===
+  - id: obstacle-cooling
+    x: -50
+    y: -450
+    w: 140
+    h: 140
+    angle: 0
+
+  # === Control room (between reactor and tank farm) ===
+  - id: obstacle-control
+    x: 220
+    y: 100
+    w: 100
+    h: 80
+    angle: 0
+
+  # === Flare stack pad (southeast corner) ===
+  - id: obstacle-flare
+    x: 600
+    y: -420
+    w: 60
+    h: 60
+    angle: 0
+
+  # === Pipe racks (connecting buildings) ===
+  # Reactor to tank farm
+  - id: obstacle-piperack1
+    x: 220
+    y: -50
+    w: 160
+    h: 20
+    angle: 0
+  # Tank farm to flare
+  - id: obstacle-piperack3
+    x: 570
+    y: -300
+    w: 20
+    h: 180
+    angle: 0
+  # Processing to cooling
+  - id: obstacle-piperack4
+    x: -180
+    y: -380
+    w: 120
+    h: 20
+    angle: 0.2
+
+  # === Loading dock (north side) ===
+  - id: obstacle-dock
+    x: -100
+    y: 550
+    w: 240
+    h: 60
+    angle: 0
+
+  # === Pump house (near tank farm) ===
+  - id: obstacle-pumphouse
+    x: 480
+    y: 80
+    w: 80
+    h: 60
+    angle: 0
+
+gasNodes:
+  # Leak A - ruptured tank in the tank farm
+  - id: gas-leakA
+    x: 520
+    y: -150
+    radius: 250
+    peak: 2.0
+
+  # Leak B - processing building pipe failure
+  - id: gas-leakB
+    x: -250
+    y: -350
+    radius: 200
+    peak: 1.8
