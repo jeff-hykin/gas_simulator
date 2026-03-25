@@ -126,7 +126,7 @@ function moveWithAvoidance(robot, distance, obstacles) {
  */
 export function createSimulator(mapSys, canvasSys, { maxLinearVelocity = 20, maxAngularVelocity = Math.PI } = {}) {
 
-  const robot = createRobot({ x: 0, y: 0, w: 26, h: 18, angle: 0 });
+  const robot = createRobot({ x: 0, y: 0, w: 16, h: 10, angle: 0 });
   const robotCanvas = {
     type: 'rect',
     x: robot.x,
@@ -177,6 +177,8 @@ export function createSimulator(mapSys, canvasSys, { maxLinearVelocity = 20, max
       const gas = maxGasAt(robot, mapSys.mapData.gasNodes || []);
       const noisy = Math.max(0, gas + gaussianNoise(gasNoiseStdDev));
       simulatorPubSub.publish('gas_reading', { ppm: noisy });
+      maxGasPpm = Math.max(maxGasPpm, noisy);
+      simulatorPubSub.publish('max_gas_reading', { ppm: maxGasPpm });
       lastGasSampleTime = clock.virtualTime;
     }
 
@@ -216,6 +218,7 @@ export function createSimulator(mapSys, canvasSys, { maxLinearVelocity = 20, max
     pauseClock();
     clock.virtualTime = 0;
     clock.lastRealTime = null;
+    maxGasPpm = 0;
   }
 
   function setTimeSpeed(speed) {
@@ -282,6 +285,7 @@ export function createSimulator(mapSys, canvasSys, { maxLinearVelocity = 20, max
   let gasSamplingRate = 1; // Seconds between gas readings
   let tickRate = 1; // Seconds between agent ticks (odom/time publishing)
   let gasNoiseStdDev = 0; // Gaussian noise std-dev
+  let maxGasPpm = 0; // Running max of gas readings (hardware limitation: sensor only reports max)
 
   const keyState = new Set();
   window.addEventListener('keydown', (e) => {
@@ -330,12 +334,14 @@ export function createSimulator(mapSys, canvasSys, { maxLinearVelocity = 20, max
     });
     const unsubBridgeRoute = pubsub.subscribe('route_update', (data) => pubsub.publish('routeUpdate', data));
     const unsubBridgeGas = pubsub.subscribe('gas_reading', (data) => pubsub.publish('gasReading', data.ppm));
+    const unsubBridgeMaxGas = pubsub.subscribe('max_gas_reading', (data) => pubsub.publish('maxGasReading', data.ppm));
 
     // Connect neo agents
     agentUnsubs = [
       unsubBridgePosition,
       unsubBridgeRoute,
       unsubBridgeGas,
+      unsubBridgeMaxGas,
       connectNeoAgent(pubsub, gasAgent.create({}), getTime),
       connectNeoAgent(pubsub, localPlannerAgent.create({
         closeEnoughToWaypoint: config.waypointThreshold ?? 10,

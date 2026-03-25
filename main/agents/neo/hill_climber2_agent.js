@@ -1,7 +1,8 @@
 import simpleRouteAgent from './simple_route_agent.js'
+import { awayFromRoute } from '../../tooling/math_helpers.js'
 
 const info = {
-    inputs: ["position", "routeUpdate", "waypointReached", "gasReading"],
+    inputs: ["position", "routeUpdate", "waypointReached", "maxGasReading"],
     outputs: ["targetWaypoint", "logJson", "visualizePoints", "visualizeLines"],
 }
 
@@ -16,6 +17,7 @@ function create({
     maxRandomTurns = 15,          // exit gasFollow after this many consecutive random turns
     steerStep = DEG5,             // initial steering bias when things are improving
     steerDecrement = DEG1,        // how much to reduce steer toward 0 when things get worse
+    waypointTimeout = 2,         // seconds before giving up on a waypoint (e.g. stuck on building)
     routeAgentConfig = {},
 } = {}) {
     const routeAgent = simpleRouteAgent.create(routeAgentConfig)
@@ -25,13 +27,13 @@ function create({
             position:        false,
             routeUpdate:     false,
             waypointReached: false,
-            gasReading:      false,
+            maxGasReading:   false,
         },
         state: {
             position:         null,
             routeUpdate:      null,
             waypointReached:  null,
-            gasReading:       null,
+            maxGasReading:    null,
             mode:             "idle",
             currentHeading:   null,
             prevPrevGas:      0,        // gas two waypoints ago
@@ -40,6 +42,7 @@ function create({
             randomTurnCount:  0,
             currentSteer:     0,        // steering bias in radians (+ = right, - = left)
             prevSteer:        0,        // what currentSteer was last decision
+            waypointSetTime:  null,     // when the current gasFollow waypoint was placed
             routeFollowState: structuredClone(routeAgent.initialArg.state),
         },
         outputs: {
@@ -57,9 +60,9 @@ function create({
         const time = getTime()
 
         // ── Track best gas seen on current leg ───────────────────
-        if (updated.gasReading && state.gasReading != null) {
-            state.bestGasThisLeg = Math.max(state.bestGasThisLeg, state.gasReading)
-            console.log(`[HC2] gasReading=${state.gasReading.toFixed(4)} bestThisLeg=${state.bestGasThisLeg.toFixed(4)} prevGas=${state.prevGas.toFixed(4)} mode=${state.mode}`)
+        if (updated.maxGasReading && state.maxGasReading != null) {
+            state.bestGasThisLeg = Math.max(state.bestGasThisLeg, state.maxGasReading)
+            console.log(`[HC2] maxGasReading=${state.maxGasReading.toFixed(4)} bestThisLeg=${state.bestGasThisLeg.toFixed(4)} prevGas=${state.prevGas.toFixed(4)} mode=${state.mode}`)
         }
 
         // ── New route → enter routeFollow ──────────────────────────
@@ -90,11 +93,11 @@ function create({
 
         // ── Switch: routeFollow → gasFollow when gas is increasing ─
         if (state.mode === "routeFollow"
-            && updated.gasReading
-            && state.gasReading != null
-            && state.gasReading >= minGasToEnter
+            && updated.maxGasReading
+            && state.maxGasReading != null
+            && state.maxGasReading >= minGasToEnter
             && state.bestGasThisLeg - state.prevGas > gasIncreaseThreshold) {
-            console.log(`[HC2] *** ENTERING gasFollow *** gas=${state.gasReading.toFixed(4)} bestThisLeg=${state.bestGasThisLeg.toFixed(4)} prevGas=${state.prevGas.toFixed(4)} delta=${(state.bestGasThisLeg - state.prevGas).toFixed(4)}`)
+            console.log(`[HC2] *** ENTERING gasFollow *** maxGas=${state.maxGasReading.toFixed(4)} bestThisLeg=${state.bestGasThisLeg.toFixed(4)} prevGas=${state.prevGas.toFixed(4)} delta=${(state.bestGasThisLeg - state.prevGas).toFixed(4)}`)
             state.mode = "gasFollow"
             state.randomTurnCount = 0
             state.currentSteer = 0
@@ -114,12 +117,17 @@ function create({
             }
             outputs.targetWaypoint = wp
             outputs.visualizePoints = [{ id: 'hillTarget', x: wp.x, y: wp.y, color: '#ffaa00', r: 6, label: 'H2' }]
+            state.waypointSetTime = time
             console.log(`[HC2] initial waypoint: (${wp.x.toFixed(1)}, ${wp.y.toFixed(1)}) heading=${(state.currentHeading * 180 / Math.PI).toFixed(1)}°`)
         }
 
-        // ── Gas follow: decide when waypoint is reached ────────────
+        // ── Gas follow: decide when waypoint is reached or timed out ─
         if (state.mode === "gasFollow" && position != null) {
-            if (updated.waypointReached) {
+            const timedOut = state.waypointSetTime != null && (time - state.waypointSetTime) > waypointTimeout
+            if (timedOut) {
+                console.log(`[HC2] *** WAYPOINT TIMEOUT *** after ${(time - state.waypointSetTime).toFixed(1)}s → treating as failed leg, random turn`)
+            }
+            if (updated.waypointReached || timedOut) {
                 // we arrived at the waypoint — compare best gas this leg vs previous leg
                 const improved       = state.bestGasThisLeg > state.prevGas + gasIncreaseThreshold
                 const prevImproved   = state.prevGas > state.prevPrevGas + gasIncreaseThreshold
@@ -131,11 +139,15 @@ function create({
 
                     // steering feedback: fine-tune the heading
                     if (state.currentSteer === 0 && state.prevSteer === 0) {
-                        // no steering yet → introduce a small random bias
-                        const direction = Math.random() < 0.5 ? -1 : 1
+                        // no steering yet → bias away from route
+                        const route = state.routeFollowState.routeWaypoints
+                        // const direction = (route && route.length >= 2 && position)
+                        //     ? awayFromRoute({ location: position, heading: state.currentHeading || 0, route })
+                        //     : (Math.random() < 0.5 ? -1 : 1)
+                        const direction = (Math.random() < 0.5 ? -1 : 1)
                         state.prevSteer = state.currentSteer
                         state.currentSteer = direction * steerStep
-                        console.log(`[HC2] gas improved, no steer yet → introducing ${(state.currentSteer * 180 / Math.PI).toFixed(1)}° bias`)
+                        console.log(`[HC2] gas improved, no steer yet → steering away from route: ${(state.currentSteer * 180 / Math.PI).toFixed(1)}° bias`)
                     } else {
                         // already steering → keep it as-is
                         console.log(`[HC2] gas improved, keeping steer=${(state.currentSteer * 180 / Math.PI).toFixed(1)}°`)
@@ -188,6 +200,7 @@ function create({
                     state.randomTurnCount = 0
                     state.currentSteer = 0
                     state.prevSteer = 0
+                    state.waypointSetTime = null
                     outputs.visualizePoints = [{ id: 'hillTarget', remove: true }]
                 }
 
@@ -199,6 +212,7 @@ function create({
                     }
                     outputs.targetWaypoint = wp
                     outputs.visualizePoints = [{ id: 'hillTarget', x: wp.x, y: wp.y, color: '#ffaa00', r: 6, label: 'H2' }]
+                    state.waypointSetTime = time
                     console.log(`[HC2] next waypoint: (${wp.x.toFixed(1)}, ${wp.y.toFixed(1)})`)
                 }
             }
@@ -209,7 +223,7 @@ function create({
         outputs.logJson = {
             mode: state.mode,
             randomTurns: `${state.randomTurnCount}/${maxRandomTurns}`,
-            rawGas: (state.gasReading || 0).toFixed(4),
+            maxGas: (state.maxGasReading || 0).toFixed(4),
             prevPrevGas: state.prevPrevGas.toFixed(4),
             prevGas: state.prevGas.toFixed(4),
             bestThisLeg: state.bestGasThisLeg.toFixed(4),
