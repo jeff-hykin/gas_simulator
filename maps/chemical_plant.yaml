@@ -21,14 +21,14 @@ styles:
     lineWidth: 2
 markers:
   - id: marker-ico1d9
-    x: -418.2380024132856
+    x: 200
     'y': 345.813102824527
     label: Start
 routes:
   - id: route-ua4je2
     points:
-      - x: -36
-        'y': 342
+    #   - x: -36
+    #     'y': 342
       - x: 366
         'y': 308
       - x: 435
