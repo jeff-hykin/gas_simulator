@@ -3,7 +3,7 @@
  */
 
 import { createPubSub, connectNeoAgent } from '../tooling/pubsub.js';
-import gasAgent from '../agents/neo/smart_hill_climber_agent.js';
+import gasAgent from '../agents/neo/hill_climber2_agent.js';
 import localPlannerAgent from '../agents/neo/local_planner.js';
 
 export function gaussianPeakAt(distance, radius, peak) {
@@ -270,7 +270,7 @@ export function createSimulator(mapSys, canvasSys, { maxLinearVelocity = 20, max
     // Apply linear movement (inline from moveForward/moveWithAvoidance)
     moveWithAvoidance(robot, linearDistance, obstacles);
 
-    console.log(`[MOVE] linDist=${linearDistance.toFixed(2)} angDist=${angularDistance.toFixed(2)}rad(${(angularDistance*180/Math.PI).toFixed(1)}°) before=(${beforeX.toFixed(1)},${beforeY.toFixed(1)},${beforeAngle.toFixed(1)}°) after=(${robot.x.toFixed(1)},${robot.y.toFixed(1)},${robot.angle.toFixed(1)}°)`);
+    // console.log(`[MOVE] linDist=${linearDistance.toFixed(2)} angDist=${angularDistance.toFixed(2)}rad(${(angularDistance*180/Math.PI).toFixed(1)}°) before=(${beforeX.toFixed(1)},${beforeY.toFixed(1)},${beforeAngle.toFixed(1)}°) after=(${robot.x.toFixed(1)},${robot.y.toFixed(1)},${robot.angle.toFixed(1)}°)`);
   }
 
   let agentActive = false;

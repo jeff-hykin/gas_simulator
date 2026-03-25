@@ -44,7 +44,7 @@ function create({
         const { time, odom, targetWaypoint } = state
         const outputs = { logJson: {}}
         state = { ...state }
-        console.log(`[LP] update called. mode=${state.mode} updated=${JSON.stringify(updated)} odom=${state.odom ? `(${state.odom.x.toFixed(1)},${state.odom.y.toFixed(1)},h=${state.odom.heading.toFixed(2)})` : 'null'} target=${state.targetWaypoint ? `(${state.targetWaypoint.x.toFixed(1)},${state.targetWaypoint.y.toFixed(1)})` : 'null'}`)
+        // console.log(`[LP] update called. mode=${state.mode} updated=${JSON.stringify(updated)} odom=${state.odom ? `(${state.odom.x.toFixed(1)},${state.odom.y.toFixed(1)},h=${state.odom.heading.toFixed(2)})` : 'null'} target=${state.targetWaypoint ? `(${state.targetWaypoint.x.toFixed(1)},${state.targetWaypoint.y.toFixed(1)})` : 'null'}`)
         // keep state.targetWaypoint up to date
         if (updated.targetWaypoint) {
             if (JSON.stringify(state.prevTargetWaypoint) === JSON.stringify(state.targetWaypoint)) {
@@ -105,7 +105,7 @@ function create({
                 state.decisionTimer = timer({ duration: timeBeforeRandomMove, getTime, data: structuredClone(state) })
             }
 
-            console.log(`[LP-EVAL] changeInDist=${changeInDistance.toFixed(2)} changeInTime=${changeInTime.toFixed(2)} progress=${state.progress.toFixed(2)} timerDone=${state.decisionTimer.done}`)
+            // console.log(`[LP-EVAL] changeInDist=${changeInDistance.toFixed(2)} changeInTime=${changeInTime.toFixed(2)} progress=${state.progress.toFixed(2)} timerDone=${state.decisionTimer.done}`)
             // switch to random mode
             if (state.mode != "random" && state.decisionTimer.done) {
                 state.prevOdom = state.odom  // snapshot position at start of random move (used for distance limit check)
@@ -156,7 +156,7 @@ function create({
             const angularVelocity = Math.sign(rawAngularDiff) * Math.min(Math.abs(rawAngularDiff) * angularGain, maxAngularVelocity)
             outputs.movement = { linearVelocity: movementSpeed, angularVelocity }
             const dist = distance(state.odom, state.targetWaypoint)
-            console.log(`[LP-GREEDY] heading=${state.odom.heading.toFixed(2)}rad targetAngle=${targetAngle.toFixed(2)}rad rawAngDiff=${rawAngularDiff.toFixed(2)} angVel=${angularVelocity.toFixed(2)} linVel=${movementSpeed} dist=${dist.toFixed(1)}`)
+            // console.log(`[LP-GREEDY] heading=${state.odom.heading.toFixed(2)}rad targetAngle=${targetAngle.toFixed(2)}rad rawAngDiff=${rawAngularDiff.toFixed(2)} angVel=${angularVelocity.toFixed(2)} linVel=${movementSpeed} dist=${dist.toFixed(1)}`)
             outputs.logJson.localPlanner = `going after waypoint (greedily)`
         }
 
