@@ -9,6 +9,26 @@ const info = {
 const DEG5 = 5 * Math.PI / 180   // 5 degrees in radians
 const DEG1 = 1 * Math.PI / 180   // 1 degree in radians
 
+// Map a normalized value [0,1] to blue → red → purple hex color
+function gasToColor(t) {
+    t = Math.max(0, Math.min(1, t))
+    let r, g, b
+    if (t < 0.5) {
+        // blue → red
+        const s = t / 0.5
+        r = Math.round(255 * s)
+        g = 0
+        b = Math.round(255 * (1 - s))
+    } else {
+        // red → purple
+        const s = (t - 0.5) / 0.5
+        r = 255
+        g = 0
+        b = Math.round(255 * s)
+    }
+    return '#' + [r, g, b].map(c => c.toString(16).padStart(2, '0')).join('')
+}
+
 function create({
     minGasToEnter = 0.1,          // minimum gas PPM to even consider entering gasFollow
     gasIncreaseThreshold = 0.005, // switch to gasFollow when current - prev > this
@@ -49,6 +69,9 @@ function create({
             returningToScent: false,    // true when navigating back to lostScentPos
             gasFollowStartTime: null,   // when gasFollow mode was entered (virtual time)
             peakGasInFollow:  0,        // highest maxGasReading seen during this gasFollow session
+            gasDotCount:      0,        // incrementing ID for gas topology dots
+            prevMaxGasForDot: null,     // previous maxGasReading value for border comparison
+            gasDotPeakSeen:   0,        // running peak for normalizing dot colors
             routeFollowState: structuredClone(routeAgent.initialArg.state),
         },
         outputs: {
@@ -71,6 +94,29 @@ function create({
             if (state.mode === "gasFollow") {
                 state.peakGasInFollow = Math.max(state.peakGasInFollow, state.maxGasReading)
             }
+
+            // ── Drop topology dot ────────────────────────────────────
+            if (position != null) {
+                const unchanged = state.prevMaxGasForDot != null && state.maxGasReading === state.prevMaxGasForDot
+                // Log-scale normalization: ~0 → 0, minGasToEnter → 1
+                const t = (state.maxGasReading > 0 && minGasToEnter > 0)
+                    ? Math.max(0, Math.min(1, Math.log10(state.maxGasReading) / Math.log10(minGasToEnter)))
+                    : 0
+                const dotColor = gasToColor(t)
+                const dotId = `gasDot_${state.gasDotCount++}`
+                const dot = {
+                    id: dotId, x: position.x, y: position.y, r: 3,
+                    color: dotColor,
+                    fill: dotColor,
+                }
+                if (unchanged) dot.stroke = '#ffffff'
+                outputs.visualizePoints = [
+                    ...(outputs.visualizePoints || []),
+                    dot,
+                ]
+                state.prevMaxGasForDot = state.maxGasReading
+            }
+
             console.log(`[HC2] maxGasReading=${state.maxGasReading.toFixed(4)} bestThisLeg=${state.bestGasThisLeg.toFixed(4)} prevGas=${state.prevGas.toFixed(4)} mode=${state.mode}`)
         }
 

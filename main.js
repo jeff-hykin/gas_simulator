@@ -110,6 +110,8 @@ function playAgent() {
 
       // Add or update point
       const { x, y, color = '#ff0000', label = '', r = 5 } = data;
+      const pointStroke = data.stroke || color;
+      const pointFill = data.fill || `${color}80`;
 
       // Check if point already exists
       let point = visualizationPointsById.get(id);
@@ -118,8 +120,8 @@ function playAgent() {
         point.x = x;
         point.y = y;
         point.r = r;
-        point.stroke = color;
-        point.fill = `${color}80`;
+        point.stroke = pointStroke;
+        point.fill = pointFill;
         point.label = label;
       } else {
         // Create new point
@@ -128,8 +130,8 @@ function playAgent() {
           x,
           y,
           r,
-          stroke: color,
-          fill: `${color}80`,
+          stroke: pointStroke,
+          fill: pointFill,
           lineWidth: 2,
           label,
         };
