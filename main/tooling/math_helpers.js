@@ -240,3 +240,65 @@ export function nearestPointOnPolyline(p, polyline) {
     }
     return best
 }
+
+/**
+ * Returns -1 (turn left) or 1 (turn right) to indicate the shortest turn
+ * that would face the agent away from the nearest point on the route.
+ *
+ * "Away from the route" means perpendicular to the closest line segment,
+ * on the side the agent is already on.
+ *
+ * @param {{x:number, y:number}} location  - agent position
+ * @param {number} heading                 - agent heading in radians
+ * @param {{x:number, y:number}[]} route   - array of waypoints forming a polyline
+ * @returns {number} -1 for left, 1 for right
+ *
+ * @example
+ *   // agent at (5,5), heading east (0 rad), route along x-axis
+ *   awayFromRoute({x:5,y:5}, 0, [{x:0,y:0},{x:10,y:0}]) // -1 (turn left, toward +y)
+ */
+export function awayFromRoute(location, heading, route) {
+    if (!route || route.length < 2) return 1
+
+    // 1. Find the closest segment and the nearest point on it
+    let bestDist = Infinity
+    let bestSegA = null
+    let bestSegB = null
+    let bestPoint = null
+    for (let i = 0; i < route.length - 1; i++) {
+        const candidate = nearestPointOnSegment(location, route[i], route[i + 1])
+        const d = vecDistance(location, candidate)
+        if (d < bestDist) {
+            bestDist = d
+            bestPoint = candidate
+            bestSegA = route[i]
+            bestSegB = route[i + 1]
+        }
+    }
+
+    // 2. Compute the segment direction and the perpendicular pointing away
+    const segDir = vecSub(bestSegB, bestSegA)
+    const toAgent = vecSub(location, bestPoint)
+
+    // If agent is essentially on the segment, pick perpendicular based on
+    // which side a small nudge in the current heading would place it
+    let awayDir
+    if (vecMagnitude(toAgent) < 1e-6) {
+        // Use heading to pick a side: project heading onto segment normal
+        const headingVec = { x: Math.cos(heading), y: Math.sin(heading) }
+        // Two perpendiculars: (-segDir.y, segDir.x) and (segDir.y, -segDir.x)
+        const perpA = { x: -segDir.y, y: segDir.x }
+        awayDir = vecDot(headingVec, perpA) >= 0 ? perpA : { x: segDir.y, y: -segDir.x }
+    } else {
+        awayDir = toAgent
+    }
+
+    // 3. Angle of the "away" direction
+    const awayAngle = Math.atan2(awayDir.y, awayDir.x)
+
+    // 4. Shortest signed angle from current heading to awayAngle
+    const diff = angleDifference(heading, awayAngle)
+
+    // diff > 0 means counter-clockwise (left), diff < 0 means clockwise (right)
+    return diff >= 0 ? -1 : 1
+}
