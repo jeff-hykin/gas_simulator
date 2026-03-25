@@ -17,6 +17,9 @@ function create({
     interestWindow = 15,          // number of recent readings to check for progress
     interestDropRatio = 0.7,      // if best-in-window / peak < this, lose interest
     gasRateIncreaseRatio = 0.002, // gradient slope threshold to enter gas follow
+    flatGradientThreshold = 0.0005, // if slope stays below this while gas is high, we're at the source
+    flatGradientWindow = 10,      // how many consecutive flat readings before stopping
+    noImprovementTimeout = 30,    // seconds without a new peak gas reading before giving up
     minSamplesForGradient = 3,    // need at least this many buffer entries
 } = {}) {
     const routeAgent = simpleRouteAgent.create(routeAgentConfig)
@@ -34,11 +37,14 @@ function create({
             waypointReached:       null,
             gasReading:            null,
             maxGasReading:         0,
+            lastLoggedGasReading:  null,   // skip logging duplicate readings
             cooldown:              null,
             gasBuffer:             [],
             mode:                  "idle",
             currentHeading:        null,   // current gas-chase heading (radians)
             peakGasInChase:        0,      // highest reading since entering gasFollow
+            flatCount:             0,      // consecutive ticks with flat gradient during gas follow
+            noImprovementTimer:    null,   // resets when a new peak is found in gasFollow
             routeFollowState:      structuredClone(routeAgent.initialArg.state),
         },
         outputs: {
@@ -54,12 +60,15 @@ function create({
         let outputs = { targetWaypoint: null, logJson: null, visualizePoints: null, visualizeLines: null }
         state = { ...state }
 
-        // ── Accumulate gas buffer ─────────────────────────────────────
+        // ── Accumulate gas buffer (skip if reading unchanged) ─────────
         if (updated.gasReading && state.gasReading != null && position != null) {
             state.maxGasReading = Math.max(state.maxGasReading, state.gasReading)
-            state.gasBuffer = [...state.gasBuffer, { time: getTime(), gasReading: state.gasReading, location: position }]
-            if (state.gasBuffer.length > bufferSize) {
-                state.gasBuffer = state.gasBuffer.slice(-bufferSize)
+            if (state.gasReading !== state.lastLoggedGasReading) {
+                state.lastLoggedGasReading = state.gasReading
+                state.gasBuffer = [...state.gasBuffer, { time: getTime(), gasReading: state.gasReading, location: position }]
+                if (state.gasBuffer.length > bufferSize) {
+                    state.gasBuffer = state.gasBuffer.slice(-bufferSize)
+                }
             }
         }
 
@@ -103,29 +112,64 @@ function create({
 
         // ── Gas follow: greedy gradient chase ────────────────────────
         if (state.mode === "gasFollow" && position != null) {
-            // Update peak gas reading during chase
+            // Update peak gas reading during chase; reset timer on new peak
             if (state.gasReading != null) {
-                state.peakGasInChase = Math.max(state.peakGasInChase, state.gasReading)
-            }
-
-            // Decide heading: use gradient if strong, otherwise perturb current heading
-            if (gradient.slope > gasRateIncreaseRatio && state.gasBuffer.length >= minSamplesForGradient) {
-                // Strong gradient — follow it directly
-                state.currentHeading = gradient.angle
-            } else if (state.currentHeading != null) {
-                // Weak/noisy gradient — randomly perturb current heading slightly
-                const perturbation = (Math.random() - 0.5) * 2 * perturbAngle
-                state.currentHeading = state.currentHeading + perturbation
-            }
-
-            // Place waypoint ahead in current heading direction
-            if (state.currentHeading != null) {
-                const wp = {
-                    x: position.x + Math.cos(state.currentHeading) * stepDistance,
-                    y: position.y + Math.sin(state.currentHeading) * stepDistance,
+                if (state.gasReading > state.peakGasInChase) {
+                    state.peakGasInChase = state.gasReading
+                    state.noImprovementTimer = timer({ duration: noImprovementTimeout, getTime, data: null })
                 }
-                outputs.targetWaypoint = wp
-                outputs.visualizePoints = [{ id: 'gasTarget', x: wp.x, y: wp.y, color: '#ff4400', r: 6, label: 'G' }]
+            }
+
+            // No-improvement timer expired → back to route follow
+            if (state.noImprovementTimer != null && state.noImprovementTimer.done) {
+                state.mode              = "routeFollow"
+                state.currentHeading    = null
+                state.peakGasInChase    = 0
+                state.flatCount         = 0
+                state.noImprovementTimer = null
+                state.cooldown          = timer({ duration: switchingCooldown, getTime, data: null })
+                outputs.visualizePoints = [{ id: 'gasTarget', remove: true }]
+                outputs.logJson = { ...outputs.logJson, gasAgent: `no gas improvement for ${noImprovementTimeout}s — returning to route follow` }
+            }
+        }
+
+        if (state.mode === "gasFollow" && position != null) {
+            // Track flat gradient — if gas is high but gradient is flat
+            if (gradient.slope < flatGradientThreshold && state.maxGasReading > gasThreshold) {
+                state.flatCount = state.flatCount + 1
+            } else {
+                state.flatCount = 0
+            }
+
+            if (state.flatCount >= flatGradientWindow) {
+                // Gradient is flat — return to route following
+                state.mode           = "routeFollow"
+                state.currentHeading = null
+                state.peakGasInChase = 0
+                state.flatCount      = 0
+                state.cooldown       = timer({ duration: switchingCooldown, getTime, data: null })
+                outputs.visualizePoints = [{ id: 'gasTarget', remove: true }]
+                outputs.logJson = { ...outputs.logJson, gasAgent: `flat gradient — returning to route follow (peak=${state.peakGasInChase.toFixed(2)})` }
+            } else {
+                // Decide heading: use gradient if strong, otherwise perturb current heading
+                if (gradient.slope > gasRateIncreaseRatio && state.gasBuffer.length >= minSamplesForGradient) {
+                    // Strong gradient — follow it directly
+                    state.currentHeading = gradient.angle
+                } else if (state.currentHeading != null) {
+                    // Weak/noisy gradient — randomly perturb current heading slightly
+                    const perturbation = (Math.random() - 0.5) * 2 * perturbAngle
+                    state.currentHeading = state.currentHeading + perturbation
+                }
+
+                // Place waypoint ahead in current heading direction
+                if (state.currentHeading != null) {
+                    const wp = {
+                        x: position.x + Math.cos(state.currentHeading) * stepDistance,
+                        y: position.y + Math.sin(state.currentHeading) * stepDistance,
+                    }
+                    outputs.targetWaypoint = wp
+                    outputs.visualizePoints = [{ id: 'gasTarget', x: wp.x, y: wp.y, color: '#ff4400', r: 6, label: 'G' }]
+                }
             }
         }
 
@@ -138,10 +182,12 @@ function create({
                 if (state.gasBuffer.length >= minSamplesForGradient
                         && state.maxGasReading > gasThreshold
                         && interest > gasRateIncreaseRatio) {
-                    state.mode           = "gasFollow"
-                    state.currentHeading = gradient.angle
-                    state.peakGasInChase = state.gasReading || 0
-                    state.cooldown       = timer({ duration: switchingCooldown, getTime, data: null })
+                    state.mode              = "gasFollow"
+                    state.currentHeading    = gradient.angle
+                    state.peakGasInChase    = state.gasReading || 0
+                    state.flatCount         = 0
+                    state.noImprovementTimer = timer({ duration: noImprovementTimeout, getTime, data: null })
+                    state.cooldown          = timer({ duration: switchingCooldown, getTime, data: null })
                     outputs.logJson = { ...outputs.logJson, gasAgent: `entering greedy gas follow (slope=${interest.toFixed(3)})` }
                 }
             } else {
