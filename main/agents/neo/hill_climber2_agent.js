@@ -5,12 +5,17 @@ const info = {
     outputs: ["targetWaypoint", "logJson", "visualizePoints", "visualizeLines"],
 }
 
+const DEG5 = 5 * Math.PI / 180   // 5 degrees in radians
+const DEG1 = 1 * Math.PI / 180   // 1 degree in radians
+
 function create({
     minGasToEnter = 0.1,          // minimum gas PPM to even consider entering gasFollow
     gasIncreaseThreshold = 0.005, // switch to gasFollow when current - prev > this
     turnAngle = Math.PI / 6,
     stepDistance = 30,
     maxRandomTurns = 15,          // exit gasFollow after this many consecutive random turns
+    steerStep = DEG5,             // initial steering bias when things are improving
+    steerDecrement = DEG1,        // how much to reduce steer toward 0 when things get worse
     routeAgentConfig = {},
 } = {}) {
     const routeAgent = simpleRouteAgent.create(routeAgentConfig)
@@ -29,9 +34,12 @@ function create({
             gasReading:       null,
             mode:             "idle",
             currentHeading:   null,
+            prevPrevGas:      0,        // gas two waypoints ago
             prevGas:          0,        // gas at previous waypoint
             bestGasThisLeg:   0,        // best gas seen while traveling to current waypoint
             randomTurnCount:  0,
+            currentSteer:     0,        // steering bias in radians (+ = right, - = left)
+            prevSteer:        0,        // what currentSteer was last decision
             routeFollowState: structuredClone(routeAgent.initialArg.state),
         },
         outputs: {
@@ -89,6 +97,9 @@ function create({
             console.log(`[HC2] *** ENTERING gasFollow *** gas=${state.gasReading.toFixed(4)} bestThisLeg=${state.bestGasThisLeg.toFixed(4)} prevGas=${state.prevGas.toFixed(4)} delta=${(state.bestGasThisLeg - state.prevGas).toFixed(4)}`)
             state.mode = "gasFollow"
             state.randomTurnCount = 0
+            state.currentSteer = 0
+            state.prevSteer = 0
+            state.prevPrevGas = 0
             state.prevGas = state.bestGasThisLeg
             state.bestGasThisLeg = 0
             if (position != null && position.heading != null) {
@@ -110,22 +121,59 @@ function create({
         if (state.mode === "gasFollow" && position != null) {
             if (updated.waypointReached) {
                 // we arrived at the waypoint — compare best gas this leg vs previous leg
-                const improved = state.bestGasThisLeg > state.prevGas + gasIncreaseThreshold
-                console.log(`[HC2] waypointReached! bestThisLeg=${state.bestGasThisLeg.toFixed(4)} prevGas=${state.prevGas.toFixed(4)} improved=${improved} randomTurns=${state.randomTurnCount}/${maxRandomTurns}`)
+                const improved       = state.bestGasThisLeg > state.prevGas + gasIncreaseThreshold
+                const prevImproved   = state.prevGas > state.prevPrevGas + gasIncreaseThreshold
+                console.log(`[HC2] waypointReached! bestThisLeg=${state.bestGasThisLeg.toFixed(4)} prevGas=${state.prevGas.toFixed(4)} prevPrevGas=${state.prevPrevGas.toFixed(4)} improved=${improved} prevImproved=${prevImproved} steer=${(state.currentSteer * 180 / Math.PI).toFixed(1)}° prevSteer=${(state.prevSteer * 180 / Math.PI).toFixed(1)}° randomTurns=${state.randomTurnCount}/${maxRandomTurns}`)
 
                 if (improved) {
-                    // gas improved → keep going straight, reset random turn count
+                    // gas improved → apply steering and reset random turn count
                     state.randomTurnCount = 0
-                    console.log(`[HC2] gas improved → going straight, reset turns`)
+
+                    // steering feedback: fine-tune the heading
+                    if (state.currentSteer === 0 && state.prevSteer === 0) {
+                        // no steering yet → introduce a small random bias
+                        const direction = Math.random() < 0.5 ? -1 : 1
+                        state.prevSteer = state.currentSteer
+                        state.currentSteer = direction * steerStep
+                        console.log(`[HC2] gas improved, no steer yet → introducing ${(state.currentSteer * 180 / Math.PI).toFixed(1)}° bias`)
+                    } else {
+                        // already steering → keep it as-is
+                        console.log(`[HC2] gas improved, keeping steer=${(state.currentSteer * 180 / Math.PI).toFixed(1)}°`)
+                    }
+
+                    // apply steering bias to heading
+                    state.currentHeading = (state.currentHeading || 0) + state.currentSteer
+                    console.log(`[HC2] applied steer → heading=${(state.currentHeading * 180 / Math.PI).toFixed(1)}°`)
                 } else {
-                    // no improvement → random turn
-                    const direction = Math.random() < 0.5 ? -1 : 1
-                    state.currentHeading = (state.currentHeading || 0) + direction * turnAngle
-                    state.randomTurnCount = state.randomTurnCount + 1
-                    console.log(`[HC2] no improvement → random turn ${direction > 0 ? '+' : '-'}${(turnAngle * 180 / Math.PI).toFixed(0)}° newHeading=${(state.currentHeading * 180 / Math.PI).toFixed(1)}° turns=${state.randomTurnCount}/${maxRandomTurns}`)
+                    // gas got worse → decrement steer back toward 0
+                    if (state.currentSteer > 0) {
+                        state.prevSteer = state.currentSteer
+                        state.currentSteer = Math.max(0, state.currentSteer - steerDecrement)
+                        console.log(`[HC2] gas worse, decrementing steer: ${(state.prevSteer * 180 / Math.PI).toFixed(1)}° → ${(state.currentSteer * 180 / Math.PI).toFixed(1)}°`)
+                    } else if (state.currentSteer < 0) {
+                        state.prevSteer = state.currentSteer
+                        state.currentSteer = Math.min(0, state.currentSteer + steerDecrement)
+                        console.log(`[HC2] gas worse, decrementing steer: ${(state.prevSteer * 180 / Math.PI).toFixed(1)}° → ${(state.currentSteer * 180 / Math.PI).toFixed(1)}°`)
+                    }
+
+                    // apply remaining steer (may be 0 now)
+                    state.currentHeading = (state.currentHeading || 0) + state.currentSteer
+
+                    // if steer has hit 0 and gas is still not improving → random turn
+                    if (state.currentSteer === 0) {
+                        const direction = Math.random() < 0.5 ? -1 : 1
+                        state.currentHeading = state.currentHeading + direction * turnAngle
+                        state.randomTurnCount = state.randomTurnCount + 1
+                        // reset steer state for next cycle
+                        state.prevSteer = 0
+                        console.log(`[HC2] steer exhausted → random turn ${direction > 0 ? '+' : '-'}${(turnAngle * 180 / Math.PI).toFixed(0)}° heading=${(state.currentHeading * 180 / Math.PI).toFixed(1)}° turns=${state.randomTurnCount}/${maxRandomTurns}`)
+                    } else {
+                        console.log(`[HC2] gas worse, applied reduced steer → heading=${(state.currentHeading * 180 / Math.PI).toFixed(1)}°`)
+                    }
                 }
 
-                // save this leg's best as reference, reset for next leg
+                // shift gas history
+                state.prevPrevGas = state.prevGas
                 state.prevGas = state.bestGasThisLeg
                 state.bestGasThisLeg = 0
 
@@ -134,9 +182,12 @@ function create({
                     console.log(`[HC2] *** EXITING gasFollow *** too many random turns (${state.randomTurnCount})`)
                     state.mode = "routeFollow"
                     state.currentHeading = null
+                    state.prevPrevGas = 0
                     state.prevGas = 0
                     state.bestGasThisLeg = 0
                     state.randomTurnCount = 0
+                    state.currentSteer = 0
+                    state.prevSteer = 0
                     outputs.visualizePoints = [{ id: 'hillTarget', remove: true }]
                 }
 
@@ -154,13 +205,16 @@ function create({
         }
 
         const headingDeg = state.currentHeading != null ? (state.currentHeading * 180 / Math.PI).toFixed(0) + "°" : "none"
+        const steerDeg = (state.currentSteer * 180 / Math.PI).toFixed(1)
         outputs.logJson = {
             mode: state.mode,
             randomTurns: `${state.randomTurnCount}/${maxRandomTurns}`,
             rawGas: (state.gasReading || 0).toFixed(4),
+            prevPrevGas: state.prevPrevGas.toFixed(4),
             prevGas: state.prevGas.toFixed(4),
             bestThisLeg: state.bestGasThisLeg.toFixed(4),
             heading: headingDeg,
+            steer: `${steerDeg}°`,
             time: time.toFixed(1),
             posX: position ? position.x.toFixed(1) : "?",
             posY: position ? position.y.toFixed(1) : "?",

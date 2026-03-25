@@ -248,16 +248,17 @@ export function nearestPointOnPolyline(p, polyline) {
  * "Away from the route" means perpendicular to the closest line segment,
  * on the side the agent is already on.
  *
- * @param {{x:number, y:number}} location  - agent position
- * @param {number} heading                 - agent heading in radians
- * @param {{x:number, y:number}[]} route   - array of waypoints forming a polyline
+ * @param {object} args
+ * @param {{x:number, y:number}} args.location  - agent position
+ * @param {number} args.heading                 - agent heading in radians
+ * @param {{x:number, y:number}[]} args.route   - array of waypoints forming a polyline
  * @returns {number} -1 for left, 1 for right
  *
  * @example
  *   // agent at (5,5), heading east (0 rad), route along x-axis
- *   awayFromRoute({x:5,y:5}, 0, [{x:0,y:0},{x:10,y:0}]) // -1 (turn left, toward +y)
+ *   awayFromRoute({location:{x:5,y:5}, heading:0, route:[{x:0,y:0},{x:10,y:0}]}) // -1 (turn left, toward +y)
  */
-export function awayFromRoute(location, heading, route) {
+export function awayFromRoute({ location, heading, route }) {
     if (!route || route.length < 2) return 1
 
     // 1. Find the closest segment and the nearest point on it
