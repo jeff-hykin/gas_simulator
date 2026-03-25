@@ -41,3 +41,18 @@ export function timer({duration, getTime, data}) {
         },
     }
 }
+
+const everyNthIds = new Map()
+export function everyNth({rate, init=0, id}, func) {
+    let count = init
+    try {
+        count = everyNthIds.get(id) || 0
+    } catch (error) {
+        console.debug(`error is:`,error)
+    }
+    if (count%rate == 0) {
+        func()
+    }
+    console.debug(`count is:`,count)
+    everyNthIds.set(id, count+1)
+}

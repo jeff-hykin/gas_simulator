@@ -8,6 +8,7 @@ const canvasSys = createCanvasSystem({ width: 1100, height: 830 });
 // Visualization points by ID (for debugging/analysis)
 const visualizationPointsById = new Map();
 const visualizationLinesById = new Map();
+let vectorFieldItems = []; // Canvas items for vector field arrows
 
 // Current JSON state (merged from all logJson publishes)
 const currentJsonState = {};
@@ -167,6 +168,69 @@ function playAgent() {
       canvasSys.render();
     })
 
+    // Set up vector field channel (renders gradient arrows on the canvas)
+    mainPubSub.subscribe('vectorField', (arrows) => {
+      // Remove previous field arrows
+      for (const item of vectorFieldItems) {
+        canvasSys.removeFromWorld(item);
+      }
+      vectorFieldItems = [];
+
+      if (!arrows || arrows.length === 0) {
+        canvasSys.render();
+        return;
+      }
+
+      // Find max slope for color scaling
+      const maxSlope = arrows.reduce((m, a) => Math.max(m, a.slope), 0);
+
+      for (const arrow of arrows) {
+        // Color: interpolate from dim blue (weak) to bright red (strong)
+        const t = maxSlope > 0 ? Math.min(arrow.slope / maxSlope, 1) : 0;
+        const r = Math.round(50 + 205 * t);
+        const g = Math.round(180 * (1 - t));
+        const b = Math.round(255 * (1 - t));
+        const color = `rgb(${r},${g},${b})`;
+
+        const x1 = arrow.x;
+        const y1 = arrow.y;
+        const x2 = arrow.x + arrow.dx;
+        const y2 = arrow.y + arrow.dy;
+
+        // Arrow shaft
+        const shaft = {
+          type: 'line',
+          points: [{ x: x1, y: y1 }, { x: x2, y: y2 }],
+          color,
+          lineWidth: 1.5,
+          opacity: 0.7,
+        };
+        vectorFieldItems.push(shaft);
+        canvasSys.addToWorld(shaft);
+
+        // Arrowhead (two small lines)
+        const angle = Math.atan2(arrow.dy, arrow.dx);
+        const headLen = Math.hypot(arrow.dx, arrow.dy) * 0.35;
+        const headAngle = 0.5; // ~29 degrees
+        const hx1 = x2 - Math.cos(angle - headAngle) * headLen;
+        const hy1 = y2 - Math.sin(angle - headAngle) * headLen;
+        const hx2 = x2 - Math.cos(angle + headAngle) * headLen;
+        const hy2 = y2 - Math.sin(angle + headAngle) * headLen;
+
+        const head = {
+          type: 'line',
+          points: [{ x: hx1, y: hy1 }, { x: x2, y: y2 }, { x: hx2, y: hy2 }],
+          color,
+          lineWidth: 1.5,
+          opacity: 0.7,
+        };
+        vectorFieldItems.push(head);
+        canvasSys.addToWorld(head);
+      }
+
+      canvasSys.render();
+    });
+
     const startPos = getStartPosition();
     sim.startAgentLoop(mainPubSub, {
       ...agentConfig,
@@ -228,6 +292,12 @@ function resetAgent() {
     if (index !== -1) world.splice(index, 1);
   });
   visualizationPointsById.clear();
+
+  // Clear vector field
+  for (const item of vectorFieldItems) {
+    canvasSys.removeFromWorld(item);
+  }
+  vectorFieldItems = [];
 
   canvasSys.render();
   updateAgentButtons();

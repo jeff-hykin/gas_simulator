@@ -129,6 +129,33 @@ function create({
         if (position != null) {
             const lineLen = 40
             outputs.visualizeLines = [{ id: 'gradientDir', x1: position.x, y1: position.y, x2: position.x + Math.cos(gradient.angle) * lineLen, y2: position.y + Math.sin(gradient.angle) * lineLen, color: '#00ffcc', lineWidth: 2 }]
+
+            // ── Vector field: compute gradient at grid points around the robot ──
+            everyNth({ rate: 40, id: "1923869283416",}, ()=>{
+                if (state.gasBuffer.length >= minSamplesForGradient) {
+                    const half = Math.floor(vectorFieldGridSize / 2)
+                    const arrows = []
+                    for (let gi = -half; gi <= half; gi++) {
+                        for (let gj = -half; gj <= half; gj++) {
+                            const px = position.x + gi * vectorFieldSpacing
+                            const py = position.y + gj * vectorFieldSpacing
+                            const localGrad = gasGradient({ x: px, y: py }, state.gasBuffer)
+                            if (localGrad.slope > 1e-6) {
+                                // Scale arrow length by slope, capped at vectorFieldArrowLen
+                                const scale = Math.min(localGrad.slope / gasRateIncreaseRatio, 1) * vectorFieldArrowLen
+                                arrows.push({
+                                    x: px,
+                                    y: py,
+                                    dx: Math.cos(localGrad.angle) * scale,
+                                    dy: Math.sin(localGrad.angle) * scale,
+                                    slope: localGrad.slope,
+                                })
+                            }
+                        }
+                    }
+                    outputs.vectorField = arrows
+                }
+            })
         }
         if (state.maxGasLocation != null) {
             vizPoints.push({ id: 'maxGasLoc', x: state.maxGasLocation.x, y: state.maxGasLocation.y, color: '#ff00ff', r: 8, label: 'MAX' })
