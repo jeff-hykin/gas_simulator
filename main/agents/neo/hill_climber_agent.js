@@ -8,7 +8,7 @@ const info = {
 function create({
     gasThreshold = 0.120,
     gasFollowDuration = 200,
-    sampleInterval = 2,        // time units between gas samples
+    sampleInterval = 3,        // time units between gas samples
     turnAngle = Math.PI / 6,   // 30 degrees in radians
     stepDistance = 30,
     routeAgentConfig = {},
