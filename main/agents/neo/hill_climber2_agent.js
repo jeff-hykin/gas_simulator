@@ -19,6 +19,7 @@ function create({
     steerStep = DEG5,             // initial steering bias when things are improving
     steerDecrement = DEG1,        // how much to reduce steer toward 0 when things get worse
     waypointTimeout = 2,         // seconds before giving up on a waypoint (e.g. stuck on building)
+    minProductivity = 0.05,       // exit gasFollow if productivity drops below this (productivity=average rate of gas increase while searching for gas)
     routeAgentConfig = {},
 } = {}) {
     const routeAgent = simpleRouteAgent.create(routeAgentConfig)
@@ -46,6 +47,8 @@ function create({
             waypointSetTime:  null,     // when the current gasFollow waypoint was placed
             lostScentPos:     null,     // {x,y} where gradient first zeroed out
             returningToScent: false,    // true when navigating back to lostScentPos
+            gasFollowStartTime: null,   // when gasFollow mode was entered (virtual time)
+            peakGasInFollow:  0,        // highest maxGasReading seen during this gasFollow session
             routeFollowState: structuredClone(routeAgent.initialArg.state),
         },
         outputs: {
@@ -65,6 +68,9 @@ function create({
         // ── Track best gas seen on current leg ───────────────────
         if (updated.maxGasReading && state.maxGasReading != null) {
             state.bestGasThisLeg = Math.max(state.bestGasThisLeg, state.maxGasReading)
+            if (state.mode === "gasFollow") {
+                state.peakGasInFollow = Math.max(state.peakGasInFollow, state.maxGasReading)
+            }
             console.log(`[HC2] maxGasReading=${state.maxGasReading.toFixed(4)} bestThisLeg=${state.bestGasThisLeg.toFixed(4)} prevGas=${state.prevGas.toFixed(4)} mode=${state.mode}`)
         }
 
@@ -106,6 +112,8 @@ function create({
             state.currentSteer = 0
             state.prevSteer = 0
             state.prevPrevGas = 0
+            state.gasFollowStartTime = time
+            state.peakGasInFollow = state.maxGasReading
             state.prevGas = state.bestGasThisLeg
             state.bestGasThisLeg = 0
             if (position != null && position.heading != null) {
@@ -232,13 +240,23 @@ function create({
                     // skip placing a normal next waypoint
                 }
 
+                // productivity check: exit if not worth staying in gasFollow (skip during return)
+                if (state.gasFollowStartTime != null && !state.returningToScent) {
+                    const gasFollowingTimeSpent = time - state.gasFollowStartTime
+                    const gasFollowingProductivity = (state.peakGasInFollow - minGasToEnter) / (gasFollowingTimeSpent + 10)
+                    if (gasFollowingProductivity < minProductivity && gasFollowingTimeSpent > 5) {
+                        console.log(`[HC2] *** EXITING gasFollow (low productivity) *** productivity=${gasFollowingProductivity.toFixed(6)} peakGas=${state.peakGasInFollow.toFixed(4)} timeSpent=${gasFollowingTimeSpent.toFixed(1)}s`)
+                        state.randomTurnCount = maxRandomTurns + 1 // trigger the exit below
+                    }
+                }
+
                 // too many random turns → back to route
                 if (state.randomTurnCount > maxRandomTurns) {
                     console.log(`[HC2] *** EXITING gasFollow *** too many random turns (${state.randomTurnCount})`)
                     state.mode = "routeFollow"
                     state.currentHeading = null
                     state.prevPrevGas = 0
-                    state.prevGas = 0
+                    state.prevGas = state.maxGasReading || 0  // prevent immediate re-entry (maxGasReading is monotonic)
                     state.bestGasThisLeg = 0
                     state.randomTurnCount = 0
                     state.currentSteer = 0
@@ -246,6 +264,10 @@ function create({
                     state.waypointSetTime = null
                     state.lostScentPos = null
                     state.returningToScent = false
+                    state.gasFollowStartTime = null
+                    state.peakGasInFollow = 0
+                    // force SRA to re-emit its current waypoint (local planner lost it during gasFollow)
+                    state.routeFollowState = { ...state.routeFollowState, currentPublishedWaypoint: null }
                     outputs.visualizePoints = [{ id: 'hillTarget', remove: true }, { id: 'lostScent', remove: true }]
                 }
 
@@ -275,6 +297,10 @@ function create({
 
         const headingDeg = state.currentHeading != null ? (state.currentHeading * 180 / Math.PI).toFixed(0) + "°" : "none"
         const steerDeg = (state.currentSteer * 180 / Math.PI).toFixed(1)
+        const gasFollowingTimeSpent = state.gasFollowStartTime != null ? time - state.gasFollowStartTime : 0
+        const gasFollowingProductivity = state.gasFollowStartTime != null
+            ? (state.peakGasInFollow - minGasToEnter) / (gasFollowingTimeSpent + 10)
+            : 0
         outputs.logJson = {
             mode: state.mode,
             randomTurns: `${state.randomTurnCount}/${maxRandomTurns}`,
@@ -284,6 +310,9 @@ function create({
             bestThisLeg: state.bestGasThisLeg.toFixed(4),
             heading: headingDeg,
             steer: `${steerDeg}°`,
+            followTime: gasFollowingTimeSpent.toFixed(1),
+            productivity: gasFollowingProductivity.toFixed(6),
+            peakGas: state.peakGasInFollow.toFixed(4),
             time: time.toFixed(1),
             posX: position ? position.x.toFixed(1) : "?",
             posY: position ? position.y.toFixed(1) : "?",
