@@ -618,3 +618,8 @@ settings/home/.gitconfig
 settings/home/.mongorc.js
 settings/home/.ungitrc
 settings/home/.vuerc
+
+#
+# Proofshot
+#
+proofshot-artifacts/
