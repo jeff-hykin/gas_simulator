@@ -23,6 +23,7 @@ function onMapLoaded() {
   // When a map is loaded, reset the robot to the start marker position
   const startPos = getStartPosition();
   sim.setRobotPosition(startPos.x, startPos.y, 0);
+  canvasSys.centerOn(startPos);
   // If the agent is running, stop it and clear state
   if (sim.agentActive) {
     sim.stopAgentLoop();

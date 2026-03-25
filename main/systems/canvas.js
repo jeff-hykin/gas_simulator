@@ -51,6 +51,22 @@ export function createCanvasSystem({ width = 800, height = 600 } = {}) {
     return { offsetX: state.offsetX, offsetY: state.offsetY, scale: state.scale };
   }
 
+  function setView({ offsetX, offsetY, scale } = {}) {
+    if (offsetX != null) state.offsetX = offsetX;
+    if (offsetY != null) state.offsetY = offsetY;
+    if (scale != null) state.scale = Math.max(0.1, Math.min(6, scale));
+    render();
+  }
+
+  /**
+   * Center the view on a world coordinate.
+   */
+  function centerOn({ x, y }) {
+    state.offsetX = -x-(width/2);
+    state.offsetY = -y-(height/2);
+    render();
+  }
+
   /**
    * Convert world coordinates to screen pixels.
    * @example
@@ -394,6 +410,8 @@ export function createCanvasSystem({ width = 800, height = 600 } = {}) {
     clearWorld,
     getWorld: () => world.slice(),
     getView,
+    setView,
+    centerOn,
     worldToScreen,
     screenToWorld,
     takeControl,
