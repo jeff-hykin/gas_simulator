@@ -329,6 +329,13 @@ function toggleAgent() {
   }
 }
 
+window.addEventListener('keydown', (e) => {
+  if (e.code === 'Space' && e.target === document.body) {
+    e.preventDefault();
+    toggleAgent();
+  }
+});
+
 const btnToggle = buildButton('Play', toggleAgent);
 const btnReset = buildButton('Reset', resetAgent);
 btnToggle.classList.add('full-width');
