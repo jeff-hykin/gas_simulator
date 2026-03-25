@@ -1,10 +1,10 @@
-import { timer } from "../../tooling/time.js"
+import { timer, everyNth } from "../../tooling/time.js"
 import simpleRouteAgent from './simple_route_agent.js'
 import { gasGradient } from './gas_agent.js'
 
 const info = {
     inputs: ["position", "routeUpdate", "waypointReached", "gasReading"],
-    outputs: ["targetWaypoint", "logJson", "visualizePoints", "visualizeLines"],
+    outputs: ["targetWaypoint", "logJson", "visualizePoints", "visualizeLines", "vectorField"],
 }
 
 /**
@@ -34,6 +34,9 @@ function create({
     flatGradientWindow = 10,      // consecutive flat ticks before giving up
     noImprovementTimeout = 30,    // seconds without a new peak gas reading before giving up
     minSamplesForGradient = 3,    // need at least this many buffer entries
+    vectorFieldGridSize = 5,      // NxN grid of gradient arrows around robot
+    vectorFieldSpacing = 40,      // spacing between grid points in world units
+    vectorFieldArrowLen = 25,     // max arrow length for visualization
 } = {}) {
     const routeAgent = simpleRouteAgent.create(routeAgentConfig)
 
@@ -66,12 +69,13 @@ function create({
             logJson:         null,
             visualizePoints: null,
             visualizeLines:  null,
+            vectorField:     null,
         },
     }
 
     function update(getTime, { state, updated }) {
         const { position, routeUpdate, waypointReached } = state
-        let outputs = { targetWaypoint: null, logJson: null, visualizePoints: null, visualizeLines: null }
+        let outputs = { targetWaypoint: null, logJson: null, visualizePoints: null, visualizeLines: null, vectorField: null }
         state = { ...state }
 
         // ── Accumulate gas buffer (skip if reading unchanged) ─────────
