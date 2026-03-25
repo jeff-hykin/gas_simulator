@@ -14,7 +14,8 @@ function create({
     gasIncreaseThreshold = 0.005, // switch to gasFollow when current - prev > this
     turnAngle = Math.PI / 6,
     stepDistance = 30,
-    maxRandomTurns = 15,          // exit gasFollow after this many consecutive random turns
+    returnsAfterRandomTurns = 10, // return to lost-scent position after this many consecutive random turns
+    maxRandomTurns = 15,          // exit gasFollow after this many consecutive random turns (including post-return)
     steerStep = DEG5,             // initial steering bias when things are improving
     steerDecrement = DEG1,        // how much to reduce steer toward 0 when things get worse
     waypointTimeout = 2,         // seconds before giving up on a waypoint (e.g. stuck on building)
@@ -43,6 +44,8 @@ function create({
             currentSteer:     0,        // steering bias in radians (+ = right, - = left)
             prevSteer:        0,        // what currentSteer was last decision
             waypointSetTime:  null,     // when the current gasFollow waypoint was placed
+            lostScentPos:     null,     // {x,y} where gradient first zeroed out
+            returningToScent: false,    // true when navigating back to lostScentPos
             routeFollowState: structuredClone(routeAgent.initialArg.state),
         },
         outputs: {
@@ -123,11 +126,38 @@ function create({
 
         // ── Gas follow: decide when waypoint is reached or timed out ─
         if (state.mode === "gasFollow" && position != null) {
-            const timedOut = state.waypointSetTime != null && (time - state.waypointSetTime) > waypointTimeout
+            // no timeout while returning to scent (it may be far away)
+            const timedOut = !state.returningToScent
+                && state.waypointSetTime != null
+                && (time - state.waypointSetTime) > waypointTimeout
             if (timedOut) {
                 console.log(`[HC2] *** WAYPOINT TIMEOUT *** after ${(time - state.waypointSetTime).toFixed(1)}s → treating as failed leg, random turn`)
             }
             if (updated.waypointReached || timedOut) {
+                // ── Returning to scent: on arrival, reset and resume ──
+                if (state.returningToScent) {
+                    console.log(`[HC2] arrived back at lost-scent position → resuming exploration`)
+                    state.returningToScent = false
+                    state.lostScentPos = null
+                    outputs.visualizePoints = [{ id: 'lostScent', remove: true }]
+                    state.randomTurnCount = 0
+                    state.currentSteer = 0
+                    state.prevSteer = 0
+                    state.bestGasThisLeg = 0
+                    // pick a random heading to try from here
+                    state.currentHeading = Math.random() * 2 * Math.PI
+                    const wp = {
+                        x: position.x + Math.cos(state.currentHeading) * stepDistance,
+                        y: position.y + Math.sin(state.currentHeading) * stepDistance,
+                    }
+                    outputs.targetWaypoint = wp
+                    outputs.visualizePoints = [{ id: 'hillTarget', x: wp.x, y: wp.y, color: '#ffaa00', r: 6, label: 'H2' }]
+                    state.waypointSetTime = time
+                    console.log(`[HC2] random heading=${(state.currentHeading * 180 / Math.PI).toFixed(1)}° wp=(${wp.x.toFixed(1)}, ${wp.y.toFixed(1)})`)
+                    // skip normal decision logic this tick
+                    return { state, outputs: { ...outputs, logJson: { mode: 'gasFollow-returnArrived', ...outputs.logJson } } }
+                }
+
                 // we arrived at the waypoint — compare best gas this leg vs previous leg
                 const improved       = state.bestGasThisLeg > state.prevGas + gasIncreaseThreshold
                 const prevImproved   = state.prevGas > state.prevPrevGas + gasIncreaseThreshold
@@ -136,6 +166,8 @@ function create({
                 if (improved) {
                     // gas improved → apply steering and reset random turn count
                     state.randomTurnCount = 0
+                    // update last-known-good position (where gradient was still positive)
+                    state.lostScentPos = { x: position.x, y: position.y }
 
                     // steering feedback: fine-tune the heading
                     if (state.currentSteer === 0 && state.prevSteer === 0) {
@@ -189,6 +221,17 @@ function create({
                 state.prevGas = state.bestGasThisLeg
                 state.bestGasThisLeg = 0
 
+                // after N random turns, return to where we lost the scent
+                if (state.randomTurnCount >= returnsAfterRandomTurns
+                    && !state.returningToScent
+                    && state.lostScentPos != null) {
+                    console.log(`[HC2] *** RETURNING TO SCENT *** at (${state.lostScentPos.x.toFixed(1)}, ${state.lostScentPos.y.toFixed(1)}) after ${state.randomTurnCount} random turns`)
+                    state.returningToScent = true
+                    outputs.targetWaypoint = { x: state.lostScentPos.x, y: state.lostScentPos.y }
+                    state.waypointSetTime = time
+                    // skip placing a normal next waypoint
+                }
+
                 // too many random turns → back to route
                 if (state.randomTurnCount > maxRandomTurns) {
                     console.log(`[HC2] *** EXITING gasFollow *** too many random turns (${state.randomTurnCount})`)
@@ -201,11 +244,13 @@ function create({
                     state.currentSteer = 0
                     state.prevSteer = 0
                     state.waypointSetTime = null
-                    outputs.visualizePoints = [{ id: 'hillTarget', remove: true }]
+                    state.lostScentPos = null
+                    state.returningToScent = false
+                    outputs.visualizePoints = [{ id: 'hillTarget', remove: true }, { id: 'lostScent', remove: true }]
                 }
 
-                // place next waypoint if still in gasFollow
-                if (state.mode === "gasFollow" && state.currentHeading != null) {
+                // place next waypoint if still in gasFollow (and not returning to scent)
+                if (state.mode === "gasFollow" && state.currentHeading != null && !state.returningToScent) {
                     const wp = {
                         x: position.x + Math.cos(state.currentHeading) * stepDistance,
                         y: position.y + Math.sin(state.currentHeading) * stepDistance,
@@ -216,6 +261,16 @@ function create({
                     console.log(`[HC2] next waypoint: (${wp.x.toFixed(1)}, ${wp.y.toFixed(1)})`)
                 }
             }
+        }
+
+        // ── Always show lostScent marker if we have one ──────────
+        if (state.lostScentPos != null) {
+            const scentColor = state.returningToScent ? '#ff4444' : '#44ff44'
+            const scentLabel = state.returningToScent ? 'RETURN' : 'GRAD'
+            outputs.visualizePoints = [
+                ...(outputs.visualizePoints || []),
+                { id: 'lostScent', x: state.lostScentPos.x, y: state.lostScentPos.y, color: scentColor, r: 6, label: scentLabel },
+            ]
         }
 
         const headingDeg = state.currentHeading != null ? (state.currentHeading * 180 / Math.PI).toFixed(0) + "°" : "none"
