@@ -17,7 +17,7 @@ const info = {
  * @param {{time:any, gasReading:number, location:{x:number,y:number}}[]} samples
  * @returns {{ angle:number, slope:number }}
  */
-export function gasGradient(position, samples) {
+export function gasGradient(position, samples, { minSpread = 5 } = {}) {
     const pts = []
     for (const s of samples) {
         if (s.location != null && s.gasReading != null) {
@@ -25,6 +25,16 @@ export function gasGradient(position, samples) {
         }
     }
     if (pts.length < 3) return { angle: 0, slope: 0 }
+
+    // Require minimum spatial spread — without it the plane fit is garbage
+    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity
+    for (const p of pts) {
+        if (p.x < minX) minX = p.x
+        if (p.x > maxX) maxX = p.x
+        if (p.y < minY) minY = p.y
+        if (p.y > maxY) maxY = p.y
+    }
+    if (Math.max(maxX - minX, maxY - minY) < minSpread) return { angle: 0, slope: 0 }
 
     // Weighted least-squares: weight = 1 / (distance + 1)
     let sw = 0, swx = 0, swy = 0, swv = 0
