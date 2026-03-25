@@ -53,6 +53,5 @@ export function everyNth({rate, init=0, id}, func) {
     if (count%rate == 0) {
         func()
     }
-    console.debug(`count is:`,count)
     everyNthIds.set(id, count+1)
 }
