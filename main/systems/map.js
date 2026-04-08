@@ -8,7 +8,7 @@ const DEFAULT_STYLES = {
   marker: { r: 5, stroke: '#f2f2f2', fill: '#0ea5e9', lineWidth: 2, font: '12px monospace', color: '#f2f2f2' },
   route: { stroke: '#fbbf24', lineWidth: 2, r: 3, fill: '#fbbf24' },
   obstacle: { stroke: '#e11d48', fill: 'rgba(225,29,72,0.2)', lineWidth: 2 },
-  gasNode: { stroke: '#22c55e', lineWidth: 2 },
+  gasNode: { stroke: '#a855f7', lineWidth: 2 },
 };
 
 function makeId(prefix) {
@@ -131,8 +131,8 @@ export function gasNodeAsCanvas(node, styles) {
       y: node.y,
       r: visualRadius,
       stops: node.stops || [
-        { offset: 0, color: `rgba(34,197,94,${alpha})` },
-        { offset: 1, color: 'rgba(34,197,94,0)' },
+        { offset: 0, color: `rgba(168,85,247,${alpha})` },
+        { offset: 1, color: 'rgba(168,85,247,0)' },
       ],
       inherit,
       owner: node,
@@ -446,11 +446,11 @@ export function createMapSystem(canvasSys, { onMapLoaded } = {}) {
             radius: 1,
             peak: 1,
             visualRadius: 2,
-            stroke: '#86efac',
+            stroke: '#c084fc',
             lineWidth: 2,
             stops: [
-              { offset: 0, color: 'rgba(34,197,94,0.35)' },
-              { offset: 1, color: 'rgba(34,197,94,0)' },
+              { offset: 0, color: 'rgba(168,85,247,0.35)' },
+              { offset: 1, color: 'rgba(168,85,247,0)' },
             ],
           };
           ui.pendingGasCanvas = gasNodeAsCanvas(preview, mapData.styles);
