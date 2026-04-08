@@ -9,23 +9,13 @@ const info = {
 const DEG5 = 5 * Math.PI / 180   // 5 degrees in radians
 const DEG1 = 1 * Math.PI / 180   // 1 degree in radians
 
-// Map a normalized value [0,1] to blue → red → purple hex color
+// Map a normalized value [0,1] to desaturated red → saturated red
 function gasToColor(t) {
     t = Math.max(0, Math.min(1, t))
-    let r, g, b
-    if (t < 0.5) {
-        // blue → red
-        const s = t / 0.5
-        r = Math.round(255 * s)
-        g = 0
-        b = Math.round(255 * (1 - s))
-    } else {
-        // red → purple
-        const s = (t - 0.5) / 0.5
-        r = 255
-        g = 0
-        b = Math.round(255 * s)
-    }
+    // At t=0: fully saturated red (255, 0, 0), at t=1: desaturated red (200, 160, 160)
+    const r = Math.round(255 - 55 * t)
+    const g = Math.round(160 * t)
+    const b = Math.round(160 * t)
     return '#' + [r, g, b].map(c => c.toString(16).padStart(2, '0')).join('')
 }
 
