@@ -44,10 +44,21 @@ function create({
             }
         }
 
-        // 2. Apply waypointReached (always advance when actually reached)
+        // 2. Apply waypointReached — only advance if the reached waypoint matches what we last published.
+        //    Otherwise it's for someone else's target (e.g. a gas-follow waypoint from a parent agent)
+        //    that happened to arrive while we were the active route-owner.
         if (updated.waypointReached) {
-            console.log(`SimpleAgent: waypoint ${s.currentWaypointIndex + 1}/${s.routeWaypoints.length} reached`)
-            s = { ...s, currentWaypointIndex: s.currentWaypointIndex + 1, currentPublishedWaypoint: null, ticksOnCurrentWaypoint: 0 }
+            const reached = waypointReached && waypointReached.waypoint
+            const published = s.currentPublishedWaypoint
+            const matches = reached && published
+                && reached.x === published.x
+                && reached.y === published.y
+            if (matches) {
+                console.log(`SimpleAgent: waypoint ${s.currentWaypointIndex + 1}/${s.routeWaypoints.length} reached`)
+                s = { ...s, currentWaypointIndex: s.currentWaypointIndex + 1, currentPublishedWaypoint: null, ticksOnCurrentWaypoint: 0 }
+            } else {
+                console.log(`SimpleAgent: ignoring waypointReached — payload ${reached ? `(${reached.x.toFixed(1)},${reached.y.toFixed(1)})` : 'null'} != published ${published ? `(${published.x.toFixed(1)},${published.y.toFixed(1)})` : 'null'}`)
+            }
         }
 
         // 3. On position update, compute and log progress metrics; skip if time exceeded

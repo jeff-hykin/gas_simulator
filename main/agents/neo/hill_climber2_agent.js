@@ -303,7 +303,15 @@ function create({
                     state.gasFollowStartTime = null
                     state.peakGasInFollow = 0
                     // force SRA to re-emit its current waypoint (local planner lost it during gasFollow)
-                    state.routeFollowState = { ...state.routeFollowState, currentPublishedWaypoint: null }
+                    // also clear the progress-tracking fields so the stale startTime/initialDistance
+                    // from before gasFollow doesn't trigger a spurious skip on the first position tick
+                    state.routeFollowState = {
+                        ...state.routeFollowState,
+                        currentPublishedWaypoint: null,
+                        currentWaypointStartTime: null,
+                        currentWaypointInitialDistance: null,
+                        ticksOnCurrentWaypoint: 0,
+                    }
                     outputs.visualizePoints = [{ id: 'hillTarget', remove: true }, { id: 'lostScent', remove: true }]
                 }
 
