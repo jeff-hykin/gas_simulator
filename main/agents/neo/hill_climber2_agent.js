@@ -3,7 +3,7 @@ import { awayFromRoute } from '../../tooling/math_helpers.js'
 
 const info = {
     inputs: ["position", "routeUpdate", "waypointReached", "maxGasReading"],
-    outputs: ["targetWaypoint", "logJson", "visualizePoints", "visualizeLines"],
+    outputs: ["targetWaypoint", "logJson", "visualizePoints", "visualizeLines", "toast"],
 }
 
 const DEG5 = 5 * Math.PI / 180   // 5 degrees in radians
@@ -62,6 +62,7 @@ function create({
             gasDotCount:      0,        // incrementing ID for gas topology dots
             prevMaxGasForDot: null,     // previous maxGasReading value for border comparison
             gasDotPeakSeen:   0,        // running peak for normalizing dot colors
+            firstSteerDone:   false,    // have we ever picked an initial steering direction?
             routeFollowState: structuredClone(routeAgent.initialArg.state),
         },
         outputs: {
@@ -69,12 +70,13 @@ function create({
             logJson:         null,
             visualizePoints: null,
             visualizeLines:  null,
+            toast:           null,
         },
     }
 
     function update(getTime, { state, updated }) {
         const { position, routeUpdate, waypointReached } = state
-        let outputs = { targetWaypoint: null, logJson: null, visualizePoints: null, visualizeLines: null }
+        let outputs = { targetWaypoint: null, logJson: null, visualizePoints: null, visualizeLines: null, toast: null }
         state = { ...state }
         const time = getTime()
 
@@ -143,6 +145,7 @@ function create({
             && state.maxGasReading >= minGasToEnter
             && state.bestGasThisLeg - state.prevGas > gasIncreaseThreshold) {
             console.log(`[HC2] *** ENTERING gasFollow *** maxGas=${state.maxGasReading.toFixed(4)} bestThisLeg=${state.bestGasThisLeg.toFixed(4)} prevGas=${state.prevGas.toFixed(4)} delta=${(state.bestGasThisLeg - state.prevGas).toFixed(4)}`)
+            outputs.toast = { message: `Gas detected — following gradient (${state.maxGasReading.toFixed(2)} PPM)`, type: "success" }
             state.mode = "gasFollow"
             state.randomTurnCount = 0
             state.currentSteer = 0
@@ -215,15 +218,15 @@ function create({
 
                     // steering feedback: fine-tune the heading
                     if (state.currentSteer === 0 && state.prevSteer === 0) {
-                        // no steering yet → bias away from route
-                        const route = state.routeFollowState.routeWaypoints
-                        // const direction = (route && route.length >= 2 && position)
-                        //     ? awayFromRoute({ location: position, heading: state.currentHeading || 0, route })
-                        //     : (Math.random() < 0.5 ? -1 : 1)
-                        const direction = (Math.random() < 0.5 ? -1 : 1)
+                        // no steering yet → first-ever attempt goes left, otherwise random
+                        // (left = negative angular delta, since sim's `a` key decrements angle)
+                        const direction = !state.firstSteerDone
+                            ? -1
+                            : (Math.random() < 0.5 ? -1 : 1)
+                        state.firstSteerDone = true
                         state.prevSteer = state.currentSteer
                         state.currentSteer = direction * steerStep
-                        console.log(`[HC2] gas improved, no steer yet → steering away from route: ${(state.currentSteer * 180 / Math.PI).toFixed(1)}° bias`)
+                        console.log(`[HC2] gas improved, no steer yet → steering ${direction < 0 ? 'left' : 'right'}: ${(state.currentSteer * 180 / Math.PI).toFixed(1)}° bias`)
                     } else {
                         // already steering → keep it as-is
                         console.log(`[HC2] gas improved, keeping steer=${(state.currentSteer * 180 / Math.PI).toFixed(1)}°`)
@@ -270,6 +273,7 @@ function create({
                     && !state.returningToScent
                     && state.lostScentPos != null) {
                     console.log(`[HC2] *** RETURNING TO SCENT *** at (${state.lostScentPos.x.toFixed(1)}, ${state.lostScentPos.y.toFixed(1)}) after ${state.randomTurnCount} random turns`)
+                    outputs.toast = { message: "Lost the scent — returning to last gradient point", type: "warning" }
                     state.returningToScent = true
                     outputs.targetWaypoint = { x: state.lostScentPos.x, y: state.lostScentPos.y }
                     state.waypointSetTime = time
@@ -289,6 +293,7 @@ function create({
                 // too many random turns → back to route
                 if (state.randomTurnCount > maxRandomTurns) {
                     console.log(`[HC2] *** EXITING gasFollow *** too many random turns (${state.randomTurnCount})`)
+                    outputs.toast = { message: "Resuming route", type: "info" }
                     state.mode = "routeFollow"
                     state.currentHeading = null
                     state.prevPrevGas = 0
