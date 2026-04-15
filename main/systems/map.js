@@ -85,6 +85,7 @@ export function routeAsCanvas(route, styles) {
     stroke: route.stroke,
     lineWidth: route.lineWidth,
     inherit,
+    layer: 'route',
     owner: route,
   };
   const points = route.points.map((pt) => ({
@@ -96,6 +97,7 @@ export function routeAsCanvas(route, styles) {
     stroke: route.stroke,
     lineWidth: route.lineWidth,
     inherit,
+    layer: 'route',
     owner: route,
   }));
   return [line, points];
@@ -115,6 +117,7 @@ export function obstacleAsCanvas(obstacle, styles) {
       fill: obstacle.fill,
       lineWidth: obstacle.lineWidth,
       inherit,
+      layer: 'obstacles',
       owner: obstacle,
     },
   ];
@@ -141,6 +144,7 @@ export function gasNodeAsCanvas(node, styles) {
       stroke: `rgba(168,85,247,${alpha})`,
       lineWidth,
       inherit,
+      layer: 'gas',
       owner: node,
     });
   }
@@ -153,6 +157,7 @@ export function gasNodeAsCanvas(node, styles) {
     fill: node.stroke || '#a855f7',
     lineWidth: 3,
     inherit,
+    layer: 'gas',
     owner: node,
   });
   return items;

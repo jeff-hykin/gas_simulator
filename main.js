@@ -147,6 +147,7 @@ function playAgent() {
           lineWidth: 2,
           label,
         };
+        if (id.startsWith('gasDot_')) point.layer = 'gradient-trail';
         visualizationPointsById.set(id, point);
         canvasSys.addToWorld(point);
       }
@@ -392,7 +393,47 @@ for (const entry of legendEntries) {
   legend.append(row);
 }
 canvasWrap.append(legend);
+
+// Layer toggle panel — bottom-left overlay (anchored to viewport)
+const layerPanel = document.createElement('div');
+layerPanel.className = 'canvas-layer-panel';
+Object.assign(layerPanel.style, {
+  position: 'fixed',
+  bottom: '10px',
+  left: '10px',
+  zIndex: '10',
+  padding: '8px 10px',
+  background: 'rgba(15,15,16,0.78)',
+  border: '1px solid #333',
+  borderRadius: '4px',
+  font: '12px monospace',
+  color: '#eaeaea',
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '4px',
+  userSelect: 'none',
+});
+const layerToggles = [
+  { label: 'gas',            layer: 'gas',             initial: true },
+  { label: 'obstacles',      layer: 'obstacles',       initial: true },
+  { label: 'route',          layer: 'route',           initial: true },
+  { label: 'gradient-trail', layer: 'gradient-trail',  initial: true },
+];
+for (const { label, layer, initial } of layerToggles) {
+  const row = document.createElement('label');
+  Object.assign(row.style, { display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' });
+  const cb = document.createElement('input');
+  cb.type = 'checkbox';
+  cb.checked = initial;
+  canvasSys.setLayerVisible(layer, initial);
+  cb.addEventListener('change', () => canvasSys.setLayerVisible(layer, cb.checked));
+  const text = document.createElement('span');
+  text.textContent = label;
+  row.append(cb, text);
+  layerPanel.append(row);
+}
 document.body.append(canvasWrap);
+document.body.append(layerPanel);
 
 // Sidebar on the right with all controls
 const sidebar = document.createElement('div');

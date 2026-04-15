@@ -24,6 +24,7 @@ export function createCanvasSystem({ width = 800, height = 600 } = {}) {
 
   const world = [];
   let backgroundImage = null;
+  const hiddenLayers = new Set();
 
   const state = {
     offsetX: 0,
@@ -240,9 +241,21 @@ export function createCanvasSystem({ width = 800, height = 600 } = {}) {
     }
     const items = flattenWorld(world);
     for (const item of items) {
+      const layer = item.layer ?? (item.inherit && item.inherit.layer);
+      if (layer && hiddenLayers.has(layer)) continue;
       renderItem(item);
     }
     ctx.restore();
+  }
+
+  function setLayerVisible(layer, visible) {
+    if (visible) hiddenLayers.delete(layer);
+    else hiddenLayers.add(layer);
+    render();
+  }
+
+  function isLayerVisible(layer) {
+    return !hiddenLayers.has(layer);
   }
 
   function setBackground(src) {
@@ -440,5 +453,7 @@ export function createCanvasSystem({ width = 800, height = 600 } = {}) {
     releaseControl,
     render,
     setBackground,
+    setLayerVisible,
+    isLayerVisible,
   };
 }
