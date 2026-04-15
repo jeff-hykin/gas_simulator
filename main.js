@@ -171,6 +171,12 @@ function playAgent() {
       canvasSys.render();
     })
 
+    // Set up toast channel (transient top-of-screen notifications)
+    mainPubSub.subscribe('toast', (data) => {
+      if (!data || !data.message) return;
+      showToast(data.message, data.type || 'info', data.duration || 3000);
+    });
+
     // Set up vector field channel (renders gradient arrows on the canvas)
     mainPubSub.subscribe('vectorField', (arrows) => {
       // Remove previous field arrows
@@ -306,10 +312,74 @@ function resetAgent() {
   updateAgentButtons();
 }
 
+// ── Toast notifications ───────────────────────────────────────────────
+
+const toastContainer = document.createElement('div');
+toastContainer.className = 'toast-container';
+document.body.append(toastContainer);
+
+function showToast(message, type = 'info', duration = 3000) {
+  const toast = document.createElement('div');
+  toast.className = `toast toast-${type}`;
+  toast.textContent = message;
+  toast.style.setProperty('--toast-duration', `${duration}ms`);
+  toastContainer.append(toast);
+  setTimeout(() => {
+    toast.classList.add('toast-out');
+    setTimeout(() => toast.remove(), 300);
+  }, duration);
+}
+
 // ── Layout ────────────────────────────────────────────────────────────
 
-// Canvas goes directly in body
-document.body.append(canvasSys.canvas);
+// Canvas goes directly in body, wrapped so the legend can overlay it
+const canvasWrap = document.createElement('div');
+canvasWrap.style.position = 'relative';
+canvasWrap.style.display = 'inline-block';
+canvasWrap.append(canvasSys.canvas);
+
+const legend = document.createElement('div');
+legend.className = 'canvas-legend';
+Object.assign(legend.style, {
+  position: 'absolute',
+  top: '10px',
+  left: '10px',
+  padding: '8px 10px',
+  background: 'rgba(15,15,16,0.78)',
+  border: '1px solid #333',
+  borderRadius: '4px',
+  font: '12px monospace',
+  color: '#eaeaea',
+  pointerEvents: 'none',
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '4px',
+});
+const legendEntries = [
+  { label: 'agent',      stroke: '#22d3ee', fill: 'rgba(34,211,238,0.2)' },
+  { label: 'route',      stroke: '#fbbf24', fill: '#fbbf24' },
+  { label: 'building',   stroke: '#e11d48', fill: 'rgba(225,29,72,0.2)' },
+  { label: 'gas',        stroke: '#a855f7', fill: 'transparent' },
+  { label: 'smell lost point', stroke: '#22c55e', fill: '#22c55e' },
+];
+for (const entry of legendEntries) {
+  const row = document.createElement('div');
+  Object.assign(row.style, { display: 'flex', alignItems: 'center', gap: '8px' });
+  const swatch = document.createElement('div');
+  Object.assign(swatch.style, {
+    width: '14px',
+    height: '14px',
+    border: `2px solid ${entry.stroke}`,
+    background: entry.fill,
+    boxSizing: 'border-box',
+  });
+  const text = document.createElement('span');
+  text.textContent = entry.label;
+  row.append(swatch, text);
+  legend.append(row);
+}
+canvasWrap.append(legend);
+document.body.append(canvasWrap);
 
 // Sidebar on the right with all controls
 const sidebar = document.createElement('div');

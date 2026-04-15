@@ -126,13 +126,13 @@ export function gasNodeAsCanvas(node, styles) {
   const items = [];
   // Topo-style iso-concentration rings. Gaussian: ppm(d) = peak * exp(-d^2/(2σ^2)).
   // Ring at sigma-multiple k has ppm/peak = exp(-k^2/2). Closer rings → higher ppm → thicker stroke.
-  const ringKs = node.ringKs || [0.4, 0.75, 1.1, 1.45, 1.8, 2.15, 2.5];
+  const ringKs = node.ringKs || [0.25, 0.45, 0.65, 0.85, 1.05, 1.25, 1.45, 1.65, 1.85, 2.05, 2.25, 2.5];
   const maxK = ringKs[ringKs.length - 1];
   for (const k of ringKs) {
     // Far = thin+faint, near = thick+bold.
     const t = 1 - (k / maxK); // 1 near center, 0 at outer edge
-    const lineWidth = 0.5 + Math.pow(t, 1.6) * 6.5;
-    const alpha = (0.2 + Math.pow(t, 1.3) * 0.65).toFixed(3);
+    const lineWidth = 0.2 + Math.pow(t, 2.6) * 6.8;
+    const alpha = (0.35 + Math.pow(t, 2.0) * 0.65).toFixed(3);
     items.push({
       type: 'circle',
       x: node.x,
