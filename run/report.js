@@ -259,8 +259,8 @@ const HTML_TEMPLATE = `<!doctype html>
         <div id="pace-per-map" class="small-multiples"></div>
       </div>
       <div class="chart-card chart-full">
-        <h2>Per-run waypoint arrival pace</h2>
-        <div class="legend-note">one mini chart per scenario · solid = advances · dashed = hits</div>
+        <h2>Arrival pace (per scenario)</h2>
+        <div class="legend-note">The gap between solid and dashed = skipped, x-axis: time, y-axis: waypoint #</div>
         <div id="pace-per-run" class="small-multiples"></div>
       </div>
     </div>
