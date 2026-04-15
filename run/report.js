@@ -203,6 +203,11 @@ const HTML_TEMPLATE = `<!doctype html>
       margin: 0 0 6px 2px;
       font-weight: 500;
     }
+    .legend-note {
+      font-size: 11px;
+      color: var(--muted);
+      margin: -10px 0 14px 0;
+    }
     footer {
       color: var(--muted);
       font-size: 11px;
@@ -237,12 +242,26 @@ const HTML_TEMPLATE = `<!doctype html>
         <div id="route-chart" style="height: 300px;"></div>
       </div>
       <div class="chart-card chart-full">
-        <h2>Per-scenario closeness</h2>
+        <h2>Per-scenario closeness (higher = better)</h2>
         <div id="scatter-chart" style="height: 380px;"></div>
       </div>
       <div class="chart-card chart-full">
         <h2>Closeness by map</h2>
         <div id="per-map" class="small-multiples"></div>
+      </div>
+      <div class="chart-card chart-full">
+        <h2>Waypoints hit by map</h2>
+        <div id="waypoints-per-map" style="height: 360px;"></div>
+      </div>
+      <div class="chart-card chart-full">
+        <h2>Waypoint arrival pace</h2>
+        <div class="legend-note">solid line = advances (reaches + skips) · dashed line = physical reaches only · the gap shows skipped waypoints</div>
+        <div id="pace-per-map" class="small-multiples"></div>
+      </div>
+      <div class="chart-card chart-full">
+        <h2>Per-run waypoint arrival pace</h2>
+        <div class="legend-note">one mini chart per scenario · solid = advances · dashed = hits</div>
+        <div id="pace-per-run" class="small-multiples"></div>
       </div>
     </div>
 
@@ -439,19 +458,45 @@ const HTML_TEMPLATE = `<!doctype html>
     }
 
     // ── Per-scenario scatter ─────────────────────────
+    // Values are shown as (baseline.minDist - agent.minDist) so that positive = the agent
+    // got closer to gas than baseline on that scenario, and the baseline sits on the zero line.
     function scatterChart() {
+      const baselineIdx = METRICS.agents.findIndex(a => /^baseline/i.test(a.name))
+      const useBaseline = baselineIdx >= 0
+      const baselineByScen = new Map()
+      if (useBaseline) {
+        for (const r of METRICS.agents[baselineIdx].runs) {
+          baselineByScen.set(r.scenarioIndex, r.minDistanceToGas)
+        }
+      }
+
       const agentCount = METRICS.agents.length
+      const visibleAgents = METRICS.agents
+        .map((a, i) => ({ a, i }))
+        .filter(({ i }) => i !== baselineIdx)
+
+      // Keep jitter slots consistent with the original agent indices so colors/positions
+      // stay aligned even though baseline is hidden.
       const jitter = 0.18
-      const data = METRICS.agents.map((agent, i) => ({
+
+      const data = visibleAgents.map(({ a: agent, i }) => ({
         type: 'scatter',
         mode: 'markers',
         name: agentLabel(i, agent.name),
         x: agent.runs.map(r => r.scenarioIndex + (i - (agentCount - 1) / 2) * jitter),
-        y: agent.runs.map(r => r.minDistanceToGas),
+        y: agent.runs.map(r => {
+          if (!useBaseline) return r.minDistanceToGas
+          const b = baselineByScen.get(r.scenarioIndex)
+          if (!Number.isFinite(b) || !Number.isFinite(r.minDistanceToGas)) return null
+          return b - r.minDistanceToGas
+        }),
         customdata: agent.runs.map(r => METRICS.scenarios[r.scenarioIndex].mapName.replace('.yaml', '')),
-        marker: { color: COLORS[i % COLORS.length], size: 9, opacity: 0.8, line: { color: '#0f172a', width: 1 } },
-        hovertemplate: '<b>' + agent.name + '</b><br>scenario %{x:.0f} · %{customdata}<br>min dist: %{y:.1f}<extra></extra>',
+        marker: { color: COLORS[i % COLORS.length], size: 9, opacity: 0.85, line: { color: '#0f172a', width: 1 } },
+        hovertemplate: useBaseline
+          ? '<b>' + agent.name + '</b><br>scenario %{x:.0f} · %{customdata}<br>Δ vs baseline: %{y:+.1f}<extra></extra>'
+          : '<b>' + agent.name + '</b><br>scenario %{x:.0f} · %{customdata}<br>min dist: %{y:.1f}<extra></extra>',
       }))
+
       const layout = {
         ...BASE_LAYOUT,
         showlegend: true,
@@ -463,7 +508,33 @@ const HTML_TEMPLATE = `<!doctype html>
           dtick: 1,
           range: [-0.6, METRICS.scenarios.length - 0.4],
         },
-        yaxis: { ...BASE_LAYOUT.yaxis, title: { text: 'min distance to gas', font: { color: MUTED, size: 11 } }, rangemode: 'tozero' },
+        yaxis: {
+          ...BASE_LAYOUT.yaxis,
+          title: {
+            text: useBaseline ? 'units closer to gas (how much better than baseline)' : 'min distance to gas',
+            font: { color: MUTED, size: 11 },
+          },
+          zeroline: useBaseline,
+          zerolinecolor: useBaseline ? 'rgba(241, 245, 249, 0.45)' : GRID,
+          zerolinewidth: useBaseline ? 2 : 1,
+          rangemode: useBaseline ? 'normal' : 'tozero',
+        },
+        shapes: useBaseline ? [{
+          type: 'line',
+          xref: 'paper', x0: 0, x1: 1,
+          yref: 'y', y0: 0, y1: 0,
+          line: { color: 'rgba(241, 245, 249, 0.5)', width: 1.5, dash: 'dash' },
+          layer: 'below',
+        }] : [],
+        annotations: useBaseline ? [{
+          xref: 'paper', x: 0.998, xanchor: 'right',
+          yref: 'y', y: 0, yanchor: 'bottom',
+          text: 'baseline',
+          showarrow: false,
+          font: { color: MUTED, size: 10 },
+          bgcolor: 'rgba(15, 23, 42, 0.85)',
+          borderpad: 2,
+        }] : [],
         margin: { l: 65, r: 20, t: 10, b: 80 },
       }
       Plotly.newPlot('scatter-chart', data, layout, PLOTLY_CONFIG)
@@ -572,6 +643,318 @@ const HTML_TEMPLATE = `<!doctype html>
       })
     }
 
+    // ── Helper: scenarios grouped by map ─────────────
+    function scenariosByMap() {
+      const byMap = new Map()
+      for (const s of METRICS.scenarios) {
+        if (!byMap.has(s.mapName)) byMap.set(s.mapName, new Set())
+        byMap.get(s.mapName).add(s.index)
+      }
+      return byMap
+    }
+
+    function routeTotalForMap(mapName) {
+      // All runs of the same map report the same routeWaypointsTotal;
+      // pick the first finite one we find across any agent.
+      for (const agent of METRICS.agents) {
+        for (const run of agent.runs) {
+          if (METRICS.scenarios[run.scenarioIndex].mapName === mapName
+              && Number.isFinite(run.routeWaypointsTotal)) {
+            return run.routeWaypointsTotal
+          }
+        }
+      }
+      return 0
+    }
+
+    // ── Waypoints hit by map — grouped bar chart ─────
+    function waypointsPerMapChart() {
+      const mapNames = Array.from(new Set(METRICS.scenarios.map(s => s.mapName))).sort()
+      const byMap = scenariosByMap()
+      const totals = mapNames.map(m => routeTotalForMap(m))
+
+      const traces = METRICS.agents.map((agent, i) => {
+        const meansPct = []
+        const stdsPct = []
+        const counts = []
+        const meansAbs = []
+        for (let mi = 0; mi < mapNames.length; mi++) {
+          const mapName = mapNames[mi]
+          const total = totals[mi] || 0
+          const scenIdxs = byMap.get(mapName)
+          const hits = agent.runs
+            .filter(r => scenIdxs.has(r.scenarioIndex))
+            .map(r => r.routeWaypointsHit)
+            .filter(Number.isFinite)
+          const meanAbs = hits.length ? hits.reduce((a, b) => a + b, 0) / hits.length : 0
+          const stdAbs  = hits.length > 1
+            ? Math.sqrt(hits.reduce((a, b) => a + (b - meanAbs) ** 2, 0) / (hits.length - 1))
+            : 0
+          meansAbs.push(meanAbs)
+          meansPct.push(total > 0 ? (meanAbs / total) * 100 : 0)
+          stdsPct.push(total > 0 ? (stdAbs / total) * 100 : 0)
+          counts.push(hits.length)
+        }
+        return {
+          type: 'bar',
+          name: agentLabel(i, agent.name),
+          x: mapNames.map(m => m.replace('.yaml', '')),
+          y: meansPct,
+          error_y: { type: 'data', array: stdsPct, visible: true, color: MUTED, thickness: 1.5, width: 4 },
+          marker: { color: COLORS[i % COLORS.length], line: { width: 0 } },
+          customdata: meansPct.map((_, k) => [counts[k], totals[k], meansAbs[k]]),
+          hovertemplate: '<b>' + agent.name + '</b><br>%{x}<br>%{y:.0f}%  (%{customdata[2]:.1f} / %{customdata[1]} wp)<br>n=%{customdata[0]} runs<extra></extra>',
+        }
+      })
+
+      const tickText = mapNames.map((m, k) =>
+        m.replace('.yaml', '') + ' <span style="color:' + MUTED + ';font-size:10px">(/' + totals[k] + ')</span>'
+      )
+
+      const layout = {
+        ...BASE_LAYOUT,
+        barmode: 'group',
+        bargap: 0.25,
+        bargroupgap: 0.08,
+        showlegend: true,
+        legend: { orientation: 'h', y: -0.22, font: { color: TEXT, size: 12 }, bgcolor: 'transparent' },
+        xaxis: {
+          ...BASE_LAYOUT.xaxis,
+          tickmode: 'array',
+          tickvals: mapNames.map(m => m.replace('.yaml', '')),
+          ticktext: tickText,
+          automargin: true,
+        },
+        yaxis: {
+          ...BASE_LAYOUT.yaxis,
+          title: { text: 'physical reaches (% of route length)', font: { color: MUTED, size: 11 } },
+          range: [0, 105],
+          ticksuffix: '%',
+        },
+        margin: { l: 60, r: 20, t: 10, b: 100 },
+      }
+      Plotly.newPlot('waypoints-per-map', traces, layout, PLOTLY_CONFIG)
+    }
+
+    // ── Helper: build a mean cumulative-count step curve from multiple runs' event
+    //    time arrays. Given [run1Times, run2Times, ...], returns {xs, ys} where at
+    //    each merged event time t, ys = mean(count of events in run_i with time <= t).
+    //    Monotonic in t. The curve is extended flat to xMax.
+    function meanCumulativeCurve(perRunTimes, xMax) {
+      const nonEmpty = perRunTimes.filter(a => Array.isArray(a))
+      if (nonEmpty.length === 0) return { xs: [0, xMax], ys: [0, 0] }
+      const allTimes = Array.from(new Set(nonEmpty.flatMap(a => a))).sort((a, b) => a - b)
+      const xs = [0]
+      const ys = [0]
+      for (const t of allTimes) {
+        if (t > xMax) break
+        let sum = 0
+        for (const arr of nonEmpty) {
+          for (const h of arr) if (h <= t) sum++
+        }
+        xs.push(t)
+        ys.push(sum / nonEmpty.length)
+      }
+      // Extend line flat to xMax so short trajectories don't look cut off.
+      xs.push(xMax)
+      ys.push(ys[ys.length - 1])
+      return { xs, ys }
+    }
+
+    // ── Waypoint arrival pace — small multiples (averaged across runs per map) ─
+    // Per map: step plot of mean cumulative-advances / hits vs virtual time.
+    // Solid line: reaches + skips (advances through the route).
+    // Dashed line: physical reaches only.
+    // The gap between them = mean number of skipped waypoints.
+    function wayPointPaceCharts() {
+      const mapNames = Array.from(new Set(METRICS.scenarios.map(s => s.mapName))).sort()
+      const container = document.getElementById('pace-per-map')
+      container.innerHTML = ''
+      const byMap = scenariosByMap()
+      const seconds = METRICS.meta.seconds
+
+      const pending = mapNames.map(mapName => {
+        const wrap = document.createElement('div')
+        wrap.className = 'small-multiple'
+        const title = document.createElement('div')
+        title.className = 'small-multiple-title'
+        const total = routeTotalForMap(mapName)
+        title.textContent = mapName.replace('.yaml', '') + ' (' + total + ' wp)'
+        wrap.appendChild(title)
+        const chartDiv = document.createElement('div')
+        chartDiv.style.height = '220px'
+        wrap.appendChild(chartDiv)
+        container.appendChild(wrap)
+        return { mapName, chartDiv, total }
+      })
+
+      pending.forEach(({ mapName, chartDiv, total }) => {
+        const scenIdxs = byMap.get(mapName)
+
+        // x-range: cap at the max advance time seen across all agents+runs, × 1.1.
+        let xMax = 0
+        METRICS.agents.forEach(agent => {
+          agent.runs
+            .filter(r => scenIdxs.has(r.scenarioIndex))
+            .forEach(r => {
+              for (const arr of [r.routeAdvanceTimes, r.routeHitTimes]) {
+                if (!Array.isArray(arr)) continue
+                for (const t of arr) if (t > xMax) xMax = t
+              }
+            })
+        })
+        xMax = Math.min(seconds, Math.max(xMax * 1.1, 30))
+
+        const traces = []
+        METRICS.agents.forEach((agent, i) => {
+          const runs = agent.runs.filter(r => scenIdxs.has(r.scenarioIndex))
+          if (runs.length === 0) return
+
+          const advanceCurve = meanCumulativeCurve(runs.map(r => r.routeAdvanceTimes || []), xMax)
+          const hitCurve     = meanCumulativeCurve(runs.map(r => r.routeHitTimes     || []), xMax)
+
+          traces.push({
+            type: 'scatter',
+            mode: 'lines',
+            name: agentLabel(i, agent.name),
+            x: advanceCurve.xs,
+            y: advanceCurve.ys,
+            line: { color: COLORS[i % COLORS.length], width: 2, shape: 'hv' },
+            hovertemplate: '<b>' + agent.name + '</b><br>t=%{x:.1f}s → %{y:.1f} advances<extra></extra>',
+            legendgroup: 'a' + i,
+          })
+          traces.push({
+            type: 'scatter',
+            mode: 'lines',
+            name: agentLabel(i, agent.name) + ' (hits)',
+            x: hitCurve.xs,
+            y: hitCurve.ys,
+            line: { color: COLORS[i % COLORS.length], width: 1.5, shape: 'hv', dash: 'dot' },
+            opacity: 0.7,
+            showlegend: false,
+            hovertemplate: '<b>' + agent.name + '</b> (hits)<br>t=%{x:.1f}s → %{y:.1f} hit<extra></extra>',
+            legendgroup: 'a' + i,
+          })
+        })
+
+        const layout = {
+          ...BASE_LAYOUT,
+          margin: { l: 38, r: 10, t: 6, b: 30 },
+          showlegend: false,
+          xaxis: {
+            ...BASE_LAYOUT.xaxis,
+            range: [0, xMax],
+            tickfont: { color: MUTED, size: 9 },
+            title: { text: 'seconds', font: { color: MUTED, size: 9 }, standoff: 4 },
+          },
+          yaxis: {
+            ...BASE_LAYOUT.yaxis,
+            rangemode: 'tozero',
+            range: [0, total + 0.5],
+            dtick: Math.max(1, Math.ceil(total / 5)),
+            tickfont: { color: MUTED, size: 9 },
+          },
+        }
+        Plotly.newPlot(chartDiv, traces, layout, PLOTLY_CONFIG)
+      })
+    }
+
+    // ── Per-run waypoint arrival pace — one mini chart per scenario ──
+    // Each chart shows every agent's trajectory for a single run: solid = advances,
+    // dashed = hits. Lets you inspect variability that the averaged chart smooths over.
+    function perRunPaceCharts() {
+      const container = document.getElementById('pace-per-run')
+      container.innerHTML = ''
+      const seconds = METRICS.meta.seconds
+
+      const pending = METRICS.scenarios.map(s => {
+        const wrap = document.createElement('div')
+        wrap.className = 'small-multiple'
+        const title = document.createElement('div')
+        title.className = 'small-multiple-title'
+        const total = routeTotalForMap(s.mapName)
+        title.textContent = '#' + s.index + ' · ' + s.mapName.replace('.yaml', '') + ' (' + total + ' wp)'
+        wrap.appendChild(title)
+        const chartDiv = document.createElement('div')
+        chartDiv.style.height = '170px'
+        wrap.appendChild(chartDiv)
+        container.appendChild(wrap)
+        return { scenario: s, chartDiv, total }
+      })
+
+      pending.forEach(({ scenario, chartDiv, total }) => {
+        const scenIdx = scenario.index
+
+        // x-range: cap at max advance time in any agent on this run, × 1.1.
+        let xMax = 0
+        METRICS.agents.forEach(agent => {
+          const run = agent.runs.find(r => r.scenarioIndex === scenIdx)
+          if (!run) return
+          for (const arr of [run.routeAdvanceTimes, run.routeHitTimes]) {
+            if (!Array.isArray(arr)) continue
+            for (const t of arr) if (t > xMax) xMax = t
+          }
+        })
+        xMax = Math.min(seconds, Math.max(xMax * 1.1, 30))
+
+        const stepPlot = (times, xMax) => {
+          const arr = Array.isArray(times) ? [...times].sort((a, b) => a - b) : []
+          const xs = [0]
+          const ys = [0]
+          for (const t of arr) {
+            if (t > xMax) break
+            xs.push(t)
+            ys.push(ys[ys.length - 1] + 1)
+          }
+          xs.push(xMax)
+          ys.push(ys[ys.length - 1])
+          return { xs, ys }
+        }
+
+        const traces = []
+        METRICS.agents.forEach((agent, i) => {
+          const run = agent.runs.find(r => r.scenarioIndex === scenIdx)
+          if (!run) return
+          const advance = stepPlot(run.routeAdvanceTimes, xMax)
+          const hit     = stepPlot(run.routeHitTimes, xMax)
+          traces.push({
+            type: 'scatter', mode: 'lines',
+            x: advance.xs, y: advance.ys,
+            line: { color: COLORS[i % COLORS.length], width: 1.6, shape: 'hv' },
+            showlegend: false,
+            hovertemplate: '<b>' + agent.name + '</b><br>t=%{x:.1f}s → %{y} advances<extra></extra>',
+          })
+          traces.push({
+            type: 'scatter', mode: 'lines',
+            x: hit.xs, y: hit.ys,
+            line: { color: COLORS[i % COLORS.length], width: 1.2, shape: 'hv', dash: 'dot' },
+            opacity: 0.65,
+            showlegend: false,
+            hovertemplate: '<b>' + agent.name + '</b> (hits)<br>t=%{x:.1f}s → %{y} hit<extra></extra>',
+          })
+        })
+
+        const layout = {
+          ...BASE_LAYOUT,
+          margin: { l: 34, r: 8, t: 4, b: 24 },
+          showlegend: false,
+          xaxis: {
+            ...BASE_LAYOUT.xaxis,
+            range: [0, xMax],
+            tickfont: { color: MUTED, size: 9 },
+          },
+          yaxis: {
+            ...BASE_LAYOUT.yaxis,
+            rangemode: 'tozero',
+            range: [0, total + 0.5],
+            dtick: Math.max(1, Math.ceil(total / 4)),
+            tickfont: { color: MUTED, size: 9 },
+          },
+        }
+        Plotly.newPlot(chartDiv, traces, layout, PLOTLY_CONFIG)
+      })
+    }
+
     renderMeta()
     renderSummary()
     closenessChart()
@@ -579,6 +962,9 @@ const HTML_TEMPLATE = `<!doctype html>
     scatterChart()
     ecdfChart()
     perMapCharts()
+    waypointsPerMapChart()
+    wayPointPaceCharts()
+    perRunPaceCharts()
   </script>
 </body>
 </html>`

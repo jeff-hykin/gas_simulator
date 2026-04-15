@@ -154,34 +154,61 @@ function runScenario({ agentModule, scenario, config }) {
 
     // Route-progress tracking via simple_route_agent's logJson.
     //   - waypoint "N/M" → agent is currently *working on* the N-th waypoint (1-indexed),
-    //     so (N-1) waypoints have been reached-or-skipped at that point.
+    //     so (N-1) waypoints have been reached-or-skipped at that point. Each increment
+    //     of N represents one "advance" (a reach or a skip).
     //   - routeDone: true → fires once when simple_route_agent has advanced PAST the last
     //     waypoint (reach or skip). Needed because a final blocked waypoint never produces
     //     a waypointReached event, so we can't detect completion from that channel alone.
-    let maxWaypointActive = 0  // max "N" seen in "N/M" strings
+    //
+    // `routeAdvanceTimes` captures the virtual time of every advance (reach OR skip).
+    // By comparing it with `routeHitTimes` (physical reaches only) the report can draw
+    // a "skipped waypoints" curve as (advances − hits).
+    let maxWaypointActive = 0
+    let prevN = 0
+    let firstWaypointEmission = true
+    let routeDoneRecorded = false
     let timeToCompleteRoute = NaN
+    const routeAdvanceTimes = []
     pubsub.subscribe('logJson', (data) => {
         if (!data) return
         if (typeof data.waypoint === 'string') {
             const m = data.waypoint.match(/^(\d+)\/(\d+)$/)
             if (m) {
                 const n = parseInt(m[1], 10)
-                if (n > maxWaypointActive) maxWaypointActive = n
+                if (n > prevN) {
+                    if (firstWaypointEmission) {
+                        // First emission: currentWaypointIndex just became 0, no advance yet.
+                        firstWaypointEmission = false
+                    } else {
+                        for (let k = prevN; k < n; k++) routeAdvanceTimes.push(virtualTime)
+                    }
+                    prevN = n
+                    if (n > maxWaypointActive) maxWaypointActive = n
+                }
             }
         }
-        if (data.routeDone === true && Number.isNaN(timeToCompleteRoute)) {
-            timeToCompleteRoute = virtualTime
+        if (data.routeDone === true && !routeDoneRecorded) {
+            routeDoneRecorded = true
+            // routeDone fires once, when currentWaypointIndex passes the final waypoint.
+            // That's one final advance not otherwise visible via "N/M" changes.
+            routeAdvanceTimes.push(virtualTime)
+            if (Number.isNaN(timeToCompleteRoute)) timeToCompleteRoute = virtualTime
         }
     })
 
     // Physical waypoint-reach tracking (distinct from skipping).
     // Matches against the *original* route coordinates so gas-follow waypoints don't count.
+    // Also records the virtual time at each hit so we can build arrival-pace charts later.
     const routeWaypointKey = new Set(routePoints.map(p => `${p.x},${p.y}`))
     let routeWaypointsHit = 0
+    const routeHitTimes = []
     pubsub.subscribe('waypointReached', (data) => {
         if (!data || !data.waypoint) return
         const key = `${data.waypoint.x},${data.waypoint.y}`
-        if (routeWaypointKey.has(key)) routeWaypointsHit++
+        if (routeWaypointKey.has(key)) {
+            routeWaypointsHit++
+            routeHitTimes.push(virtualTime)
+        }
     })
 
     // Silence agent console noise for eval
@@ -277,6 +304,8 @@ function runScenario({ agentModule, scenario, config }) {
                 : 1,
             routeWaypointsHit,
             routeWaypointsTotal: routePoints.length,
+            routeHitTimes: routeHitTimes.slice(),
+            routeAdvanceTimes: routeAdvanceTimes.slice(),
             waypointsHitPerMinute: (() => {
                 const elapsed = Number.isFinite(timeToCompleteRoute) ? timeToCompleteRoute : config.maxSeconds
                 return elapsed > 0 ? (routeWaypointsHit / elapsed) * 60 : 0
@@ -298,6 +327,8 @@ function runScenario({ agentModule, scenario, config }) {
             routeCompletionFraction: NaN,
             routeWaypointsHit: NaN,
             routeWaypointsTotal: NaN,
+            routeHitTimes: [],
+            routeAdvanceTimes: [],
             waypointsHitPerMinute: NaN,
             timeToCompleteRoute: NaN,
             crashed: true,

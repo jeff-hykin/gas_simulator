@@ -3,13 +3,15 @@ import { createMapSystem, deserializeMap } from './main/systems/map.js';
 import { createSimulator } from './main/systems/simulator.js';
 import { createPubSub } from './main/tooling/pubsub.js';
 import gradientAgent from './main/agents/neo/gradient_agent.js';
-import hillClimberAgent from './main/agents/neo/hill_climber_agent.js';
-import hillClimber2Agent from './main/agents/neo/hill_climber2_agent.js';
+import dumbLobsterAgent from './main/agents/neo/dumb_lobster_agent.js';
+import smartLobsterAgent from './main/agents/neo/smart_lobster_agent.js';
+import baselineAgent from './main/agents/neo/baseline_agent.js';
 
 const AGENT_OPTIONS = [
-  { label: 'hill_climber2', agent: hillClimber2Agent },
-  { label: 'hill_climber',  agent: hillClimberAgent },
+  { label: 'smart_lobster', agent: smartLobsterAgent },
+  { label: 'dumb_lobster',  agent: dumbLobsterAgent },
   { label: 'gradient',      agent: gradientAgent },
+  { label: 'baseline',      agent: baselineAgent },
 ];
 let selectedGasAgent = AGENT_OPTIONS[0].agent;
 

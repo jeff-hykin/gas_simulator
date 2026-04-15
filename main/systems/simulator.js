@@ -3,7 +3,7 @@
  */
 
 import { createPubSub, connectNeoAgent } from '../tooling/pubsub.js';
-import defaultGasAgent from '../agents/neo/hill_climber2_agent.js';
+import defaultGasAgent from '../agents/neo/smart_lobster_agent.js';
 import localPlannerAgent from '../agents/neo/local_planner.js';
 
 export function gaussianPeakAt(distance, radius, peak) {
