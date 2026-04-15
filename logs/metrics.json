@@ -1,0 +1,242 @@
+{
+  "meta": {
+    "timestamp": "2026-04-15T19:32:11.814Z",
+    "runs": 3,
+    "seconds": 20,
+    "seed": 42,
+    "config": {
+      "decisionRate": 0.05,
+      "gasRadius": 200,
+      "gasPeak": 1
+    }
+  },
+  "scenarios": [
+    {
+      "index": 0,
+      "mapName": "train_real.yaml",
+      "gasPosition": {
+        "x": -87.01459140119437,
+        "y": 262.47103539537295
+      },
+      "start": {
+        "x": -451.7064163549578,
+        "y": 65.42093156792248
+      },
+      "startAngleDeg": 241.10425491817296
+    },
+    {
+      "index": 1,
+      "mapName": "chemical_plant.yaml",
+      "gasPosition": {
+        "x": 44.96069213284818,
+        "y": -182.94237021151858
+      },
+      "start": {
+        "x": 200,
+        "y": 345.813102824527
+      },
+      "startAngleDeg": 224.90807541646063
+    },
+    {
+      "index": 2,
+      "mapName": "train_wreck.yaml",
+      "gasPosition": {
+        "x": 929.085305177141,
+        "y": 264.38842243747786
+      },
+      "start": {
+        "x": 600,
+        "y": 450
+      },
+      "startAngleDeg": 110.52054483443499
+    }
+  ],
+  "agents": [
+    {
+      "name": "hill_climber2_agent",
+      "path": "/Users/jeffhykin/repos/gas_simulator/main/agents/neo/hill_climber2_agent.js",
+      "runs": [
+        {
+          "scenarioIndex": 0,
+          "minDistanceToGas": 160.92792826744932,
+          "finalDistanceToGas": 160.92792826744932,
+          "meanDistanceToGas": 394.892670928075,
+          "maxGasReading": 0.7234509893861074,
+          "totalDistanceTraveled": 1110,
+          "timeToFirstWithin50": null,
+          "routeCompletionFraction": 0.1111111111111111,
+          "timeToCompleteRoute": null,
+          "crashed": false
+        },
+        {
+          "scenarioIndex": 1,
+          "minDistanceToGas": 209.56654601849874,
+          "finalDistanceToGas": 223.51826041566983,
+          "meanDistanceToGas": 391.691954097012,
+          "maxGasReading": 0.5775404965627668,
+          "totalDistanceTraveled": 1158,
+          "timeToFirstWithin50": null,
+          "routeCompletionFraction": 0.125,
+          "timeToCompleteRoute": null,
+          "crashed": false
+        },
+        {
+          "scenarioIndex": 2,
+          "minDistanceToGas": 189.32038090111402,
+          "finalDistanceToGas": 211.29661530812774,
+          "meanDistanceToGas": 343.4081484648274,
+          "maxGasReading": 0.6388870614905025,
+          "totalDistanceTraveled": 1082.9999999999993,
+          "timeToFirstWithin50": null,
+          "routeCompletionFraction": 0,
+          "timeToCompleteRoute": null,
+          "crashed": false
+        }
+      ],
+      "aggregate": {
+        "minDistanceToGas": {
+          "mean": 186.6049517290207,
+          "std": 24.432743416871276,
+          "n": 3,
+          "total": 3
+        },
+        "finalDistanceToGas": {
+          "mean": 198.58093466374896,
+          "std": 33.176103151116365,
+          "n": 3,
+          "total": 3
+        },
+        "meanDistanceToGas": {
+          "mean": 376.6642578299714,
+          "std": 28.845064649571864,
+          "n": 3,
+          "total": 3
+        },
+        "maxGasReading": {
+          "mean": 0.6466261824797922,
+          "std": 0.07326246292783692,
+          "n": 3,
+          "total": 3
+        },
+        "totalDistanceTraveled": {
+          "mean": 1116.9999999999998,
+          "std": 37.98683982644546,
+          "n": 3,
+          "total": 3
+        },
+        "timeToFirstWithin50": {
+          "mean": null,
+          "std": 0,
+          "n": 0,
+          "total": 3
+        },
+        "routeCompletionFraction": {
+          "mean": 0.0787037037037037,
+          "std": 0.06851226197661454,
+          "n": 3,
+          "total": 3
+        },
+        "timeToCompleteRoute": {
+          "mean": null,
+          "std": 0,
+          "n": 0,
+          "total": 3
+        },
+        "crashed": 0
+      }
+    },
+    {
+      "name": "gradient_agent",
+      "path": "/Users/jeffhykin/repos/gas_simulator/main/agents/neo/gradient_agent.js",
+      "runs": [
+        {
+          "scenarioIndex": 0,
+          "minDistanceToGas": 228.07683516627918,
+          "finalDistanceToGas": 366.044570017341,
+          "meanDistanceToGas": 317.22581264853835,
+          "maxGasReading": 0.5219215267780252,
+          "totalDistanceTraveled": 690.0000000000001,
+          "timeToFirstWithin50": null,
+          "routeCompletionFraction": 0,
+          "timeToCompleteRoute": null,
+          "crashed": false
+        },
+        {
+          "scenarioIndex": 1,
+          "minDistanceToGas": 392.1408824353076,
+          "finalDistanceToGas": 436.74919789637306,
+          "meanDistanceToGas": 455.32829143658705,
+          "maxGasReading": 0.14628757599886005,
+          "totalDistanceTraveled": 840.0000000000001,
+          "timeToFirstWithin50": null,
+          "routeCompletionFraction": 0.125,
+          "timeToCompleteRoute": null,
+          "crashed": false
+        },
+        {
+          "scenarioIndex": 2,
+          "minDistanceToGas": 118.27759092312277,
+          "finalDistanceToGas": 216.34780314426433,
+          "meanDistanceToGas": 375.78726954290784,
+          "maxGasReading": 0.8395662778102848,
+          "totalDistanceTraveled": 1164.000000000003,
+          "timeToFirstWithin50": null,
+          "routeCompletionFraction": 0,
+          "timeToCompleteRoute": null,
+          "crashed": false
+        }
+      ],
+      "aggregate": {
+        "minDistanceToGas": {
+          "mean": 246.16510284156985,
+          "std": 137.8247607655885,
+          "n": 3,
+          "total": 3
+        },
+        "finalDistanceToGas": {
+          "mean": 339.7138570193261,
+          "std": 112.535210211767,
+          "n": 3,
+          "total": 3
+        },
+        "meanDistanceToGas": {
+          "mean": 382.78045787601104,
+          "std": 69.3163196812089,
+          "n": 3,
+          "total": 3
+        },
+        "maxGasReading": {
+          "mean": 0.5025917935290567,
+          "std": 0.3470433237175739,
+          "n": 3,
+          "total": 3
+        },
+        "totalDistanceTraveled": {
+          "mean": 898.000000000001,
+          "std": 242.26431846229596,
+          "n": 3,
+          "total": 3
+        },
+        "timeToFirstWithin50": {
+          "mean": null,
+          "std": 0,
+          "n": 0,
+          "total": 3
+        },
+        "routeCompletionFraction": {
+          "mean": 0.041666666666666664,
+          "std": 0.07216878364870323,
+          "n": 3,
+          "total": 3
+        },
+        "timeToCompleteRoute": {
+          "mean": null,
+          "std": 0,
+          "n": 0,
+          "total": 3
+        },
+        "crashed": 0
+      }
+    }
+  ]
+}

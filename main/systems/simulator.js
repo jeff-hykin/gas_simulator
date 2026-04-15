@@ -76,7 +76,7 @@ export function isRobotInObstacle(robot, obstacles = []) {
   return false;
 }
 
-function isCircleInAnyObstacle(center, radius, obstacles = []) {
+export function isCircleInAnyObstacle(center, radius, obstacles = []) {
   for (const obstacle of obstacles) {
     if (isCircleInObstacle(center, radius, obstacle)) return true;
   }
@@ -98,7 +98,7 @@ function tryMoveWithAngle(robot, angle, distance, obstacles) {
   return true;
 }
 
-function moveWithAvoidance(robot, distance, obstacles) {
+export function moveWithAvoidance(robot, distance, obstacles) {
   if (!obstacles || obstacles.length === 0) {
     const rad = (robot.angle * Math.PI) / 180;
     robot.x += Math.cos(rad) * distance;

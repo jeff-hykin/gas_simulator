@@ -64,13 +64,13 @@ function create({
             state = {
                 ...state,
                 mode: "greedy",
-                decisionTimer: timer({ duration: timeBeforeRandomMove, getTime, data: structuredClone(state) }),
+                decisionTimer: timer({ duration: timeBeforeRandomMove, getTime, data: { prevOdom: state.prevOdom } }),
             }
         }
 
         // always have a timer if somehow one was not provided
         if (state.decisionTimer == null) {
-            state.decisionTimer = timer({ duration: timeBeforeRandomMove, getTime, data: structuredClone(state) })
+            state.decisionTimer = timer({ duration: timeBeforeRandomMove, getTime, data: { prevOdom: state.prevOdom } })
         }
 
         // keep state.evaluationPoints in check
@@ -102,14 +102,14 @@ function create({
 
             // delay timer every time there is progress
             if (changeInDistance >= minimumDistanceThatIsProgress) {
-                state.decisionTimer = timer({ duration: timeBeforeRandomMove, getTime, data: structuredClone(state) })
+                state.decisionTimer = timer({ duration: timeBeforeRandomMove, getTime, data: { prevOdom: state.prevOdom } })
             }
 
             // console.log(`[LP-EVAL] changeInDist=${changeInDistance.toFixed(2)} changeInTime=${changeInTime.toFixed(2)} progress=${state.progress.toFixed(2)} timerDone=${state.decisionTimer.done}`)
             // switch to random mode
             if (state.mode != "random" && state.decisionTimer.done) {
                 state.prevOdom = state.odom  // snapshot position at start of random move (used for distance limit check)
-                state.decisionTimer = timer({ duration: timeBeforeRandomMove, getTime, data: structuredClone(state) })
+                state.decisionTimer = timer({ duration: timeBeforeRandomMove, getTime, data: { prevOdom: state.prevOdom } })
                 state.mode = "random"
                 state.randomTargetAngle = Math.random() * 2 * Math.PI
                 const angularVelocity = angleDifference(odom.heading, state.randomTargetAngle)
@@ -130,13 +130,13 @@ function create({
                     state = {
                         ...state,
                         mode: "greedy",
-                        decisionTimer: timer({ duration: timeBeforeRandomMove, getTime, data: structuredClone(state) }),
+                        decisionTimer: timer({ duration: timeBeforeRandomMove, getTime, data: { prevOdom: state.prevOdom } }),
                     }
                 // if time limit hit, do a new random angle
                 } else if (state.decisionTimer.done) {
                     state.randomTargetAngle = Math.random() * 2 * Math.PI;
                     const angularVelocity = angleDifference(state.odom.heading, state.randomTargetAngle)
-                    state.decisionTimer = timer({ duration: timeBeforeRandomMove, getTime, data: structuredClone(state) })
+                    state.decisionTimer = timer({ duration: timeBeforeRandomMove, getTime, data: { prevOdom: state.prevOdom } })
                     outputs.movement = { linearVelocity: state.movementSpeed, angularVelocity }
                     outputs.logJson.localPlanner = `no progress for ${state.decisionTimer.count.toFixed(0)}s, re-shuffling`
                     return {state, outputs}
