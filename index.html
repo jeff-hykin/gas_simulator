@@ -126,6 +126,59 @@
       .json-value {
         color: var(--text);
       }
+      .toast-container {
+        position: fixed;
+        top: 24px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        z-index: 1000;
+        pointer-events: none;
+        align-items: center;
+      }
+      .toast {
+        background: var(--panel);
+        color: var(--text);
+        padding: 12px 22px;
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        box-shadow: 0 10px 32px rgba(0, 0, 0, 0.5);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        animation: toast-in 0.3s ease-out;
+        max-width: 80vw;
+        text-align: center;
+      }
+      .toast.toast-out {
+        animation: toast-out 0.3s ease-in forwards;
+      }
+      .toast-info {
+        border-color: rgba(34, 211, 238, 0.6);
+        box-shadow: 0 10px 32px rgba(0, 0, 0, 0.5), 0 0 18px rgba(34, 211, 238, 0.25);
+      }
+      .toast-success {
+        border-color: rgba(74, 222, 128, 0.6);
+        box-shadow: 0 10px 32px rgba(0, 0, 0, 0.5), 0 0 18px rgba(74, 222, 128, 0.25);
+      }
+      .toast-warning {
+        border-color: rgba(251, 191, 36, 0.6);
+        box-shadow: 0 10px 32px rgba(0, 0, 0, 0.5), 0 0 18px rgba(251, 191, 36, 0.25);
+      }
+      .toast-alert {
+        border-color: rgba(239, 68, 68, 0.6);
+        box-shadow: 0 10px 32px rgba(0, 0, 0, 0.5), 0 0 18px rgba(239, 68, 68, 0.3);
+      }
+      @keyframes toast-in {
+        from { opacity: 0; transform: translateY(-12px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      @keyframes toast-out {
+        from { opacity: 1; transform: translateY(0); }
+        to { opacity: 0; transform: translateY(-12px); }
+      }
     </style>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
