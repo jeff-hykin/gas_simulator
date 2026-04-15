@@ -122,33 +122,40 @@ export function obstacleAsCanvas(obstacle, styles) {
 
 export function gasNodeAsCanvas(node, styles) {
   const inherit = styles.gasNode;
-  const visualRadius = node.visualRadius ?? node.radius * 2;
-  const alpha = Math.max(0.15, Math.min(0.85, 0.2 + node.peak * 0.35));
-  return [
-    {
-      type: 'radialGradient',
+  const sigma = node.radius;
+  const items = [];
+  // Topo-style iso-concentration rings. Gaussian: ppm(d) = peak * exp(-d^2/(2σ^2)).
+  // Ring at sigma-multiple k has ppm/peak = exp(-k^2/2). Closer rings → higher ppm → thicker stroke.
+  const ringKs = node.ringKs || [0.4, 0.75, 1.1, 1.45, 1.8, 2.15, 2.5];
+  const maxK = ringKs[ringKs.length - 1];
+  for (const k of ringKs) {
+    // Far = thin+faint, near = thick+bold.
+    const t = 1 - (k / maxK); // 1 near center, 0 at outer edge
+    const lineWidth = 0.5 + Math.pow(t, 1.6) * 6.5;
+    const alpha = (0.2 + Math.pow(t, 1.3) * 0.65).toFixed(3);
+    items.push({
+      type: 'circle',
       x: node.x,
       y: node.y,
-      r: visualRadius,
-      stops: node.stops || [
-        { offset: 0, color: `rgba(168,85,247,${alpha})` },
-        { offset: 1, color: 'rgba(168,85,247,0)' },
-      ],
+      r: sigma * k,
+      stroke: `rgba(168,85,247,${alpha})`,
+      lineWidth,
       inherit,
       owner: node,
-    },
-    {
-      type: 'point',
-      x: node.x,
-      y: node.y,
-      r: 6,
-      stroke: node.stroke || '#a855f7',
-      fill: node.stroke || '#a855f7',
-      lineWidth: 3,
-      inherit,
-      owner: node,
-    },
-  ];
+    });
+  }
+  items.push({
+    type: 'point',
+    x: node.x,
+    y: node.y,
+    r: 6,
+    stroke: node.stroke || '#a855f7',
+    fill: node.stroke || '#a855f7',
+    lineWidth: 3,
+    inherit,
+    owner: node,
+  });
+  return items;
 }
 
 export function buildAsCanvas(mapData) {

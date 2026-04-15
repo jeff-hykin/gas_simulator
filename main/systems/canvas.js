@@ -188,10 +188,29 @@ export function createCanvasSystem({ width = 800, height = 600 } = {}) {
       ctx.rect(-w * state.scale / 2, -h * state.scale / 2, w * state.scale, h * state.scale);
       applyStrokeFill(item);
       ctx.restore();
-    } else if (type === 'radialGradient') {
+    } else if (type === 'circle') {
       const { x, y, r } = item;
       const center = worldToScreen({ x, y });
       const radius = r * state.scale;
+      ctx.beginPath();
+      ctx.arc(center.x, center.y, radius, 0, Math.PI * 2);
+      applyStrokeFill(item);
+    } else if (type === 'radialGradient') {
+      const { x, y, r } = item;
+      const center = worldToScreen({ x, y });
+      let radius = r * state.scale;
+      let alphaMul = 1;
+      if (item.pulse) {
+        const period = item.pulsePeriod ?? 0.9;
+        const phase = (performance.now() / 1000) * (Math.PI * 2) / period;
+        const wave = (Math.sin(phase) + 1) / 2; // 0..1
+        const minA = item.pulseMinAlpha ?? 0.25;
+        const maxA = item.pulseMaxAlpha ?? 0.6;
+        alphaMul = minA + (maxA - minA) * wave;
+        const radiusMin = item.pulseMinScale ?? 0.92;
+        const radiusMax = item.pulseMaxScale ?? 1.12;
+        radius *= radiusMin + (radiusMax - radiusMin) * wave;
+      }
       const gradient = ctx.createRadialGradient(center.x, center.y, 0, center.x, center.y, radius);
       const stops = item.stops || [
         { offset: 0, color: 'rgba(255,255,255,0.8)' },
@@ -200,10 +219,13 @@ export function createCanvasSystem({ width = 800, height = 600 } = {}) {
       for (const stop of stops) {
         gradient.addColorStop(stop.offset, stop.color);
       }
+      const prevAlpha = ctx.globalAlpha;
+      ctx.globalAlpha = Math.max(0, Math.min(1, prevAlpha * alphaMul));
       ctx.fillStyle = gradient;
       ctx.beginPath();
       ctx.arc(center.x, center.y, radius, 0, Math.PI * 2);
       ctx.fill();
+      ctx.globalAlpha = prevAlpha;
     }
   }
 
