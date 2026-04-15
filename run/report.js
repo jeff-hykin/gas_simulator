@@ -250,7 +250,7 @@ const HTML_TEMPLATE = `<!doctype html>
         <div id="per-map" class="small-multiples"></div>
       </div>
       <div class="chart-card chart-full">
-        <h2>Waypoints hit by map</h2>
+        <h2>Waypoints hit by map (agents can skip waypoints)</h2>
         <div id="waypoints-per-map" style="height: 360px;"></div>
       </div>
       <div class="chart-card chart-full">
