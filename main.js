@@ -2,6 +2,16 @@ import { createCanvasSystem } from './main/systems/canvas.js';
 import { createMapSystem, deserializeMap } from './main/systems/map.js';
 import { createSimulator } from './main/systems/simulator.js';
 import { createPubSub } from './main/tooling/pubsub.js';
+import gradientAgent from './main/agents/neo/gradient_agent.js';
+import hillClimberAgent from './main/agents/neo/hill_climber_agent.js';
+import hillClimber2Agent from './main/agents/neo/hill_climber2_agent.js';
+
+const AGENT_OPTIONS = [
+  { label: 'hill_climber2', agent: hillClimber2Agent },
+  { label: 'hill_climber',  agent: hillClimberAgent },
+  { label: 'gradient',      agent: gradientAgent },
+];
+let selectedGasAgent = AGENT_OPTIONS[0].agent;
 
 const canvasSys = createCanvasSystem({ width: 1100, height: 830 });
 
@@ -244,6 +254,7 @@ function playAgent() {
     sim.startAgentLoop(mainPubSub, {
       ...agentConfig,
       startPosition: startPos,
+      gasAgent: selectedGasAgent,
     });
 
     const routes = mapSys.mapData.routes || [];
@@ -412,7 +423,26 @@ const btnToggle = buildButton('Play', toggleAgent);
 const btnReset = buildButton('Reset', resetAgent);
 btnToggle.classList.add('full-width');
 btnReset.classList.add('full-width');
-agentControls.append(btnToggle, btnReset);
+
+const agentSelect = document.createElement('select');
+agentSelect.className = 'full-width';
+for (const { label } of AGENT_OPTIONS) {
+  const opt = document.createElement('option');
+  opt.value = label;
+  opt.textContent = label;
+  agentSelect.append(opt);
+}
+agentSelect.addEventListener('change', () => {
+  const chosen = AGENT_OPTIONS.find((o) => o.label === agentSelect.value);
+  if (!chosen) return;
+  selectedGasAgent = chosen.agent;
+  // Force a fresh agent session on next play so the new factory takes effect.
+  if (sim.agentActive) sim.stopAgentLoop();
+  mainPubSub = null;
+  updateAgentButtons();
+});
+
+agentControls.append(agentSelect, btnToggle, btnReset);
 
 // JSON state display container
 const jsonStateDisplay = document.createElement('div');
@@ -430,7 +460,7 @@ sidebar.append(
 document.body.append(sidebar);
 
 // ── Load default map on startup ───────────────────────────────────────
-let defaultMap = './maps/chemical_plant.yaml';
+let defaultMap = './maps/train_real.yaml';
 fetch(defaultMap)
   .then((response) => response.text())
   .then((yamlText) => {

@@ -1,8 +1,17 @@
 import simpleRouteAgent from './simple_route_agent.js'
 
 const info = {
-    inputs: ["position", "routeUpdate", "waypointReached", "gasReading"],
-    outputs: ["targetWaypoint", "logJson", "visualizePoints", "visualizeLines"],
+    inputs: ["position", "routeUpdate", "waypointReached", "gasReading", "maxGasReading"],
+    outputs: ["targetWaypoint", "logJson", "visualizePoints", "visualizeLines", "toast"],
+}
+
+// Map a normalized value [0,1] to desaturated red → saturated red
+function gasToColor(t) {
+    t = Math.max(0, Math.min(1, t))
+    const r = Math.round(255 - 55 * t)
+    const g = Math.round(160 * t)
+    const b = Math.round(160 * t)
+    return '#' + [r, g, b].map(c => c.toString(16).padStart(2, '0')).join('')
 }
 
 function create({
@@ -21,33 +30,59 @@ function create({
             routeUpdate:     false,
             waypointReached: false,
             gasReading:      false,
+            maxGasReading:   false,
         },
         state: {
-            position:         null,
-            routeUpdate:      null,
-            waypointReached:  null,
-            gasReading:       null,
-            mode:             "idle",
-            gasFollowCounter: 0,
-            currentHeading:   null,
-            prevSample:       0,
-            currentSample:    0,
-            lastSampleTime:   null,
-            routeFollowState: structuredClone(routeAgent.initialArg.state),
+            position:          null,
+            routeUpdate:       null,
+            waypointReached:   null,
+            gasReading:        null,
+            maxGasReading:     null,
+            mode:              "idle",
+            gasFollowCounter:  0,
+            currentHeading:    null,
+            prevSample:        0,
+            currentSample:     0,
+            lastSampleTime:    null,
+            gasDotCount:       0,
+            prevMaxGasForDot:  null,
+            routeFollowState:  structuredClone(routeAgent.initialArg.state),
         },
         outputs: {
             targetWaypoint:  null,
             logJson:         null,
             visualizePoints: null,
             visualizeLines:  null,
+            toast:           null,
         },
     }
 
     function update(getTime, { state, updated }) {
         const { position, routeUpdate, waypointReached } = state
-        let outputs = { targetWaypoint: null, logJson: null, visualizePoints: null, visualizeLines: null }
+        let outputs = { targetWaypoint: null, logJson: null, visualizePoints: null, visualizeLines: null, toast: null }
         state = { ...state }
         const time = getTime()
+
+        // ── Drop topology dot ────────────────────────────────────
+        if (updated.maxGasReading && state.maxGasReading != null && position != null) {
+            const unchanged = state.prevMaxGasForDot != null && state.maxGasReading === state.prevMaxGasForDot
+            const t = (state.maxGasReading > 0 && gasThreshold > 0)
+                ? Math.max(0, Math.min(1, Math.log10(state.maxGasReading) / Math.log10(gasThreshold)))
+                : 0
+            const dotColor = gasToColor(t)
+            const dotId = `gasDot_${state.gasDotCount++}`
+            const dot = {
+                id: dotId, x: position.x, y: position.y, r: 3,
+                color: dotColor,
+                fill: dotColor,
+            }
+            if (unchanged) dot.stroke = '#ffffff'
+            outputs.visualizePoints = [
+                ...(outputs.visualizePoints || []),
+                dot,
+            ]
+            state.prevMaxGasForDot = state.maxGasReading
+        }
 
         // ── Sample gas every sampleInterval time units ─────────────
         if (updated.gasReading && state.gasReading != null) {
@@ -97,6 +132,7 @@ function create({
             } else {
                 state.currentHeading = 0
             }
+            outputs.toast = { message: `Gas detected — following gradient (${state.gasReading.toFixed(2)} PPM)`, type: "success" }
         }
 
         // ── Gas follow ─────────────────────────────────────────────
@@ -116,7 +152,10 @@ function create({
                     y: position.y + Math.sin(state.currentHeading) * stepDistance,
                 }
                 outputs.targetWaypoint = wp
-                outputs.visualizePoints = [{ id: 'hillTarget', x: wp.x, y: wp.y, color: '#ffaa00', r: 6, label: 'H' }]
+                outputs.visualizePoints = [
+                    ...(outputs.visualizePoints || []),
+                    { id: 'hillTarget', x: wp.x, y: wp.y, color: '#ffaa00', r: 6, label: 'H' },
+                ]
             }
 
             // countdown expired → back to route
@@ -125,7 +164,11 @@ function create({
                 state.currentHeading = null
                 state.prevSample = 0
                 state.currentSample = 0
-                outputs.visualizePoints = [{ id: 'hillTarget', remove: true }]
+                outputs.toast = { message: "Resuming route", type: "info" }
+                outputs.visualizePoints = [
+                    ...(outputs.visualizePoints || []),
+                    { id: 'hillTarget', remove: true },
+                ]
             }
         }
 

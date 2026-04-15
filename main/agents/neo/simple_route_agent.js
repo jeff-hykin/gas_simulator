@@ -19,6 +19,7 @@ function create({
             currentWaypointStartTime: null,
             currentWaypointInitialDistance: null,
             ticksOnCurrentWaypoint: 0,
+            routeDoneEmitted: false,
         },
         outputs: {
             targetWaypoint: null,
@@ -41,6 +42,7 @@ function create({
                 routeWaypoints: routeUpdate.waypoints.map(w => ({ x: w.x, y: w.y })),
                 currentWaypointIndex: 0,
                 currentPublishedWaypoint: null,
+                routeDoneEmitted: false,
             }
         }
 
@@ -88,8 +90,10 @@ function create({
 
         // 4. Emit target_waypoint if current waypoint changed
         if (s.routeWaypoints.length === 0 || s.currentWaypointIndex >= s.routeWaypoints.length) {
-            if (s.routeWaypoints.length > 0) {
+            if (s.routeWaypoints.length > 0 && !s.routeDoneEmitted) {
                 console.log('SimpleAgent: route completed')
+                s = { ...s, routeDoneEmitted: true }
+                logJson = { ...(logJson || {}), routeDone: true }
             }
         } else {
             const target = s.routeWaypoints[s.currentWaypointIndex]

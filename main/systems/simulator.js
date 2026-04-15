@@ -3,7 +3,7 @@
  */
 
 import { createPubSub, connectNeoAgent } from '../tooling/pubsub.js';
-import gasAgent from '../agents/neo/hill_climber2_agent.js';
+import defaultGasAgent from '../agents/neo/hill_climber2_agent.js';
 import localPlannerAgent from '../agents/neo/local_planner.js';
 
 export function gaussianPeakAt(distance, radius, peak) {
@@ -342,7 +342,7 @@ export function createSimulator(mapSys, canvasSys, { maxLinearVelocity = 20, max
       unsubBridgeRoute,
       unsubBridgeGas,
       unsubBridgeMaxGas,
-      connectNeoAgent(pubsub, gasAgent.create({}), getTime),
+      connectNeoAgent(pubsub, (config.gasAgent ?? defaultGasAgent).create({}), getTime),
       connectNeoAgent(pubsub, localPlannerAgent.create({
         closeEnoughToWaypoint: config.waypointThreshold ?? 10,
       }), getTime),
