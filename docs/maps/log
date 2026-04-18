@@ -1,0 +1,1000 @@
+[LP] update called. mode=greedy updated={"odom":false,"targetWaypoint":true} odom=(40.8,274.1,h=0.03) target=(70.4,269.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=24.45 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=0.03rad targetAngle=-0.17rad rawAngDiff=-0.20 angVel=-0.10 linVel=3 dist=30.0 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=-0.10rad(-5.7°) before=(46.7,273.4,348.9°) after=(49.6,272.6,343.2°) simulator.js:273:13
+[SIM-BRIDGE] odom→position x=49.6 y=272.6 heading=5.99rad (343.2°) simulator.js:328:15
+[LP] update called. mode=greedy updated={"odom":false,"targetWaypoint":true} odom=(40.8,274.1,h=0.03) target=(79.4,269.3) local_planner.js:47:17
+[LP-EVAL] changeInDist=24.22 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=0.03rad targetAngle=-0.12rad rawAngDiff=-0.15 angVel=-0.08 linVel=3 dist=38.9 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=-0.08rad(-4.4°) before=(49.6,272.6,343.2°) after=(52.4,271.5,338.8°) simulator.js:273:13
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(49.6,272.6,h=5.99) target=(79.4,269.3) local_planner.js:47:17
+[LP-EVAL] changeInDist=26.60 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.99rad targetAngle=-0.11rad rawAngDiff=0.18 angVel=0.09 linVel=3 dist=30.0 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.09rad(5.3°) before=(52.4,271.5,338.8°) after=(55.3,270.7,344.1°) simulator.js:273:13
+[LP] update called. mode=greedy updated={"odom":false,"targetWaypoint":true} odom=(49.6,272.6,h=5.99) target=(77.8,262.3) local_planner.js:47:17
+[LP-EVAL] changeInDist=26.36 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.99rad targetAngle=-0.35rad rawAngDiff=-0.06 angVel=-0.03 linVel=3 dist=30.0 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=-0.03rad(-1.6°) before=(55.3,270.7,344.1°) after=(58.2,269.8,342.5°) simulator.js:273:13
+[SIM-BRIDGE] odom→position x=58.2 y=269.8 heading=5.98rad (342.5°) simulator.js:328:15
+[LP] update called. mode=greedy updated={"odom":false,"targetWaypoint":true} odom=(49.6,272.6,h=5.99) target=(84.5,255.3) local_planner.js:47:17
+[LP-EVAL] changeInDist=25.90 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.99rad targetAngle=-0.46rad rawAngDiff=-0.17 angVel=-0.08 linVel=3 dist=38.9 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=-0.08rad(-4.8°) before=(58.2,269.8,342.5°) after=(60.9,268.6,337.7°) simulator.js:273:13
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(58.2,269.8,h=5.98) target=(84.5,255.3) local_planner.js:47:17
+[LP-EVAL] changeInDist=25.85 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.98rad targetAngle=-0.50rad rawAngDiff=-0.20 angVel=-0.10 linVel=3 dist=30.0 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=-0.10rad(-5.6°) before=(60.9,268.6,337.7°) after=(63.6,267.2,332.1°) simulator.js:273:13
+[LP] update called. mode=greedy updated={"odom":false,"targetWaypoint":true} odom=(58.2,269.8,h=5.98) target=(82.8,252.6) local_planner.js:47:17
+[LP-EVAL] changeInDist=25.25 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.98rad targetAngle=-0.61rad rawAngDiff=-0.30 angVel=-0.15 linVel=3 dist=30.0 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=-0.15rad(-8.7°) before=(63.6,267.2,332.1°) after=(66.0,265.4,323.4°) simulator.js:273:13
+[SIM-BRIDGE] odom→position x=66.0 y=265.4 heading=5.64rad (323.4°) simulator.js:328:15
+[LP] update called. mode=greedy updated={"odom":false,"targetWaypoint":true} odom=(58.2,269.8,h=5.98) target=(91.8,250.2) local_planner.js:47:17
+[LP-EVAL] changeInDist=25.61 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.98rad targetAngle=-0.53rad rawAngDiff=-0.22 angVel=-0.11 linVel=3 dist=38.9 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=-0.11rad(-6.4°) before=(66.0,265.4,323.4°) after=(68.2,263.4,317.0°) simulator.js:273:13
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(66.0,265.4,h=5.64) target=(91.8,250.2) local_planner.js:47:17
+[LP-EVAL] changeInDist=26.34 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.64rad targetAngle=-0.53rad rawAngDiff=0.10 angVel=0.05 linVel=3 dist=30.0 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.05rad(3.0°) before=(68.2,263.4,317.0°) after=(70.5,261.5,320.0°) simulator.js:273:13
+[LP] update called. mode=greedy updated={"odom":false,"targetWaypoint":true} odom=(66.0,265.4,h=5.64) target=(90.0,247.4) local_planner.js:47:17
+[LP-EVAL] changeInDist=25.93 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.64rad targetAngle=-0.65rad rawAngDiff=-0.01 angVel=-0.00 linVel=3 dist=30.0 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=-0.00rad(-0.2°) before=(70.5,261.5,320.0°) after=(72.8,259.5,319.8°) simulator.js:273:13
+[SIM-BRIDGE] odom→position x=72.8 y=259.5 heading=5.58rad (319.8°) simulator.js:328:15
+[SRA] update: idx=3/9 ticks=150 pos=(72.8,259.5) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+SimpleAgent: skipping waypoint 4/9 (progress=-21.68, t=15.0s) simple_route_agent.js:65:29
+SimpleAgent: publishing waypoint 5/9 at (425.0, -309.0) simple_route_agent.js:91:25
+[LP] update called. mode=greedy updated={"odom":false,"targetWaypoint":true} odom=(66.0,265.4,h=5.64) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=20.87 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.64rad targetAngle=-1.01rad rawAngDiff=-0.37 angVel=-0.19 linVel=3 dist=677.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=-0.19rad(-10.7°) before=(72.8,259.5,319.8°) after=(74.7,257.2,309.2°) simulator.js:273:13
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(72.8,259.5,h=5.58) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=23.41 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.58rad targetAngle=-1.02rad rawAngDiff=-0.32 angVel=-0.16 linVel=3 dist=668.8 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=-0.16rad(-9.0°) before=(74.7,257.2,309.2°) after=(76.2,254.6,300.1°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=1 pos=(72.8,259.5) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=76.2 y=254.6 heading=5.24rad (300.1°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=2 pos=(76.2,254.6) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(76.2,254.6,h=5.24) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=29.38 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.24rad targetAngle=-1.02rad rawAngDiff=0.03 angVel=0.01 linVel=3 dist=662.8 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.01rad(0.8°) before=(76.2,254.6,300.1°) after=(77.7,252.0,300.9°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=3 pos=(76.2,254.6) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=77.7 y=252.0 heading=5.25rad (300.9°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=4 pos=(77.7,252.0) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(77.7,252.0,h=5.25) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=32.38 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.25rad targetAngle=-1.02rad rawAngDiff=0.01 angVel=0.01 linVel=3 dist=659.8 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.01rad(0.4°) before=(77.7,252.0,300.9°) after=(79.3,249.5,301.3°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=5 pos=(77.7,252.0) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=79.3 y=249.5 heading=5.26rad (301.3°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=6 pos=(79.3,249.5) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(79.3,249.5,h=5.26) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=28.41 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.26rad targetAngle=-1.02rad rawAngDiff=0.01 angVel=0.00 linVel=3 dist=656.8 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.00rad(0.2°) before=(79.3,249.5,301.3°) after=(80.9,246.9,301.6°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=7 pos=(79.3,249.5) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=80.9 y=246.9 heading=5.26rad (301.6°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=8 pos=(80.9,246.9) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(80.9,246.9,h=5.26) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=31.41 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.26rad targetAngle=-1.02rad rawAngDiff=0.00 angVel=0.00 linVel=3 dist=653.8 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.00rad(0.1°) before=(80.9,246.9,301.6°) after=(80.9,243.9,271.7°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=9 pos=(80.9,246.9) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=80.9 y=243.9 heading=4.74rad (271.7°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=10 pos=(80.9,243.9) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(80.9,243.9,h=4.74) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=34.01 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=4.74rad targetAngle=-1.01rad rawAngDiff=0.53 angVel=0.26 linVel=3 dist=651.2 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.26rad(15.1°) before=(80.9,243.9,271.7°) after=(81.0,240.9,271.8°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=11 pos=(80.9,243.9) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=81.0 y=240.9 heading=4.74rad (271.8°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=12 pos=(81.0,240.9) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(81.0,240.9,h=4.74) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=28.76 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=4.74rad targetAngle=-1.01rad rawAngDiff=0.53 angVel=0.26 linVel=3 dist=648.6 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.26rad(15.1°) before=(81.0,240.9,271.8°) after=(80.9,237.9,266.9°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=13 pos=(81.0,240.9) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=80.9 y=237.9 heading=4.66rad (266.9°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=14 pos=(80.9,237.9) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(80.9,237.9,h=4.66) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=31.21 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=4.66rad targetAngle=-1.01rad rawAngDiff=0.62 angVel=0.31 linVel=3 dist=646.2 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.31rad(17.6°) before=(80.9,237.9,266.9°) after=(80.8,234.9,269.5°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=15 pos=(80.9,237.9) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=80.8 y=234.9 heading=4.70rad (269.5°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=16 pos=(80.8,234.9) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(80.8,234.9,h=4.70) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=33.74 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=4.70rad targetAngle=-1.01rad rawAngDiff=0.57 angVel=0.29 linVel=3 dist=643.7 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.29rad(16.4°) before=(80.8,234.9,269.5°) after=(80.9,231.9,270.9°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=17 pos=(80.8,234.9) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=80.9 y=231.9 heading=4.73rad (270.9°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=18 pos=(80.9,231.9) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(80.9,231.9,h=4.73) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=27.69 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=4.73rad targetAngle=-1.00rad rawAngDiff=0.55 angVel=0.28 linVel=3 dist=641.1 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.28rad(15.8°) before=(80.9,231.9,270.9°) after=(81.0,228.9,271.7°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=19 pos=(80.9,231.9) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=81.0 y=228.9 heading=4.74rad (271.7°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=20 pos=(81.0,228.9) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(81.0,228.9,h=4.74) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=24.30 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=4.74rad targetAngle=-1.00rad rawAngDiff=0.54 angVel=0.27 linVel=3 dist=638.5 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.27rad(15.5°) before=(81.0,228.9,271.7°) after=(80.8,225.9,267.1°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=21 pos=(81.0,228.9) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=80.8 y=225.9 heading=4.66rad (267.1°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=22 pos=(80.8,225.9) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(80.8,225.9,h=4.66) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=23.74 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=4.66rad targetAngle=-1.00rad rawAngDiff=0.62 angVel=0.31 linVel=3 dist=636.1 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.31rad(17.8°) before=(80.8,225.9,267.1°) after=(80.8,222.9,270.0°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=23 pos=(80.8,225.9) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=80.8 y=222.9 heading=4.71rad (270.0°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=24 pos=(80.8,222.9) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(80.8,222.9,h=4.71) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=23.26 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=4.71rad targetAngle=-1.00rad rawAngDiff=0.58 angVel=0.29 linVel=3 dist=633.6 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.29rad(16.5°) before=(80.8,222.9,270.0°) after=(80.9,219.9,271.4°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=25 pos=(80.8,222.9) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=80.9 y=219.9 heading=4.74rad (271.4°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=26 pos=(80.9,219.9) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(80.9,219.9,h=4.74) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=22.81 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=4.74rad targetAngle=-0.99rad rawAngDiff=0.55 angVel=0.28 linVel=3 dist=631.0 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.28rad(15.8°) before=(80.9,219.9,271.4°) after=(81.0,216.9,272.2°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=27 pos=(80.9,219.9) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=81.0 y=216.9 heading=4.75rad (272.2°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=28 pos=(81.0,216.9) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(81.0,216.9,h=4.75) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=22.80 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=4.75rad targetAngle=-0.99rad rawAngDiff=0.54 angVel=0.27 linVel=3 dist=628.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.27rad(15.5°) before=(81.0,216.9,272.2°) after=(80.9,213.9,267.7°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=29 pos=(81.0,216.9) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=80.9 y=213.9 heading=4.67rad (267.7°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=30 pos=(80.9,213.9) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(80.9,213.9,h=4.67) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=22.64 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=4.67rad targetAngle=-0.99rad rawAngDiff=0.62 angVel=0.31 linVel=3 dist=626.0 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.31rad(17.8°) before=(80.9,213.9,267.7°) after=(80.9,210.9,270.5°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=31 pos=(80.9,213.9) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=80.9 y=210.9 heading=4.72rad (270.5°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=32 pos=(80.9,210.9) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(80.9,210.9,h=4.72) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=22.71 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=4.72rad targetAngle=-0.99rad rawAngDiff=0.58 angVel=0.29 linVel=3 dist=623.5 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.29rad(16.5°) before=(80.9,210.9,270.5°) after=(81.0,207.9,272.0°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=33 pos=(80.9,210.9) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=81.0 y=207.9 heading=4.75rad (272.0°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=34 pos=(81.0,207.9) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(81.0,207.9,h=4.75) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=22.74 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=4.75rad targetAngle=-0.98rad rawAngDiff=0.55 angVel=0.28 linVel=3 dist=620.9 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.28rad(15.8°) before=(81.0,207.9,272.0°) after=(80.9,204.9,267.8°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=35 pos=(81.0,207.9) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=80.9 y=204.9 heading=4.67rad (267.8°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=36 pos=(80.9,204.9) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(80.9,204.9,h=4.67) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=22.61 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=4.67rad targetAngle=-0.98rad rawAngDiff=0.63 angVel=0.31 linVel=3 dist=618.5 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.31rad(18.0°) before=(80.9,204.9,267.8°) after=(81.0,201.9,270.8°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=37 pos=(80.9,204.9) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=81.0 y=201.9 heading=4.73rad (270.8°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=38 pos=(81.0,201.9) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(81.0,201.9,h=4.73) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=22.55 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=4.73rad targetAngle=-0.98rad rawAngDiff=0.58 angVel=0.29 linVel=3 dist=616.0 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.29rad(16.6°) before=(81.0,201.9,270.8°) after=(80.8,198.9,267.4°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=39 pos=(81.0,201.9) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=80.8 y=198.9 heading=4.67rad (267.4°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=40 pos=(80.8,198.9) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(80.8,198.9,h=4.67) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=22.52 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=4.67rad targetAngle=-0.98rad rawAngDiff=0.64 angVel=0.32 linVel=3 dist=613.6 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.32rad(18.4°) before=(80.8,198.9,267.4°) after=(80.9,195.9,270.8°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=41 pos=(80.8,198.9) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=80.9 y=195.9 heading=4.73rad (270.8°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=42 pos=(80.9,195.9) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(80.9,195.9,h=4.73) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=22.50 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=4.73rad targetAngle=-0.97rad rawAngDiff=0.59 angVel=0.29 linVel=3 dist=611.1 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.29rad(16.8°) before=(80.9,195.9,270.8°) after=(81.0,192.9,272.5°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=43 pos=(80.9,195.9) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=81.0 y=192.9 heading=4.76rad (272.5°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=44 pos=(81.0,192.9) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(81.0,192.9,h=4.76) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=22.49 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=4.76rad targetAngle=-0.97rad rawAngDiff=0.56 angVel=0.28 linVel=3 dist=608.5 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.28rad(16.0°) before=(81.0,192.9,272.5°) after=(80.9,189.9,268.5°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=45 pos=(81.0,192.9) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=80.9 y=189.9 heading=4.69rad (268.5°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=46 pos=(80.9,189.9) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(80.9,189.9,h=4.69) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=22.35 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=4.69rad targetAngle=-0.97rad rawAngDiff=0.63 angVel=0.32 linVel=3 dist=606.1 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.32rad(18.1°) before=(80.9,189.9,268.5°) after=(81.0,186.9,271.5°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=47 pos=(80.9,189.9) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=81.0 y=186.9 heading=4.74rad (271.5°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=48 pos=(81.0,186.9) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(81.0,186.9,h=4.74) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=22.42 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=4.74rad targetAngle=-0.96rad rawAngDiff=0.58 angVel=0.29 linVel=3 dist=603.6 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.29rad(16.6°) before=(81.0,186.9,271.5°) after=(80.9,183.9,268.1°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=49 pos=(81.0,186.9) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=80.9 y=183.9 heading=4.68rad (268.1°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=50 pos=(80.9,183.9) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(80.9,183.9,h=4.68) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=22.30 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=4.68rad targetAngle=-0.96rad rawAngDiff=0.64 angVel=0.32 linVel=3 dist=601.2 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.32rad(18.4°) before=(80.9,183.9,268.1°) after=(81.0,180.9,271.5°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=51 pos=(80.9,183.9) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=81.0 y=180.9 heading=4.74rad (271.5°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=52 pos=(81.0,180.9) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(81.0,180.9,h=4.74) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=22.25 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=4.74rad targetAngle=-0.96rad rawAngDiff=0.59 angVel=0.29 linVel=3 dist=598.7 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.29rad(16.8°) before=(81.0,180.9,271.5°) after=(80.9,177.9,268.3°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=53 pos=(81.0,180.9) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=80.9 y=177.9 heading=4.68rad (268.3°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=54 pos=(80.9,177.9) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(80.9,177.9,h=4.68) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=22.22 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=4.68rad targetAngle=-0.96rad rawAngDiff=0.64 angVel=0.32 linVel=3 dist=596.3 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.32rad(18.5°) before=(80.9,177.9,268.3°) after=(81.0,174.9,271.8°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=55 pos=(80.9,177.9) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=81.0 y=174.9 heading=4.74rad (271.8°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=56 pos=(81.0,174.9) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(81.0,174.9,h=4.74) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=22.21 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=4.74rad targetAngle=-0.95rad rawAngDiff=0.59 angVel=0.29 linVel=3 dist=593.8 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.29rad(16.8°) before=(81.0,174.9,271.8°) after=(81.2,172.0,273.6°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=57 pos=(81.0,174.9) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=81.2 y=172.0 heading=4.78rad (273.6°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=58 pos=(81.2,172.0) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(81.2,172.0,h=4.78) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=22.35 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=4.78rad targetAngle=-0.95rad rawAngDiff=0.56 angVel=0.28 linVel=3 dist=591.2 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.28rad(16.0°) before=(81.2,172.0,273.6°) after=(82.2,169.1,289.6°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=59 pos=(81.2,172.0) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=82.2 y=169.1 heading=5.05rad (289.6°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=60 pos=(82.2,169.1) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(82.2,169.1,h=5.05) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=22.73 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.05rad targetAngle=-0.95rad rawAngDiff=0.28 angVel=0.14 linVel=3 dist=588.3 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.14rad(8.0°) before=(82.2,169.1,289.6°) after=(83.6,166.5,297.6°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=61 pos=(82.2,169.1) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=83.6 y=166.5 heading=5.19rad (297.6°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=62 pos=(83.6,166.5) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(83.6,166.5,h=5.19) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=23.15 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.19rad targetAngle=-0.95rad rawAngDiff=0.14 angVel=0.07 linVel=3 dist=585.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.07rad(4.0°) before=(83.6,166.5,297.6°) after=(85.1,163.9,301.6°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=63 pos=(83.6,166.5) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=85.1 y=163.9 heading=5.26rad (301.6°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=64 pos=(85.1,163.9) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(85.1,163.9,h=5.26) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=23.71 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.26rad targetAngle=-0.95rad rawAngDiff=0.07 angVel=0.04 linVel=3 dist=582.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.04rad(2.0°) before=(85.1,163.9,301.6°) after=(86.8,161.4,303.7°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=65 pos=(85.1,163.9) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=86.8 y=161.4 heading=5.30rad (303.7°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=66 pos=(86.8,161.4) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(86.8,161.4,h=5.30) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=24.20 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.30rad targetAngle=-0.95rad rawAngDiff=0.04 angVel=0.02 linVel=3 dist=579.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.02rad(1.0°) before=(86.8,161.4,303.7°) after=(88.5,159.0,304.7°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=67 pos=(86.8,161.4) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=88.5 y=159.0 heading=5.32rad (304.7°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=68 pos=(88.5,159.0) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(88.5,159.0,h=5.32) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=24.79 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.32rad targetAngle=-0.95rad rawAngDiff=0.02 angVel=0.01 linVel=3 dist=576.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.01rad(0.5°) before=(88.5,159.0,304.7°) after=(90.2,156.5,305.2°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=69 pos=(88.5,159.0) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=90.2 y=156.5 heading=5.33rad (305.2°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=70 pos=(90.2,156.5) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(90.2,156.5,h=5.33) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=25.29 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.33rad targetAngle=-0.95rad rawAngDiff=0.01 angVel=0.00 linVel=3 dist=573.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.00rad(0.3°) before=(90.2,156.5,305.2°) after=(92.0,154.1,305.5°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=71 pos=(90.2,156.5) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=92.0 y=154.1 heading=5.33rad (305.5°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=72 pos=(92.0,154.1) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(92.0,154.1,h=5.33) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=25.89 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.33rad targetAngle=-0.95rad rawAngDiff=0.00 angVel=0.00 linVel=3 dist=570.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.00rad(0.1°) before=(92.0,154.1,305.5°) after=(93.7,151.6,305.6°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=73 pos=(92.0,154.1) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=93.7 y=151.6 heading=5.33rad (305.6°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=74 pos=(93.7,151.6) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(93.7,151.6,h=5.33) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=26.39 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.33rad targetAngle=-0.95rad rawAngDiff=0.00 angVel=0.00 linVel=3 dist=567.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.00rad(0.1°) before=(93.7,151.6,305.6°) after=(95.5,149.2,305.7°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=75 pos=(93.7,151.6) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=95.5 y=149.2 heading=5.33rad (305.7°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=76 pos=(95.5,149.2) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(95.5,149.2,h=5.33) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=26.84 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.33rad targetAngle=-0.95rad rawAngDiff=0.00 angVel=0.00 linVel=3 dist=564.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.00rad(0.0°) before=(95.5,149.2,305.7°) after=(97.2,146.7,305.7°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=77 pos=(95.5,149.2) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=97.2 y=146.7 heading=5.34rad (305.7°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=78 pos=(97.2,146.7) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(97.2,146.7,h=5.34) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=26.96 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.34rad targetAngle=-0.95rad rawAngDiff=0.00 angVel=0.00 linVel=3 dist=561.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.00rad(0.0°) before=(97.2,146.7,305.7°) after=(99.0,144.3,305.7°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=79 pos=(97.2,146.7) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=99.0 y=144.3 heading=5.34rad (305.7°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=80 pos=(99.0,144.3) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(99.0,144.3,h=5.34) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=26.99 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.34rad targetAngle=-0.95rad rawAngDiff=0.00 angVel=0.00 linVel=3 dist=558.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.00rad(0.0°) before=(99.0,144.3,305.7°) after=(100.7,141.9,305.7°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=81 pos=(99.0,144.3) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=100.7 y=141.9 heading=5.34rad (305.7°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=82 pos=(100.7,141.9) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(100.7,141.9,h=5.34) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=27.00 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.34rad targetAngle=-0.95rad rawAngDiff=0.00 angVel=0.00 linVel=3 dist=555.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.00rad(0.0°) before=(100.7,141.9,305.7°) after=(102.5,139.4,305.7°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=83 pos=(100.7,141.9) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=102.5 y=139.4 heading=5.34rad (305.7°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=84 pos=(102.5,139.4) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(102.5,139.4,h=5.34) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=27.00 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.34rad targetAngle=-0.95rad rawAngDiff=0.00 angVel=0.00 linVel=3 dist=552.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.00rad(0.0°) before=(102.5,139.4,305.7°) after=(104.2,137.0,305.7°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=85 pos=(102.5,139.4) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=104.2 y=137.0 heading=5.34rad (305.7°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=86 pos=(104.2,137.0) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(104.2,137.0,h=5.34) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=27.00 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.34rad targetAngle=-0.95rad rawAngDiff=0.00 angVel=0.00 linVel=3 dist=549.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.00rad(0.0°) before=(104.2,137.0,305.7°) after=(106.0,134.6,305.7°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=87 pos=(104.2,137.0) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=106.0 y=134.6 heading=5.34rad (305.7°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=88 pos=(106.0,134.6) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(106.0,134.6,h=5.34) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=27.00 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.34rad targetAngle=-0.95rad rawAngDiff=0.00 angVel=0.00 linVel=3 dist=546.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.00rad(0.0°) before=(106.0,134.6,305.7°) after=(107.7,132.1,305.7°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=89 pos=(106.0,134.6) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=107.7 y=132.1 heading=5.34rad (305.7°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=90 pos=(107.7,132.1) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(107.7,132.1,h=5.34) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=27.00 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.34rad targetAngle=-0.95rad rawAngDiff=0.00 angVel=0.00 linVel=3 dist=543.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.00rad(0.0°) before=(107.7,132.1,305.7°) after=(109.5,129.7,305.7°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=91 pos=(107.7,132.1) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=109.5 y=129.7 heading=5.34rad (305.7°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=92 pos=(109.5,129.7) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(109.5,129.7,h=5.34) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=27.00 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.34rad targetAngle=-0.95rad rawAngDiff=0.00 angVel=0.00 linVel=3 dist=540.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.00rad(0.0°) before=(109.5,129.7,305.7°) after=(111.2,127.3,305.7°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=93 pos=(109.5,129.7) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=111.2 y=127.3 heading=5.34rad (305.7°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=94 pos=(111.2,127.3) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(111.2,127.3,h=5.34) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=27.00 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.34rad targetAngle=-0.95rad rawAngDiff=0.00 angVel=0.00 linVel=3 dist=537.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.00rad(0.0°) before=(111.2,127.3,305.7°) after=(113.0,124.8,305.7°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=95 pos=(111.2,127.3) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=113.0 y=124.8 heading=5.34rad (305.7°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=96 pos=(113.0,124.8) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(113.0,124.8,h=5.34) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=27.00 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.34rad targetAngle=-0.95rad rawAngDiff=0.00 angVel=0.00 linVel=3 dist=534.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.00rad(0.0°) before=(113.0,124.8,305.7°) after=(114.7,122.4,305.7°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=97 pos=(113.0,124.8) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=114.7 y=122.4 heading=5.34rad (305.7°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=98 pos=(114.7,122.4) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(114.7,122.4,h=5.34) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=27.00 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.34rad targetAngle=-0.95rad rawAngDiff=0.00 angVel=0.00 linVel=3 dist=531.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.00rad(0.0°) before=(114.7,122.4,305.7°) after=(116.5,120.0,305.7°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=99 pos=(114.7,122.4) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=116.5 y=120.0 heading=5.34rad (305.7°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=100 pos=(116.5,120.0) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(116.5,120.0,h=5.34) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=27.00 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.34rad targetAngle=-0.95rad rawAngDiff=0.00 angVel=0.00 linVel=3 dist=528.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.00rad(0.0°) before=(116.5,120.0,305.7°) after=(118.2,117.5,305.7°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=101 pos=(116.5,120.0) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=118.2 y=117.5 heading=5.34rad (305.7°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=102 pos=(118.2,117.5) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(118.2,117.5,h=5.34) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=27.00 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.34rad targetAngle=-0.95rad rawAngDiff=0.00 angVel=0.00 linVel=3 dist=525.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.00rad(0.0°) before=(118.2,117.5,305.7°) after=(120.0,115.1,305.7°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=103 pos=(118.2,117.5) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=120.0 y=115.1 heading=5.34rad (305.7°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=104 pos=(120.0,115.1) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(120.0,115.1,h=5.34) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=27.00 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.34rad targetAngle=-0.95rad rawAngDiff=0.00 angVel=0.00 linVel=3 dist=522.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.00rad(0.0°) before=(120.0,115.1,305.7°) after=(121.8,112.6,305.7°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=105 pos=(120.0,115.1) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=121.8 y=112.6 heading=5.34rad (305.7°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=106 pos=(121.8,112.6) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(121.8,112.6,h=5.34) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=27.00 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.34rad targetAngle=-0.95rad rawAngDiff=0.00 angVel=0.00 linVel=3 dist=519.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.00rad(0.0°) before=(121.8,112.6,305.7°) after=(123.5,110.2,305.7°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=107 pos=(121.8,112.6) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=123.5 y=110.2 heading=5.34rad (305.7°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=108 pos=(123.5,110.2) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(123.5,110.2,h=5.34) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=27.00 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.34rad targetAngle=-0.95rad rawAngDiff=0.00 angVel=0.00 linVel=3 dist=516.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.00rad(0.0°) before=(123.5,110.2,305.7°) after=(125.3,107.8,305.7°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=109 pos=(123.5,110.2) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=125.3 y=107.8 heading=5.34rad (305.7°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=110 pos=(125.3,107.8) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(125.3,107.8,h=5.34) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=27.00 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.34rad targetAngle=-0.95rad rawAngDiff=0.00 angVel=0.00 linVel=3 dist=513.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.00rad(0.0°) before=(125.3,107.8,305.7°) after=(127.0,105.3,305.7°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=111 pos=(125.3,107.8) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=127.0 y=105.3 heading=5.34rad (305.7°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=112 pos=(127.0,105.3) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(127.0,105.3,h=5.34) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=27.00 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.34rad targetAngle=-0.95rad rawAngDiff=0.00 angVel=0.00 linVel=3 dist=510.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.00rad(0.0°) before=(127.0,105.3,305.7°) after=(128.8,102.9,305.7°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=113 pos=(127.0,105.3) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=128.8 y=102.9 heading=5.34rad (305.7°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=114 pos=(128.8,102.9) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(128.8,102.9,h=5.34) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=27.00 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.34rad targetAngle=-0.95rad rawAngDiff=0.00 angVel=0.00 linVel=3 dist=507.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.00rad(0.0°) before=(128.8,102.9,305.7°) after=(130.5,100.5,305.7°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=115 pos=(128.8,102.9) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=130.5 y=100.5 heading=5.34rad (305.7°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=116 pos=(130.5,100.5) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(130.5,100.5,h=5.34) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=27.00 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.34rad targetAngle=-0.95rad rawAngDiff=0.00 angVel=0.00 linVel=3 dist=504.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.00rad(0.0°) before=(130.5,100.5,305.7°) after=(132.3,98.0,305.7°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=117 pos=(130.5,100.5) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=132.3 y=98.0 heading=5.34rad (305.7°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=118 pos=(132.3,98.0) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(132.3,98.0,h=5.34) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=27.00 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.34rad targetAngle=-0.95rad rawAngDiff=0.00 angVel=0.00 linVel=3 dist=501.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.00rad(0.0°) before=(132.3,98.0,305.7°) after=(134.0,95.6,305.7°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=119 pos=(132.3,98.0) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=134.0 y=95.6 heading=5.34rad (305.7°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=120 pos=(134.0,95.6) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(134.0,95.6,h=5.34) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=27.00 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.34rad targetAngle=-0.95rad rawAngDiff=0.00 angVel=0.00 linVel=3 dist=498.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.00rad(0.0°) before=(134.0,95.6,305.7°) after=(135.8,93.2,305.7°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=121 pos=(134.0,95.6) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=135.8 y=93.2 heading=5.34rad (305.7°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=122 pos=(135.8,93.2) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(135.8,93.2,h=5.34) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=27.00 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.34rad targetAngle=-0.95rad rawAngDiff=0.00 angVel=0.00 linVel=3 dist=495.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.00rad(0.0°) before=(135.8,93.2,305.7°) after=(137.5,90.7,305.7°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=123 pos=(135.8,93.2) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=137.5 y=90.7 heading=5.34rad (305.7°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=124 pos=(137.5,90.7) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(137.5,90.7,h=5.34) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=27.00 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.34rad targetAngle=-0.95rad rawAngDiff=0.00 angVel=0.00 linVel=3 dist=492.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.00rad(0.0°) before=(137.5,90.7,305.7°) after=(139.3,88.3,305.7°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=125 pos=(137.5,90.7) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=139.3 y=88.3 heading=5.34rad (305.7°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=126 pos=(139.3,88.3) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(139.3,88.3,h=5.34) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=27.00 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.34rad targetAngle=-0.95rad rawAngDiff=0.00 angVel=0.00 linVel=3 dist=489.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.00rad(0.0°) before=(139.3,88.3,305.7°) after=(141.0,85.9,305.7°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=127 pos=(139.3,88.3) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=141.0 y=85.9 heading=5.34rad (305.7°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=128 pos=(141.0,85.9) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(141.0,85.9,h=5.34) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=27.00 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.34rad targetAngle=-0.95rad rawAngDiff=0.00 angVel=0.00 linVel=3 dist=486.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.00rad(0.0°) before=(141.0,85.9,305.7°) after=(142.8,83.4,305.7°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=129 pos=(141.0,85.9) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=142.8 y=83.4 heading=5.34rad (305.7°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=130 pos=(142.8,83.4) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(142.8,83.4,h=5.34) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=27.00 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.34rad targetAngle=-0.95rad rawAngDiff=0.00 angVel=0.00 linVel=3 dist=483.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.00rad(0.0°) before=(142.8,83.4,305.7°) after=(144.5,81.0,305.7°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=131 pos=(142.8,83.4) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=144.5 y=81.0 heading=5.34rad (305.7°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=132 pos=(144.5,81.0) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(144.5,81.0,h=5.34) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=27.00 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.34rad targetAngle=-0.95rad rawAngDiff=0.00 angVel=0.00 linVel=3 dist=480.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.00rad(0.0°) before=(144.5,81.0,305.7°) after=(146.3,78.5,305.7°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=133 pos=(144.5,81.0) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=146.3 y=78.5 heading=5.34rad (305.7°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=134 pos=(146.3,78.5) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(146.3,78.5,h=5.34) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=27.00 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.34rad targetAngle=-0.95rad rawAngDiff=0.00 angVel=0.00 linVel=3 dist=477.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.00rad(0.0°) before=(146.3,78.5,305.7°) after=(148.0,76.1,305.7°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=135 pos=(146.3,78.5) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=148.0 y=76.1 heading=5.34rad (305.7°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=136 pos=(148.0,76.1) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(148.0,76.1,h=5.34) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=27.00 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.34rad targetAngle=-0.95rad rawAngDiff=0.00 angVel=0.00 linVel=3 dist=474.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.00rad(0.0°) before=(148.0,76.1,305.7°) after=(149.8,73.7,305.7°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=137 pos=(148.0,76.1) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=149.8 y=73.7 heading=5.34rad (305.7°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=138 pos=(149.8,73.7) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(149.8,73.7,h=5.34) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=27.00 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.34rad targetAngle=-0.95rad rawAngDiff=0.00 angVel=0.00 linVel=3 dist=471.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.00rad(0.0°) before=(149.8,73.7,305.7°) after=(151.5,71.2,305.7°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=139 pos=(149.8,73.7) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=151.5 y=71.2 heading=5.34rad (305.7°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=140 pos=(151.5,71.2) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(151.5,71.2,h=5.34) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=27.00 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.34rad targetAngle=-0.95rad rawAngDiff=0.00 angVel=0.00 linVel=3 dist=468.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.00rad(0.0°) before=(151.5,71.2,305.7°) after=(153.3,68.8,305.7°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=141 pos=(151.5,71.2) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=153.3 y=68.8 heading=5.34rad (305.7°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=142 pos=(153.3,68.8) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(153.3,68.8,h=5.34) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=27.00 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.34rad targetAngle=-0.95rad rawAngDiff=0.00 angVel=0.00 linVel=3 dist=465.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.00rad(0.0°) before=(153.3,68.8,305.7°) after=(155.0,66.4,305.7°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=143 pos=(153.3,68.8) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=155.0 y=66.4 heading=5.34rad (305.7°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=144 pos=(155.0,66.4) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(155.0,66.4,h=5.34) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=27.00 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.34rad targetAngle=-0.95rad rawAngDiff=0.00 angVel=0.00 linVel=3 dist=462.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.00rad(0.0°) before=(155.0,66.4,305.7°) after=(156.8,63.9,305.7°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=145 pos=(155.0,66.4) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=156.8 y=63.9 heading=5.34rad (305.7°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=146 pos=(156.8,63.9) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(156.8,63.9,h=5.34) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=27.00 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.34rad targetAngle=-0.95rad rawAngDiff=0.00 angVel=0.00 linVel=3 dist=459.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.00rad(0.0°) before=(156.8,63.9,305.7°) after=(158.5,61.5,305.7°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=147 pos=(156.8,63.9) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=158.5 y=61.5 heading=5.34rad (305.7°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=148 pos=(158.5,61.5) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(158.5,61.5,h=5.34) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=27.00 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.34rad targetAngle=-0.95rad rawAngDiff=0.00 angVel=0.00 linVel=3 dist=456.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.00rad(0.0°) before=(158.5,61.5,305.7°) after=(160.3,59.1,305.7°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=149 pos=(158.5,61.5) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=160.3 y=59.1 heading=5.34rad (305.7°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=150 pos=(160.3,59.1) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(160.3,59.1,h=5.34) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=27.00 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.34rad targetAngle=-0.95rad rawAngDiff=0.00 angVel=0.00 linVel=3 dist=453.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.00rad(0.0°) before=(160.3,59.1,305.7°) after=(162.0,56.6,305.7°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=151 pos=(160.3,59.1) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=162.0 y=56.6 heading=5.34rad (305.7°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=152 pos=(162.0,56.6) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(162.0,56.6,h=5.34) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=27.00 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.34rad targetAngle=-0.95rad rawAngDiff=0.00 angVel=0.00 linVel=3 dist=450.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.00rad(0.0°) before=(162.0,56.6,305.7°) after=(163.8,54.2,305.7°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=153 pos=(162.0,56.6) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=163.8 y=54.2 heading=5.34rad (305.7°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=154 pos=(163.8,54.2) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(163.8,54.2,h=5.34) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=27.00 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.34rad targetAngle=-0.95rad rawAngDiff=0.00 angVel=0.00 linVel=3 dist=447.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.00rad(0.0°) before=(163.8,54.2,305.7°) after=(165.5,51.8,305.7°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=155 pos=(163.8,54.2) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=165.5 y=51.8 heading=5.34rad (305.7°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=156 pos=(165.5,51.8) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(165.5,51.8,h=5.34) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=27.00 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.34rad targetAngle=-0.95rad rawAngDiff=0.00 angVel=0.00 linVel=3 dist=444.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.00rad(0.0°) before=(165.5,51.8,305.7°) after=(167.3,49.3,305.7°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=157 pos=(165.5,51.8) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=167.3 y=49.3 heading=5.34rad (305.7°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=158 pos=(167.3,49.3) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(167.3,49.3,h=5.34) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=27.00 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.34rad targetAngle=-0.95rad rawAngDiff=0.00 angVel=0.00 linVel=3 dist=441.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.00rad(0.0°) before=(167.3,49.3,305.7°) after=(169.0,46.9,305.7°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=159 pos=(167.3,49.3) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=169.0 y=46.9 heading=5.34rad (305.7°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=160 pos=(169.0,46.9) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(169.0,46.9,h=5.34) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=27.00 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.34rad targetAngle=-0.95rad rawAngDiff=0.00 angVel=0.00 linVel=3 dist=438.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.00rad(0.0°) before=(169.0,46.9,305.7°) after=(170.8,44.5,305.7°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=161 pos=(169.0,46.9) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=170.8 y=44.5 heading=5.34rad (305.7°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=162 pos=(170.8,44.5) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(170.8,44.5,h=5.34) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=27.00 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.34rad targetAngle=-0.95rad rawAngDiff=0.00 angVel=0.00 linVel=3 dist=435.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.00rad(0.0°) before=(170.8,44.5,305.7°) after=(172.5,42.0,305.7°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=163 pos=(170.8,44.5) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=172.5 y=42.0 heading=5.34rad (305.7°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=164 pos=(172.5,42.0) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(172.5,42.0,h=5.34) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=27.00 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.34rad targetAngle=-0.95rad rawAngDiff=0.00 angVel=0.00 linVel=3 dist=432.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.00rad(0.0°) before=(172.5,42.0,305.7°) after=(174.3,39.6,305.7°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=165 pos=(172.5,42.0) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=174.3 y=39.6 heading=5.34rad (305.7°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=166 pos=(174.3,39.6) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(174.3,39.6,h=5.34) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=27.00 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.34rad targetAngle=-0.95rad rawAngDiff=0.00 angVel=0.00 linVel=3 dist=429.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.00rad(0.0°) before=(174.3,39.6,305.7°) after=(176.1,37.1,305.7°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=167 pos=(174.3,39.6) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=176.1 y=37.1 heading=5.34rad (305.7°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=168 pos=(176.1,37.1) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(176.1,37.1,h=5.34) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=27.00 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.34rad targetAngle=-0.95rad rawAngDiff=0.00 angVel=0.00 linVel=3 dist=426.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.00rad(0.0°) before=(176.1,37.1,305.7°) after=(177.8,34.7,305.7°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=169 pos=(176.1,37.1) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=177.8 y=34.7 heading=5.34rad (305.7°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=170 pos=(177.8,34.7) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(177.8,34.7,h=5.34) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=27.00 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.34rad targetAngle=-0.95rad rawAngDiff=0.00 angVel=0.00 linVel=3 dist=423.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.00rad(0.0°) before=(177.8,34.7,305.7°) after=(179.6,32.3,305.7°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=171 pos=(177.8,34.7) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=179.6 y=32.3 heading=5.34rad (305.7°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=172 pos=(179.6,32.3) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(179.6,32.3,h=5.34) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=27.00 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.34rad targetAngle=-0.95rad rawAngDiff=0.00 angVel=0.00 linVel=3 dist=420.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.00rad(0.0°) before=(179.6,32.3,305.7°) after=(181.3,29.8,305.7°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=173 pos=(179.6,32.3) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=181.3 y=29.8 heading=5.34rad (305.7°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=174 pos=(181.3,29.8) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(181.3,29.8,h=5.34) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=27.00 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.34rad targetAngle=-0.95rad rawAngDiff=0.00 angVel=0.00 linVel=3 dist=417.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.00rad(0.0°) before=(181.3,29.8,305.7°) after=(183.1,27.4,305.7°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=175 pos=(181.3,29.8) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=183.1 y=27.4 heading=5.34rad (305.7°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=176 pos=(183.1,27.4) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(183.1,27.4,h=5.34) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=27.00 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.34rad targetAngle=-0.95rad rawAngDiff=0.00 angVel=0.00 linVel=3 dist=414.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.00rad(0.0°) before=(183.1,27.4,305.7°) after=(184.8,25.0,305.7°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=177 pos=(183.1,27.4) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=184.8 y=25.0 heading=5.34rad (305.7°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=178 pos=(184.8,25.0) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(184.8,25.0,h=5.34) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=27.00 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.34rad targetAngle=-0.95rad rawAngDiff=0.00 angVel=0.00 linVel=3 dist=411.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.00rad(0.0°) before=(184.8,25.0,305.7°) after=(186.6,22.5,305.7°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=179 pos=(184.8,25.0) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=186.6 y=22.5 heading=5.34rad (305.7°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=180 pos=(186.6,22.5) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(186.6,22.5,h=5.34) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=27.00 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.34rad targetAngle=-0.95rad rawAngDiff=0.00 angVel=0.00 linVel=3 dist=408.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.00rad(0.0°) before=(186.6,22.5,305.7°) after=(188.3,20.1,305.7°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=181 pos=(186.6,22.5) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=188.3 y=20.1 heading=5.34rad (305.7°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=182 pos=(188.3,20.1) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(188.3,20.1,h=5.34) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=27.00 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.34rad targetAngle=-0.95rad rawAngDiff=0.00 angVel=0.00 linVel=3 dist=405.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.00rad(0.0°) before=(188.3,20.1,305.7°) after=(190.1,17.7,305.7°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=183 pos=(188.3,20.1) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=190.1 y=17.7 heading=5.34rad (305.7°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=184 pos=(190.1,17.7) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(190.1,17.7,h=5.34) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=27.00 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.34rad targetAngle=-0.95rad rawAngDiff=0.00 angVel=0.00 linVel=3 dist=402.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.00rad(0.0°) before=(190.1,17.7,305.7°) after=(191.8,15.2,305.7°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=185 pos=(190.1,17.7) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=191.8 y=15.2 heading=5.34rad (305.7°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=186 pos=(191.8,15.2) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(191.8,15.2,h=5.34) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=27.00 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.34rad targetAngle=-0.95rad rawAngDiff=0.00 angVel=0.00 linVel=3 dist=399.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.00rad(0.0°) before=(191.8,15.2,305.7°) after=(193.6,12.8,305.7°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=187 pos=(191.8,15.2) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=193.6 y=12.8 heading=5.34rad (305.7°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=188 pos=(193.6,12.8) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(193.6,12.8,h=5.34) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=27.00 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.34rad targetAngle=-0.95rad rawAngDiff=0.00 angVel=0.00 linVel=3 dist=396.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.00rad(0.0°) before=(193.6,12.8,305.7°) after=(195.3,10.4,305.7°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=189 pos=(193.6,12.8) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=195.3 y=10.4 heading=5.34rad (305.7°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=190 pos=(195.3,10.4) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(195.3,10.4,h=5.34) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=27.00 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.34rad targetAngle=-0.95rad rawAngDiff=0.00 angVel=0.00 linVel=3 dist=393.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.00rad(0.0°) before=(195.3,10.4,305.7°) after=(197.1,7.9,305.7°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=191 pos=(195.3,10.4) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=197.1 y=7.9 heading=5.34rad (305.7°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=192 pos=(197.1,7.9) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(197.1,7.9,h=5.34) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=27.00 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.34rad targetAngle=-0.95rad rawAngDiff=0.00 angVel=0.00 linVel=3 dist=390.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.00rad(0.0°) before=(197.1,7.9,305.7°) after=(199.8,6.7,335.7°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=193 pos=(197.1,7.9) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=199.8 y=6.7 heading=5.86rad (335.7°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=194 pos=(199.8,6.7) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(199.8,6.7,h=5.86) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=26.60 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.86rad targetAngle=-0.95rad rawAngDiff=-0.53 angVel=-0.26 linVel=3 dist=387.8 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=-0.26rad(-15.1°) before=(199.8,6.7,335.7°) after=(202.8,6.2,350.6°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=195 pos=(199.8,6.7) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=202.8 y=6.2 heading=6.12rad (350.6°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=196 pos=(202.8,6.2) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(202.8,6.2,h=6.12) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=25.71 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=6.12rad targetAngle=-0.96rad rawAngDiff=-0.79 angVel=-0.40 linVel=3 dist=385.7 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=-0.40rad(-22.7°) before=(202.8,6.2,350.6°) after=(205.5,5.1,337.9°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=197 pos=(202.8,6.2) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=205.5 y=5.1 heading=5.90rad (337.9°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=198 pos=(205.5,5.1) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(205.5,5.1,h=5.90) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=25.23 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.90rad targetAngle=-0.96rad rawAngDiff=-0.58 angVel=-0.29 linVel=3 dist=383.1 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=-0.29rad(-16.5°) before=(205.5,5.1,337.9°) after=(207.9,3.2,321.4°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=199 pos=(205.5,5.1) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=207.9 y=3.2 heading=5.61rad (321.4°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=200 pos=(207.9,3.2) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(207.9,3.2,h=5.61) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=25.10 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.61rad targetAngle=-0.96rad rawAngDiff=-0.29 angVel=-0.14 linVel=3 dist=380.3 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=-0.14rad(-8.3°) before=(207.9,3.2,321.4°) after=(209.9,1.0,313.1°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=201 pos=(207.9,3.2) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=209.9 y=1.0 heading=5.46rad (313.1°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=202 pos=(209.9,1.0) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(209.9,1.0,h=5.46) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=25.07 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.46rad targetAngle=-0.96rad rawAngDiff=-0.15 angVel=-0.07 linVel=3 dist=377.3 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=-0.07rad(-4.2°) before=(209.9,1.0,313.1°) after=(211.8,-1.3,308.9°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=203 pos=(209.9,1.0) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=211.8 y=-1.3 heading=5.39rad (308.9°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=204 pos=(211.8,-1.3) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(211.8,-1.3,h=5.39) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=25.06 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.39rad targetAngle=-0.96rad rawAngDiff=-0.07 angVel=-0.04 linVel=3 dist=374.3 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=-0.04rad(-2.1°) before=(211.8,-1.3,308.9°) after=(213.4,-3.9,301.8°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=205 pos=(211.8,-1.3) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=213.4 y=-3.9 heading=5.27rad (301.8°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=206 pos=(213.4,-3.9) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(213.4,-3.9,h=5.27) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=25.06 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.27rad targetAngle=-0.96rad rawAngDiff=0.05 angVel=0.03 linVel=3 dist=371.3 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.03rad(1.5°) before=(213.4,-3.9,301.8°) after=(213.3,-6.9,268.3°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=207 pos=(213.4,-3.9) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=213.3 y=-6.9 heading=4.68rad (268.3°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=208 pos=(213.3,-6.9) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(213.3,-6.9,h=4.68) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=24.47 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=4.68rad targetAngle=-0.96rad rawAngDiff=0.64 angVel=0.32 linVel=3 dist=368.9 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.32rad(18.4°) before=(213.3,-6.9,268.3°) after=(213.4,-9.9,271.6°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=209 pos=(213.3,-6.9) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=213.4 y=-9.9 heading=4.74rad (271.6°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=210 pos=(213.4,-9.9) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(213.4,-9.9,h=4.74) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=23.97 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=4.74rad targetAngle=-0.96rad rawAngDiff=0.59 angVel=0.29 linVel=3 dist=366.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.29rad(16.8°) before=(213.4,-9.9,271.6°) after=(213.3,-12.9,268.5°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=211 pos=(213.4,-9.9) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=213.3 y=-12.9 heading=4.69rad (268.5°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=212 pos=(213.3,-12.9) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(213.3,-12.9,h=4.69) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=23.77 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=4.69rad targetAngle=-0.95rad rawAngDiff=0.65 angVel=0.32 linVel=3 dist=364.0 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.32rad(18.5°) before=(213.3,-12.9,268.5°) after=(213.4,-15.9,272.0°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=213 pos=(213.3,-12.9) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=213.4 y=-15.9 heading=4.75rad (272.0°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=214 pos=(213.4,-15.9) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(213.4,-15.9,h=4.75) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=24.16 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=4.75rad targetAngle=-0.95rad rawAngDiff=0.59 angVel=0.30 linVel=3 dist=361.5 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.30rad(16.9°) before=(213.4,-15.9,272.0°) after=(213.4,-18.9,268.9°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=215 pos=(213.4,-15.9) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=213.4 y=-18.9 heading=4.69rad (268.9°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=216 pos=(213.4,-18.9) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(213.4,-18.9,h=4.69) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=24.03 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=4.69rad targetAngle=-0.94rad rawAngDiff=0.65 angVel=0.32 linVel=3 dist=359.1 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.32rad(18.6°) before=(213.4,-18.9,268.9°) after=(213.5,-21.9,272.5°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=217 pos=(213.4,-18.9) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=213.5 y=-21.9 heading=4.76rad (272.5°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=218 pos=(213.5,-21.9) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(213.5,-21.9,h=4.76) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=23.65 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=4.76rad targetAngle=-0.94rad rawAngDiff=0.59 angVel=0.30 linVel=3 dist=356.6 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.30rad(16.9°) before=(213.5,-21.9,272.5°) after=(213.5,-24.9,269.4°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=219 pos=(213.5,-21.9) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=213.5 y=-24.9 heading=4.70rad (269.4°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=220 pos=(213.5,-24.9) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(213.5,-24.9,h=4.70) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=23.08 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=4.70rad targetAngle=-0.93rad rawAngDiff=0.65 angVel=0.32 linVel=3 dist=354.2 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.32rad(18.6°) before=(213.5,-24.9,269.4°) after=(213.4,-27.9,268.1°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=221 pos=(213.5,-24.9) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=213.4 y=-27.9 heading=4.68rad (268.1°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=222 pos=(213.4,-27.9) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(213.4,-27.9,h=4.68) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=22.42 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=4.68rad targetAngle=-0.93rad rawAngDiff=0.68 angVel=0.34 linVel=3 dist=351.9 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.34rad(19.5°) before=(213.4,-27.9,268.1°) after=(213.5,-30.9,272.5°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=223 pos=(213.4,-27.9) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=213.5 y=-30.9 heading=4.76rad (272.5°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=224 pos=(213.5,-30.9) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(213.5,-30.9,h=4.76) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=21.90 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=4.76rad targetAngle=-0.92rad rawAngDiff=0.61 angVel=0.30 linVel=3 dist=349.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.30rad(17.4°) before=(213.5,-30.9,272.5°) after=(213.5,-33.9,269.9°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=225 pos=(213.5,-30.9) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=213.5 y=-33.9 heading=4.71rad (269.9°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=226 pos=(213.5,-33.9) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(213.5,-33.9,h=4.71) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=21.87 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=4.71rad targetAngle=-0.92rad rawAngDiff=0.66 angVel=0.33 linVel=3 dist=347.0 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.33rad(18.8°) before=(213.5,-33.9,269.9°) after=(213.4,-36.9,268.7°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=227 pos=(213.5,-33.9) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=213.4 y=-36.9 heading=4.69rad (268.7°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=228 pos=(213.4,-36.9) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(213.4,-36.9,h=4.69) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=21.70 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=4.69rad targetAngle=-0.91rad rawAngDiff=0.68 angVel=0.34 linVel=3 dist=344.7 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.34rad(19.6°) before=(213.4,-36.9,268.7°) after=(213.3,-39.9,268.3°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=229 pos=(213.4,-36.9) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=213.3 y=-39.9 heading=4.68rad (268.3°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=230 pos=(213.3,-39.9) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(213.3,-39.9,h=4.68) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=21.61 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=4.68rad targetAngle=-0.90rad rawAngDiff=0.70 angVel=0.35 linVel=3 dist=342.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.35rad(19.9°) before=(213.3,-39.9,268.3°) after=(213.5,-42.9,273.2°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=231 pos=(213.3,-39.9) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=213.5 y=-42.9 heading=4.77rad (273.2°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=232 pos=(213.5,-42.9) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(213.5,-42.9,h=4.77) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=21.56 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=4.77rad targetAngle=-0.90rad rawAngDiff=0.61 angVel=0.31 linVel=3 dist=339.9 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.31rad(17.6°) before=(213.5,-42.9,273.2°) after=(213.6,-45.9,270.9°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=233 pos=(213.5,-42.9) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=213.6 y=-45.9 heading=4.73rad (270.9°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=234 pos=(213.6,-45.9) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(213.6,-45.9,h=4.73) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=21.54 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=4.73rad targetAngle=-0.89rad rawAngDiff=0.66 angVel=0.33 linVel=3 dist=337.6 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.33rad(19.0°) before=(213.6,-45.9,270.9°) after=(213.5,-48.9,269.8°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=235 pos=(213.6,-45.9) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=213.5 y=-48.9 heading=4.71rad (269.8°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=236 pos=(213.5,-48.9) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(213.5,-48.9,h=4.71) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=21.37 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=4.71rad targetAngle=-0.89rad rawAngDiff=0.69 angVel=0.34 linVel=3 dist=335.2 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.34rad(19.6°) before=(213.5,-48.9,269.8°) after=(213.5,-51.9,269.5°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=237 pos=(213.5,-48.9) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=213.5 y=-51.9 heading=4.70rad (269.5°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=238 pos=(213.5,-51.9) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(213.5,-51.9,h=4.70) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=21.28 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=4.70rad targetAngle=-0.88rad rawAngDiff=0.70 angVel=0.35 linVel=3 dist=332.9 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.35rad(20.0°) before=(213.5,-51.9,269.5°) after=(213.5,-54.9,269.4°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=239 pos=(213.5,-51.9) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=213.5 y=-54.9 heading=4.70rad (269.4°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=240 pos=(213.5,-54.9) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(213.5,-54.9,h=4.70) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=21.24 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=4.70rad targetAngle=-0.88rad rawAngDiff=0.70 angVel=0.35 linVel=3 dist=330.6 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.35rad(20.2°) before=(213.5,-54.9,269.4°) after=(213.5,-57.9,269.6°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=241 pos=(213.5,-54.9) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=213.5 y=-57.9 heading=4.71rad (269.6°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=242 pos=(213.5,-57.9) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(213.5,-57.9,h=4.71) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=21.06 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=4.71rad targetAngle=-0.87rad rawAngDiff=0.71 angVel=0.35 linVel=3 dist=328.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.35rad(20.2°) before=(213.5,-57.9,269.6°) after=(213.5,-60.9,269.9°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=243 pos=(213.5,-57.9) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=213.5 y=-60.9 heading=4.71rad (269.9°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=244 pos=(213.5,-60.9) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(213.5,-60.9,h=4.71) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=20.96 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=4.71rad targetAngle=-0.86rad rawAngDiff=0.71 angVel=0.35 linVel=3 dist=326.1 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.35rad(20.3°) before=(213.5,-60.9,269.9°) after=(213.5,-63.9,270.2°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=245 pos=(213.5,-60.9) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=213.5 y=-63.9 heading=4.72rad (270.2°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=246 pos=(213.5,-63.9) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(213.5,-63.9,h=4.72) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=20.91 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=4.72rad targetAngle=-0.86rad rawAngDiff=0.71 angVel=0.35 linVel=3 dist=323.8 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.35rad(20.3°) before=(213.5,-63.9,270.2°) after=(214.0,-66.8,280.5°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=247 pos=(213.5,-63.9) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=214.0 y=-66.8 heading=4.90rad (280.5°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=248 pos=(214.0,-66.8) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(214.0,-66.8,h=4.90) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=21.19 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=4.90rad targetAngle=-0.85rad rawAngDiff=0.53 angVel=0.27 linVel=3 dist=321.2 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.27rad(15.3°) before=(214.0,-66.8,280.5°) after=(215.1,-69.6,290.8°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=249 pos=(214.0,-66.8) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=215.1 y=-69.6 heading=5.07rad (290.8°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=250 pos=(215.1,-69.6) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(215.1,-69.6,h=5.07) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=21.55 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.07rad targetAngle=-0.85rad rawAngDiff=0.36 angVel=0.18 linVel=3 dist=318.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.18rad(10.2°) before=(215.1,-69.6,290.8°) after=(216.6,-72.2,301.0°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=251 pos=(215.1,-69.6) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=216.6 y=-72.2 heading=5.25rad (301.0°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=252 pos=(216.6,-72.2) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(216.6,-72.2,h=5.25) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=22.13 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.25rad targetAngle=-0.85rad rawAngDiff=0.18 angVel=0.09 linVel=3 dist=315.4 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=0.09rad(5.2°) before=(216.6,-72.2,301.0°) after=(218.8,-74.3,316.2°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=253 pos=(216.6,-72.2) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=218.8 y=-74.3 heading=5.52rad (316.2°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=254 pos=(218.8,-74.3) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(218.8,-74.3,h=5.52) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=22.79 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.52rad targetAngle=-0.85rad rawAngDiff=-0.09 angVel=-0.04 linVel=3 dist=312.5 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=-0.04rad(-2.4°) before=(218.8,-74.3,316.2°) after=(218.8,-74.3,313.7°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=255 pos=(218.8,-74.3) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=218.8 y=-74.3 heading=5.48rad (313.7°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=256 pos=(218.8,-74.3) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(218.8,-74.3,h=5.48) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=20.49 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.48rad targetAngle=-0.85rad rawAngDiff=-0.04 angVel=-0.02 linVel=3 dist=312.5 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=-0.02rad(-1.2°) before=(218.8,-74.3,313.7°) after=(218.8,-74.3,312.5°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=257 pos=(218.8,-74.3) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=218.8 y=-74.3 heading=5.45rad (312.5°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=258 pos=(218.8,-74.3) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(218.8,-74.3,h=5.45) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=18.19 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.45rad targetAngle=-0.85rad rawAngDiff=-0.02 angVel=-0.01 linVel=3 dist=312.5 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=-0.01rad(-0.6°) before=(218.8,-74.3,312.5°) after=(218.8,-74.3,311.9°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=259 pos=(218.8,-74.3) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=218.8 y=-74.3 heading=5.44rad (311.9°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=260 pos=(218.8,-74.3) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(218.8,-74.3,h=5.44) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=15.91 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.44rad targetAngle=-0.85rad rawAngDiff=-0.01 angVel=-0.01 linVel=3 dist=312.5 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=-0.01rad(-0.3°) before=(218.8,-74.3,311.9°) after=(218.8,-74.3,311.6°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=261 pos=(218.8,-74.3) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=218.8 y=-74.3 heading=5.44rad (311.6°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=262 pos=(218.8,-74.3) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(218.8,-74.3,h=5.44) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=13.62 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.44rad targetAngle=-0.85rad rawAngDiff=-0.01 angVel=-0.00 linVel=3 dist=312.5 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=-0.00rad(-0.2°) before=(218.8,-74.3,311.6°) after=(218.8,-74.3,311.5°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=263 pos=(218.8,-74.3) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=218.8 y=-74.3 heading=5.44rad (311.5°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=264 pos=(218.8,-74.3) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(218.8,-74.3,h=5.44) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=11.34 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.44rad targetAngle=-0.85rad rawAngDiff=-0.00 angVel=-0.00 linVel=3 dist=312.5 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=-0.00rad(-0.1°) before=(218.8,-74.3,311.5°) after=(218.8,-74.3,311.4°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=265 pos=(218.8,-74.3) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=218.8 y=-74.3 heading=5.43rad (311.4°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=266 pos=(218.8,-74.3) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(218.8,-74.3,h=5.43) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=8.75 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.43rad targetAngle=-0.85rad rawAngDiff=-0.00 angVel=-0.00 linVel=3 dist=312.5 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=-0.00rad(-0.0°) before=(218.8,-74.3,311.4°) after=(218.8,-74.3,311.3°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=267 pos=(218.8,-74.3) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=218.8 y=-74.3 heading=5.43rad (311.3°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=268 pos=(218.8,-74.3) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(218.8,-74.3,h=5.43) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=5.94 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.43rad targetAngle=-0.85rad rawAngDiff=-0.00 angVel=-0.00 linVel=3 dist=312.5 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=-0.00rad(-0.0°) before=(218.8,-74.3,311.3°) after=(218.8,-74.3,311.3°) simulator.js:273:13
+[SRA] update: idx=4/9 ticks=269 pos=(218.8,-74.3) updated={"position":false,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[SIM-BRIDGE] odom→position x=218.8 y=-74.3 heading=5.43rad (311.3°) simulator.js:328:15
+[SRA] update: idx=4/9 ticks=270 pos=(218.8,-74.3) updated={"position":true,"routeUpdate":false,"waypointReached":false} simple_route_agent.js:34:17
+[LP] update called. mode=greedy updated={"odom":true,"targetWaypoint":false} odom=(218.8,-74.3,h=5.43) target=(425.0,-309.0) local_planner.js:47:17
+[LP-EVAL] changeInDist=2.99 changeInTime=0.00 progress=Infinity timerDone=false local_planner.js:108:21
+[LP-GREEDY] heading=5.43rad targetAngle=-0.85rad rawAngDiff=-0.00 angVel=-0.00 linVel=3 dist=312.5 local_planner.js:159:21
+[MOVE] linDist=3.00 angDist=-0.00rad(-0.0°) before=(218.8,-74.3,311.3°) after=(218.8,-74.3,311.3°) simulator.js:273:13

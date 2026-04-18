@@ -1,0 +1,157 @@
+styles:
+  marker:
+    r: 5
+    stroke: '#f2f2f2'
+    fill: '#0ea5e9'
+    lineWidth: 2
+    font: 12px monospace
+    color: '#f2f2f2'
+  route:
+    stroke: '#fbbf24'
+    lineWidth: 2
+    r: 3
+    fill: '#fbbf24'
+  obstacle:
+    stroke: '#e11d48'
+    fill: rgba(225,29,72,0.2)
+    lineWidth: 2
+  gasNode:
+    stroke: '#22c55e'
+    lineWidth: 2
+
+markers:
+  - id: marker-start
+    x: 600
+    y: 450
+    label: Start
+  - id: marker-loco
+    x: 950
+    y: 10
+    label: Locomotive
+  - id: marker-wreck
+    x: 420
+    y: -100
+    label: Wreck Center
+  - id: marker-gasleak
+    x: 300
+    y: -200
+    label: Gas Leak
+  - id: marker-caboose
+    x: 20
+    y: -200
+    label: Caboose
+
+routes:
+  # Agent survey route - approaches from the south, circles the wreck
+  - id: route-survey
+    points:
+      - {x: 600, y: 400}
+      - {x: 800, y: 250}
+      - {x: 1000, y: 100}
+      - {x: 900, y: -100}
+      - {x: 700, y: -150}
+      - {x: 500, y: -200}
+      - {x: 300, y: -250}
+      - {x: 150, y: -280}
+      - {x: 0, y: -250}
+      - {x: -50, y: -100}
+      - {x: 100, y: 0}
+      - {x: 300, y: -50}
+      - {x: 500, y: -80}
+
+obstacles:
+  # === Track bed (two parallel rails) ===
+#   - id: obstacle-rail-r1
+#     x: 700
+#     y: -8
+#     w: 1200
+#     h: 6
+#     angle: 0
+#   - id: obstacle-rail-r2
+#     x: 700
+#     y: 8
+#     w: 1200
+#     h: 6
+#     angle: 0
+
+  # === Locomotive - front of train, barely off track ===
+  - id: obstacle-loco
+    x: 950
+    y: 10
+    w: 220
+    h: 60
+    angle: 0.05
+
+  # === Tender car - just behind locomotive, slightly displaced ===
+  - id: obstacle-tender
+    x: 720
+    y: -15
+    w: 160
+    h: 45
+    angle: -0.1
+
+  # === Car 2 - beginning to jackknife ===
+  - id: obstacle-car2
+    x: 540
+    y: -60
+    w: 160
+    h: 45
+    angle: -0.35
+
+  # === Car 3 - ruptured tank car, source of gas leak ===
+  - id: obstacle-tankcar
+    x: 360
+    y: -150
+    w: 180
+    h: 50
+    angle: -0.65
+
+  # === Car 4 - thrown to the opposite side ===
+  - id: obstacle-car4
+    x: 200
+    y: -70
+    w: 160
+    h: 45
+    angle: 0.45
+
+  # === Caboose - completely derailed and rotated ===
+  - id: obstacle-caboose
+    x: 40
+    y: -190
+    w: 120
+    h: 40
+    angle: -1.1
+
+  # === Debris scattered around the wreck ===
+  - id: obstacle-debris1
+    x: 460
+    y: -110
+    w: 30
+    h: 20
+    angle: 0.8
+  - id: obstacle-debris2
+    x: 400
+    y: -50
+    w: 25
+    h: 15
+    angle: 1.3
+  - id: obstacle-debris3
+    x: 280
+    y: -100
+    w: 35
+    h: 20
+    angle: -0.4
+  - id: obstacle-debris4
+    x: 140
+    y: -140
+    w: 20
+    h: 20
+    angle: 0.6
+
+gasNodes:
+  # Gas leak from the ruptured tank car
+  - id: gas-tankleak
+    x: 330
+    y: -180
+    radius: 300
+    peak: 2.5

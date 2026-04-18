@@ -1,0 +1,34 @@
+#!/usr/bin/env sh
+#
+# Bundle the gas_simulator into a self-contained HTML at docs/index.html
+# for GitHub Pages.
+#
+# Pipeline:
+#   1. deno bundle — resolve main.js + all its ES-module deps → one JS file
+#   2. write a temp index.html that references the bundled JS instead of main.js
+#   3. run jeff-hykin/html-bundle to inline the JS + CSS + images into one HTML
+#   4. copy maps/ into docs/ so runtime fetches for YAML + backgrounds still work
+#
+set -e
+cd "$(dirname "$0")/.."
+
+TMPDIR="$(mktemp -d)"
+trap 'rm -rf "$TMPDIR"' EXIT
+
+echo "[bundle] deno bundle main.js → $TMPDIR/bundled_main.js"
+deno bundle -I main.js -o "$TMPDIR/bundled_main.js"
+
+echo "[bundle] rewriting index.html script tag"
+sed 's|<script type="module" src="./main.js"></script>|<script src="./bundled_main.js"></script>|' \
+    index.html > "$TMPDIR/index.html"
+
+echo "[bundle] running jeff-hykin/html-bundle"
+mkdir -p docs
+deno run -A https://esm.sh/gh/jeff-hykin/html-bundle@0.0.3.0/main/html-bundle.js \
+    -- "$TMPDIR/index.html" docs/index.html
+
+echo "[bundle] copying maps/ → docs/maps/"
+rm -rf docs/maps
+cp -R maps docs/maps
+
+echo "[bundle] ✓ docs/index.html"
