@@ -18,8 +18,8 @@ export function createCanvasSystem({ width = 800, height = 600 } = {}) {
   canvas.height = height * pixelRatio;
   canvas.style.width = `${width}px`;
   canvas.style.height = `${height}px`;
-  canvas.style.border = '1px solid #222';
-  canvas.style.background = '#0f0f10';
+  canvas.style.border = 'none';
+  canvas.style.background = '#e5e5ea';
   ctx.scale(pixelRatio, pixelRatio);
 
   const world = [];
@@ -231,7 +231,8 @@ export function createCanvasSystem({ width = 800, height = 600 } = {}) {
   }
 
   function render() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#e5e5ea';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.save();
     if (backgroundImage) {
       const screenW = backgroundImage.naturalWidth * state.scale;

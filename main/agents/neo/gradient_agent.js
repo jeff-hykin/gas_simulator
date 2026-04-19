@@ -38,6 +38,7 @@ function create({
             maxGasReading:     null,
             mode:              "idle",
             gasFollowCounter:  0,
+            gasFollowWaypoint: null,
             currentHeading:    null,
             gasDotCount:       0,
             prevMaxGasForDot:  null,
@@ -109,31 +110,38 @@ function create({
             && state.gasReading > gasThreshold) {
             state.mode = "gasFollow"
             state.gasFollowCounter = gasFollowDuration
+            state.gasFollowWaypoint = null // will be set on first position update
             // lock in current heading — we'll just keep going straight
             state.currentHeading = (position != null && position.heading != null) ? position.heading : 0
             outputs.toast = { message: `Gas detected — following gradient (${state.gasReading.toFixed(2)} PPM)`, type: "success" }
         }
 
         // Gas follow: go straight in the locked heading until countdown expires.
-        // No sensing, no turning — this is the dumb gradient follower.
+        // Only set waypoint once (or when previous one is reached), not every tick.
         if (state.mode === "gasFollow" && position != null) {
             state.gasFollowCounter = state.gasFollowCounter - 1
 
             if (state.currentHeading != null) {
-                const wp = {
-                    x: position.x + Math.cos(state.currentHeading) * stepDistance,
-                    y: position.y + Math.sin(state.currentHeading) * stepDistance,
+                // Only publish a new waypoint if we don't have one yet or the previous was reached
+                const needsNewWaypoint = state.gasFollowWaypoint == null || updated.waypointReached
+                if (needsNewWaypoint) {
+                    const wp = {
+                        x: position.x + Math.cos(state.currentHeading) * stepDistance,
+                        y: position.y + Math.sin(state.currentHeading) * stepDistance,
+                    }
+                    state.gasFollowWaypoint = wp
+                    outputs.targetWaypoint = wp
+                    outputs.visualizePoints = [
+                        ...(outputs.visualizePoints || []),
+                        { id: 'gradTarget', x: wp.x, y: wp.y, color: '#ffaa00', r: 6, label: 'G' },
+                    ]
                 }
-                outputs.targetWaypoint = wp
-                outputs.visualizePoints = [
-                    ...(outputs.visualizePoints || []),
-                    { id: 'gradTarget', x: wp.x, y: wp.y, color: '#ffaa00', r: 6, label: 'G' },
-                ]
             }
 
             if (state.gasFollowCounter <= 0) {
                 state.mode = "routeFollow"
                 state.currentHeading = null
+                state.gasFollowWaypoint = null
                 outputs.toast = { message: "Resuming route", type: "info" }
                 outputs.visualizePoints = [
                     ...(outputs.visualizePoints || []),
