@@ -17,9 +17,9 @@ function gasToColor(t) {
 function create({
     gasThreshold = 0.120,
     gasFollowDuration = 400,
-    sampleInterval = 3,        // time units between gas samples
-    turnAngle = Math.PI / 6,   // 30 degrees in radians
-    stepDistance = 30,
+    sampleInterval = 1,        // time units between gas samples
+    turnAngle = Math.PI / 4,   // 45 degrees in radians
+    stepDistance = 15,
     routeAgentConfig = {},
 } = {}) {
     const routeAgent = simpleRouteAgent.create(routeAgentConfig)
@@ -140,15 +140,15 @@ function create({
         if (state.mode === "gasFollow" && position != null) {
             state.gasFollowCounter = state.gasFollowCounter - 1
 
-            // if no change between samples, turn 30 degrees randomly
-            if (state.currentSample === state.prevSample && state.currentHeading != null) {
-                const direction = Math.random() < 0.5 ? -1 : 1
-                state.currentHeading = state.currentHeading + direction * turnAngle
-            }
-
-            // Only publish a new waypoint if we don't have one yet or the previous was reached
+            // Place waypoint on entry or when previous one was reached
             const needsNewWaypoint = state.gasFollowWaypoint == null || updated.waypointReached
             if (needsNewWaypoint && state.currentHeading != null) {
+                // On waypoint reached: if no gas change between samples, jiggle heading
+                if (updated.waypointReached && state.currentSample === state.prevSample) {
+                    const direction = Math.random() < 0.5 ? -1 : 1
+                    state.currentHeading = state.currentHeading + direction * turnAngle
+                    console.log(`[DUMB_LOBSTER] jiggle ${direction > 0 ? '+' : '-'}${(turnAngle * 180 / Math.PI).toFixed(0)}° heading=${(state.currentHeading * 180 / Math.PI).toFixed(1)}°`)
+                }
                 const wp = {
                     x: position.x + Math.cos(state.currentHeading) * stepDistance,
                     y: position.y + Math.sin(state.currentHeading) * stepDistance,

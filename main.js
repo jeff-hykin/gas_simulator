@@ -5,13 +5,15 @@ import { createPubSub } from './main/tooling/pubsub.js';
 import gradientAgent from './main/agents/neo/gradient_agent.js';
 import dumbLobsterAgent from './main/agents/neo/dumb_lobster_agent.js';
 import smartLobsterAgent from './main/agents/neo/smart_lobster_agent.js';
+import mediocreLobsterAgent from './main/agents/neo/mediocre_lobster_agent.js';
 import baselineAgent from './main/agents/neo/baseline_agent.js';
 
 const AGENT_OPTIONS = [
-  { label: 'smart_lobster', agent: smartLobsterAgent },
-  { label: 'dumb_lobster',  agent: dumbLobsterAgent },
-  { label: 'gradient',      agent: gradientAgent },
-  { label: 'baseline',      agent: baselineAgent },
+  { label: 'smart_lobster',    agent: smartLobsterAgent },
+  { label: 'mediocre_lobster', agent: mediocreLobsterAgent },
+  { label: 'dumb_lobster',     agent: dumbLobsterAgent },
+  { label: 'gradient',         agent: gradientAgent },
+  { label: 'baseline',         agent: baselineAgent },
 ];
 let selectedGasAgent = AGENT_OPTIONS[0].agent;
 
