@@ -138,7 +138,10 @@ function create({
 
         // ── Gas follow ─────────────────────────────────────────────
         if (state.mode === "gasFollow" && position != null) {
-            state.gasFollowCounter = state.gasFollowCounter - 1
+            // Only decrement on position updates (the actual tick), not on every input event
+            if (updated.position) {
+                state.gasFollowCounter = state.gasFollowCounter - 1
+            }
 
             // Place waypoint on entry or when previous one was reached
             const needsNewWaypoint = state.gasFollowWaypoint == null || updated.waypointReached

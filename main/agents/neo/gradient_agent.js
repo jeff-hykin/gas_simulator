@@ -125,7 +125,9 @@ function create({
         // Gas follow: go straight in the locked heading until countdown expires.
         // Only set waypoint once (or when previous one is reached), not every tick.
         if (state.mode === "gasFollow" && position != null) {
-            state.gasFollowCounter = state.gasFollowCounter - 1
+            if (updated.position) {
+                state.gasFollowCounter = state.gasFollowCounter - 1
+            }
 
             if (state.currentHeading != null) {
                 // Only publish a new waypoint if we don't have one yet or the previous was reached
