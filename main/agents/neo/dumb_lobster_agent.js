@@ -16,7 +16,7 @@ function gasToColor(t) {
 
 function create({
     gasThreshold = 0.120,
-    gasFollowDuration = 400,
+    gasFollowDuration = 1200,
     sampleInterval = 1,        // time units between gas samples
     turnAngle = Math.PI / 4,   // 45 degrees in radians
     stepDistance = 15,
