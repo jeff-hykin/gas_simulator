@@ -1,7 +1,7 @@
 import simpleRouteAgent from './simple_route_agent.js'
 
 const info = {
-    inputs: ["position", "routeUpdate", "waypointReached", "gasReading", "maxGasReading"],
+    inputs: ["position", "routeUpdate", "waypointReached", "maxGasReading"],
     outputs: ["targetWaypoint", "logJson", "visualizePoints", "visualizeLines", "toast"],
 }
 
@@ -16,7 +16,7 @@ function gasToColor(t) {
 
 function create({
     gasThreshold = 0.120,
-    gasFollowDuration = 200,
+    gasFollowDuration = 400,
     sampleInterval = 3,        // time units between gas samples
     turnAngle = Math.PI / 6,   // 30 degrees in radians
     stepDistance = 30,
@@ -29,17 +29,17 @@ function create({
             position:        false,
             routeUpdate:     false,
             waypointReached: false,
-            gasReading:      false,
             maxGasReading:   false,
         },
         state: {
             position:          null,
             routeUpdate:       null,
             waypointReached:   null,
-            gasReading:        null,
             maxGasReading:     null,
             mode:              "idle",
             gasFollowCounter:  0,
+            gasFollowWaypoint: null,
+            lastTriggeredMaxGas: 0,
             currentHeading:    null,
             prevSample:        0,
             currentSample:     0,
@@ -84,13 +84,12 @@ function create({
             state.prevMaxGasForDot = state.maxGasReading
         }
 
-        // ── Sample gas every sampleInterval time units ─────────────
-        if (updated.gasReading && state.gasReading != null) {
+        // ── Sample gas every sampleInterval time units (using max reading) ──
+        if (updated.maxGasReading && state.maxGasReading != null) {
             const shouldSample = state.lastSampleTime === null || (time - state.lastSampleTime) >= sampleInterval
             if (shouldSample) {
                 state.prevSample = state.currentSample
-                // only see increases
-                state.currentSample = Math.max(state.currentSample, state.gasReading)
+                state.currentSample = state.maxGasReading
                 state.lastSampleTime = time
             }
         }
@@ -120,19 +119,21 @@ function create({
             if (ro.logJson        != null) outputs.logJson = { ...outputs.logJson, ...ro.logJson }
         }
 
-        // ── Switch: routeFollow → gasFollow when threshold hit ─────
+        // ── Switch: routeFollow → gasFollow when max gas increases past threshold ──
+        const reTriggerMargin = (state.lastTriggeredMaxGas || 0) * 0.2
         if (state.mode === "routeFollow"
-            && state.gasReading != null
-            && state.gasReading > gasThreshold) {
+            && updated.maxGasReading
+            && state.maxGasReading != null
+            && state.maxGasReading > gasThreshold
+            && state.maxGasReading > (state.lastTriggeredMaxGas || 0) + reTriggerMargin) {
             state.mode = "gasFollow"
             state.gasFollowCounter = gasFollowDuration
+            state.gasFollowWaypoint = null
+            state.lastTriggeredMaxGas = state.maxGasReading
             // start heading in current robot direction
-            if (position != null && position.heading != null) {
-                state.currentHeading = position.heading
-            } else {
-                state.currentHeading = 0
-            }
-            outputs.toast = { message: `Gas detected — following gradient (${state.gasReading.toFixed(2)} PPM)`, type: "success" }
+            state.currentHeading = (position != null && position.heading != null) ? position.heading : 0
+            console.log(`[DUMB_LOBSTER] → gasFollow maxGas=${state.maxGasReading.toFixed(4)} lastTrigger=${state.lastTriggeredMaxGas.toFixed(4)}`)
+            outputs.toast = { message: `Gas detected — following gradient (${state.maxGasReading.toFixed(2)} PPM)`, type: "success" }
         }
 
         // ── Gas follow ─────────────────────────────────────────────
@@ -145,12 +146,14 @@ function create({
                 state.currentHeading = state.currentHeading + direction * turnAngle
             }
 
-            // place waypoint ahead
-            if (state.currentHeading != null) {
+            // Only publish a new waypoint if we don't have one yet or the previous was reached
+            const needsNewWaypoint = state.gasFollowWaypoint == null || updated.waypointReached
+            if (needsNewWaypoint && state.currentHeading != null) {
                 const wp = {
                     x: position.x + Math.cos(state.currentHeading) * stepDistance,
                     y: position.y + Math.sin(state.currentHeading) * stepDistance,
                 }
+                state.gasFollowWaypoint = wp
                 outputs.targetWaypoint = wp
                 outputs.visualizePoints = [
                     ...(outputs.visualizePoints || []),
@@ -162,8 +165,11 @@ function create({
             if (state.gasFollowCounter <= 0) {
                 state.mode = "routeFollow"
                 state.currentHeading = null
+                state.gasFollowWaypoint = null
                 state.prevSample = 0
                 state.currentSample = 0
+                state.lastTriggeredMaxGas = state.maxGasReading || state.lastTriggeredMaxGas
+                console.log(`[DUMB_LOBSTER] → routeFollow (countdown done) lastTrigger now=${(state.lastTriggeredMaxGas||0).toFixed(4)}`)
                 outputs.toast = { message: "Resuming route", type: "info" }
                 outputs.visualizePoints = [
                     ...(outputs.visualizePoints || []),
@@ -178,7 +184,7 @@ function create({
         outputs.logJson = {
             mode: state.mode,
             countdown: state.gasFollowCounter,
-            rawGas: (state.gasReading || 0).toFixed(3),
+            gas: (state.maxGasReading || 0).toFixed(3),
             prevSample: state.prevSample.toFixed(3),
             currentSample: state.currentSample.toFixed(3),
             sampleDelta: sampleDelta.toFixed(4),
