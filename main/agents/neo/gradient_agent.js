@@ -1,7 +1,7 @@
 import simpleRouteAgent from './simple_route_agent.js'
 
 const info = {
-    inputs: ["position", "routeUpdate", "waypointReached", "gasReading", "maxGasReading"],
+    inputs: ["position", "routeUpdate", "waypointReached", "maxGasReading"],
     outputs: ["targetWaypoint", "logJson", "visualizePoints", "visualizeLines", "toast"],
 }
 
@@ -16,7 +16,7 @@ function gasToColor(t) {
 
 function create({
     gasThreshold = 0.120,
-    gasFollowDuration = 200,  // ticks to stay in gasFollow once engaged
+    gasFollowDuration = 400,  // ticks to stay in gasFollow once engaged
     stepDistance = 30,
     routeAgentConfig = {},
 } = {}) {
@@ -27,18 +27,17 @@ function create({
             position:        false,
             routeUpdate:     false,
             waypointReached: false,
-            gasReading:      false,
             maxGasReading:   false,
         },
         state: {
             position:          null,
             routeUpdate:       null,
             waypointReached:   null,
-            gasReading:        null,
             maxGasReading:     null,
             mode:              "idle",
             gasFollowCounter:  0,
             gasFollowWaypoint: null,
+            lastTriggeredMaxGas: 0,
             currentHeading:    null,
             gasDotCount:       0,
             prevMaxGasForDot:  null,
@@ -104,16 +103,23 @@ function create({
             if (ro.logJson        != null) outputs.logJson = { ...outputs.logJson, ...ro.logJson }
         }
 
-        // Switch: routeFollow → gasFollow when threshold hit
+        // Switch: routeFollow → gasFollow when max gas reading crosses threshold
+        // Only trigger on the actual maxGasReading update event (not stale state),
+        // and only if the reading has increased meaningfully (>20%) since we last triggered.
+        const reTriggerMargin = (state.lastTriggeredMaxGas || 0) * 0.2
         if (state.mode === "routeFollow"
-            && state.gasReading != null
-            && state.gasReading > gasThreshold) {
+            && updated.maxGasReading
+            && state.maxGasReading != null
+            && state.maxGasReading > gasThreshold
+            && state.maxGasReading > (state.lastTriggeredMaxGas || 0) + reTriggerMargin) {
             state.mode = "gasFollow"
             state.gasFollowCounter = gasFollowDuration
             state.gasFollowWaypoint = null // will be set on first position update
+            state.lastTriggeredMaxGas = state.maxGasReading
             // lock in current heading — we'll just keep going straight
             state.currentHeading = (position != null && position.heading != null) ? position.heading : 0
-            outputs.toast = { message: `Gas detected — following gradient (${state.gasReading.toFixed(2)} PPM)`, type: "success" }
+            console.log(`[GRADIENT] → gasFollow maxGas=${state.maxGasReading.toFixed(4)} lastTrigger=${state.lastTriggeredMaxGas.toFixed(4)} threshold=${gasThreshold}`)
+            outputs.toast = { message: `Gas detected — following gradient (${state.maxGasReading.toFixed(2)} PPM)`, type: "success" }
         }
 
         // Gas follow: go straight in the locked heading until countdown expires.
@@ -142,6 +148,9 @@ function create({
                 state.mode = "routeFollow"
                 state.currentHeading = null
                 state.gasFollowWaypoint = null
+                // Snapshot current max so we don't re-trigger from the same gas field
+                state.lastTriggeredMaxGas = state.maxGasReading || state.lastTriggeredMaxGas
+                console.log(`[GRADIENT] → routeFollow (countdown done) lastTrigger now=${(state.lastTriggeredMaxGas||0).toFixed(4)}`)
                 outputs.toast = { message: "Resuming route", type: "info" }
                 outputs.visualizePoints = [
                     ...(outputs.visualizePoints || []),
@@ -153,7 +162,7 @@ function create({
         outputs.logJson = {
             mode: state.mode,
             countdown: state.gasFollowCounter,
-            gas: (state.gasReading || 0).toFixed(3),
+            gas: (state.maxGasReading || 0).toFixed(3),
             heading: state.currentHeading != null ? (state.currentHeading * 180 / Math.PI).toFixed(0) + '°' : 'none',
             ...outputs.logJson,
         }

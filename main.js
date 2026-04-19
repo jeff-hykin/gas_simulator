@@ -521,7 +521,7 @@ const _origUpdateJsonState = updateJsonStateDisplay;
 
 const gearBtn = document.createElement('button');
 gearBtn.className = 'controls-toggle';
-gearBtn.innerHTML = '&#9881;'; // ⚙
+gearBtn.innerHTML = '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="3"/><path d="M10 1.5v2M10 16.5v2M18.5 10h-2M3.5 10h-2M16 4l-1.4 1.4M5.4 14.6L4 16M16 16l-1.4-1.4M5.4 5.4L4 4"/></svg>';
 gearBtn.title = 'Settings';
 
 const drawer = document.createElement('div');
@@ -591,7 +591,7 @@ drawer.append(sim.gasReadout);
 document.body.append(gearBtn, drawer);
 
 // ── Load default map on startup ───────────────────────────────────────
-let defaultMap = './maps/train_real.yaml';
+let defaultMap = './maps/chemical_plant.yaml';
 fetch(defaultMap)
   .then((response) => response.text())
   .then((yamlText) => {

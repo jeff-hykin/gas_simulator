@@ -38,9 +38,9 @@
       /* ── Mode badge (above status bar, persistent) ────────────── */
       .mode-indicator {
         position: fixed;
-        bottom: 96px;
+        bottom: 126px;
         left: 50%;
-        transform: translateX(-50%);
+        transform: translateX(-50%) scale(1.8);
         padding: 8px 24px;
         border-radius: 22px;
         font-size: 14px;
@@ -222,11 +222,14 @@
         -webkit-backdrop-filter: blur(40px) saturate(180%);
         color: var(--muted);
         font-size: 20px;
+        line-height: 1;
         cursor: pointer;
         z-index: 200;
         display: flex;
         align-items: center;
         justify-content: center;
+        padding: 0;
+        text-indent: 0;
         transition: transform 0.3s ease, color 0.2s ease, border-color 0.2s ease;
       }
       .controls-toggle:hover {
