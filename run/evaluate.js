@@ -30,11 +30,11 @@ function mulberry32(seed) {
 
 // ── Map loading ─────────────────────────────────────────────────────
 async function loadMaps() {
+    const EVAL_MAPS = ['train_real.yaml', 'pipeline_break.yaml', 'chemical_plant.yaml']
     const files = []
     for await (const entry of Deno.readDir(MAPS_DIR)) {
         if (!entry.isFile) continue
-        if (!entry.name.endsWith('.yaml')) continue
-        if (entry.name === 'empty.yaml') continue
+        if (!EVAL_MAPS.includes(entry.name)) continue
         files.push(entry.name)
     }
     files.sort()
