@@ -39,6 +39,7 @@ function create({
             mode:              "idle",
             gasFollowCounter:  0,
             gasFollowWaypoint: null,
+            scentLost:         false,
             lastTriggeredMaxGas: 0,
             currentHeading:    null,
             prevSample:        0,
@@ -129,6 +130,7 @@ function create({
             state.mode = "gasFollow"
             state.gasFollowCounter = gasFollowDuration
             state.gasFollowWaypoint = null
+            state.scentLost = false
             state.lastTriggeredMaxGas = state.maxGasReading
             // start heading in current robot direction
             state.currentHeading = (position != null && position.heading != null) ? position.heading : 0
@@ -148,6 +150,10 @@ function create({
             if (needsNewWaypoint && state.currentHeading != null) {
                 // On waypoint reached: if no gas change between samples, jiggle heading
                 if (updated.waypointReached && state.currentSample === state.prevSample) {
+                    if (!state.scentLost) {
+                        state.scentLost = true
+                        outputs.toast = { message: "Scent lost, starting random movement", type: "warning" }
+                    }
                     const direction = Math.random() < 0.5 ? -1 : 1
                     state.currentHeading = state.currentHeading + direction * turnAngle
                     console.log(`[DUMB_LOBSTER] jiggle ${direction > 0 ? '+' : '-'}${(turnAngle * 180 / Math.PI).toFixed(0)}° heading=${(state.currentHeading * 180 / Math.PI).toFixed(1)}°`)
