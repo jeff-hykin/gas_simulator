@@ -15,7 +15,10 @@ const AGENT_OPTIONS = [
 ];
 let selectedGasAgent = AGENT_OPTIONS[0].agent;
 
-const canvasSys = createCanvasSystem({ width: 1100, height: 830 });
+const canvasSys = createCanvasSystem({ width: window.innerWidth, height: window.innerHeight });
+window.addEventListener('resize', () => {
+  canvasSys.setSize(window.innerWidth, window.innerHeight);
+});
 
 // Visualization points by ID (for debugging/analysis)
 const visualizationPointsById = new Map();
@@ -68,8 +71,10 @@ function buildButton(label, onClick) {
 
 function updateAgentButtons() {
   const running = sim.isClockRunning;
-  btnToggle.textContent = running ? 'Pause' : 'Play';
-  btnToggle.classList.toggle('is-active', running);
+  if (btnToggle) {
+    btnToggle.innerHTML = running ? '&#9646;&#9646;' : '&#9654;'; // ⏸ or ▶
+    btnToggle.classList.toggle('is-playing', running);
+  }
 }
 
 function playAgent() {
@@ -274,29 +279,36 @@ function pauseAgent() {
   updateAgentButtons();
 }
 
+// Fields to show prominently in the status bar (in order)
+const STATUS_FIELDS = ['mode', 'heading', 'time'];
+// Fields to show when space permits (second tier)
+const EXTRA_FIELDS = ['steer', 'maxGas', 'peakGas', 'productivity'];
+
 function updateJsonStateDisplay() {
-  if (!jsonStateDisplay) return;
+  if (typeof dynamicFieldsContainer === 'undefined' || !dynamicFieldsContainer) return;
+  dynamicFieldsContainer.innerHTML = '';
 
-  // Clear existing content
-  jsonStateDisplay.innerHTML = '';
-
-  // Display each key-value pair
-  Object.entries(currentJsonState).forEach(([key, value]) => {
-    const entry = document.createElement('div');
-    entry.className = 'json-entry';
-
-    const keySpan = document.createElement('span');
-    keySpan.className = 'json-key';
-    keySpan.textContent = key + ': ';
-
-    const valueSpan = document.createElement('span');
-    valueSpan.className = 'json-value';
-    valueSpan.textContent = typeof value === 'object' ? JSON.stringify(value) : String(value);
-
-    entry.appendChild(keySpan);
-    entry.appendChild(valueSpan);
-    jsonStateDisplay.appendChild(entry);
-  });
+  const allFields = [...STATUS_FIELDS, ...EXTRA_FIELDS];
+  for (const key of allFields) {
+    if (!(key in currentJsonState)) continue;
+    const value = currentJsonState[key];
+    const field = document.createElement('div');
+    field.className = 'status-field';
+    const label = document.createElement('div');
+    label.className = 'field-label';
+    label.textContent = key;
+    const val = document.createElement('div');
+    val.className = 'field-value';
+    if (typeof value === 'number') {
+      val.textContent = Number.isInteger(value) ? String(value) : value.toFixed(2);
+    } else if (typeof value === 'object') {
+      val.textContent = JSON.stringify(value);
+    } else {
+      val.textContent = String(value);
+    }
+    field.append(label, val);
+    dynamicFieldsContainer.append(field);
+  }
 }
 
 function resetAgent() {
@@ -346,45 +358,28 @@ function showToast(message, type = 'info', duration = 3000) {
 
 // ── Layout ────────────────────────────────────────────────────────────
 
-// Canvas goes directly in body, wrapped so the legend can overlay it
-const canvasWrap = document.createElement('div');
-canvasWrap.style.position = 'relative';
-canvasWrap.style.display = 'inline-block';
-canvasWrap.append(canvasSys.canvas);
+// Canvas fills the viewport
+document.body.append(canvasSys.canvas);
 
+// Legend — top-left overlay
 const legend = document.createElement('div');
 legend.className = 'canvas-legend';
-Object.assign(legend.style, {
-  position: 'absolute',
-  top: '10px',
-  left: '10px',
-  padding: '8px 10px',
-  background: 'rgba(15,15,16,0.78)',
-  border: '1px solid #333',
-  borderRadius: '4px',
-  font: '12px monospace',
-  color: '#eaeaea',
-  pointerEvents: 'none',
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '4px',
-});
 const legendEntries = [
-  { label: 'agent',      stroke: '#22d3ee', fill: 'rgba(34,211,238,0.2)' },
-  { label: 'route',      stroke: '#fbbf24', fill: '#fbbf24' },
-  { label: 'building',   stroke: '#e11d48', fill: 'rgba(225,29,72,0.2)' },
-  { label: 'gas',        stroke: '#a855f7', fill: 'transparent' },
-  { label: 'smell lost point', stroke: '#22c55e', fill: '#22c55e' },
+  { label: 'Agent',     stroke: '#22d3ee', fill: 'rgba(34,211,238,0.2)' },
+  { label: 'Route',     stroke: '#fbbf24', fill: '#fbbf24' },
+  { label: 'Building',  stroke: '#e11d48', fill: 'rgba(225,29,72,0.2)' },
+  { label: 'Gas',       stroke: '#a855f7', fill: 'transparent' },
+  { label: 'Smell lost', stroke: '#22c55e', fill: '#22c55e' },
 ];
 for (const entry of legendEntries) {
   const row = document.createElement('div');
   Object.assign(row.style, { display: 'flex', alignItems: 'center', gap: '8px' });
   const swatch = document.createElement('div');
   Object.assign(swatch.style, {
-    width: '14px',
-    height: '14px',
+    width: '12px', height: '12px',
     border: `2px solid ${entry.stroke}`,
     background: entry.fill,
+    borderRadius: '3px',
     boxSizing: 'border-box',
   });
   const text = document.createElement('span');
@@ -392,36 +387,19 @@ for (const entry of legendEntries) {
   row.append(swatch, text);
   legend.append(row);
 }
-canvasWrap.append(legend);
+document.body.append(legend);
 
-// Layer toggle panel — bottom-left overlay (anchored to viewport)
+// Layer toggle panel — bottom-left
 const layerPanel = document.createElement('div');
 layerPanel.className = 'canvas-layer-panel';
-Object.assign(layerPanel.style, {
-  position: 'fixed',
-  bottom: '10px',
-  left: '10px',
-  zIndex: '10',
-  padding: '8px 10px',
-  background: 'rgba(15,15,16,0.78)',
-  border: '1px solid #333',
-  borderRadius: '4px',
-  font: '12px monospace',
-  color: '#eaeaea',
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '4px',
-  userSelect: 'none',
-});
 const layerToggles = [
-  { label: 'gas',            layer: 'gas',             initial: true },
-  { label: 'obstacles',      layer: 'obstacles',       initial: true },
-  { label: 'route',          layer: 'route',           initial: true },
-  { label: 'gradient-trail', layer: 'gradient-trail',  initial: true },
+  { label: 'Gas',            layer: 'gas',             initial: true },
+  { label: 'Obstacles',      layer: 'obstacles',       initial: true },
+  { label: 'Route',          layer: 'route',           initial: true },
+  { label: 'Gradient trail', layer: 'gradient-trail',  initial: true },
 ];
 for (const { label, layer, initial } of layerToggles) {
   const row = document.createElement('label');
-  Object.assign(row.style, { display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' });
   const cb = document.createElement('input');
   cb.type = 'checkbox';
   cb.checked = initial;
@@ -432,20 +410,12 @@ for (const { label, layer, initial } of layerToggles) {
   row.append(cb, text);
   layerPanel.append(row);
 }
-document.body.append(canvasWrap);
 document.body.append(layerPanel);
 
-// Sidebar on the right with all controls
-const sidebar = document.createElement('div');
-sidebar.className = 'sidebar';
+// ── Status bar (bottom center) ─────────────────────────────────────
 
-// Agent controls
-const agentLabel = document.createElement('div');
-agentLabel.className = 'mode-label';
-agentLabel.textContent = 'Agent';
-
-const agentControls = document.createElement('div');
-agentControls.className = 'agent-controls';
+const statusBar = document.createElement('div');
+statusBar.className = 'status-bar';
 
 function toggleAgent() {
   if (sim.isClockRunning) {
@@ -462,13 +432,91 @@ window.addEventListener('keydown', (e) => {
   }
 });
 
-const btnToggle = buildButton('Play', toggleAgent);
-const btnReset = buildButton('Reset', resetAgent);
-btnToggle.classList.add('full-width');
-btnReset.classList.add('full-width');
+// Play/pause button (circle)
+const btnPlay = document.createElement('button');
+btnPlay.className = 'play-btn';
+btnPlay.innerHTML = '&#9654;'; // ▶
+btnPlay.addEventListener('click', toggleAgent);
+
+const btnToggle = btnPlay; // alias for updateAgentButtons
+
+const statusDivider = document.createElement('div');
+statusDivider.className = 'status-divider';
+
+// Status fields container
+const statusFields = document.createElement('div');
+statusFields.className = 'status-fields';
+
+// Gas reading field
+const gasField = document.createElement('div');
+gasField.className = 'status-field';
+const gasLabel = document.createElement('div');
+gasLabel.className = 'field-label';
+gasLabel.textContent = 'Gas';
+const gasValue = document.createElement('div');
+gasValue.className = 'field-value gas-cool';
+gasValue.textContent = '0.000';
+gasField.append(gasLabel, gasValue);
+
+// Dynamic status fields (populated from logJson)
+const dynamicFieldsContainer = document.createElement('div');
+dynamicFieldsContainer.className = 'status-fields';
+
+statusFields.append(gasField);
+statusBar.append(btnPlay, statusDivider, statusFields, dynamicFieldsContainer);
+document.body.append(statusBar);
+
+// Update gas readout in status bar instead of the old element
+const originalGasReadoutUpdate = Object.getOwnPropertyDescriptor(
+  sim.gasReadout, 'textContent'
+);
+// Observe gas readout changes by polling from the simulator
+let lastGasText = '';
+setInterval(() => {
+  const raw = sim.gasReadout.textContent;
+  if (raw !== lastGasText) {
+    lastGasText = raw;
+    const num = parseFloat(raw.replace(/[^0-9.]/g, '')) || 0;
+    gasValue.textContent = num.toFixed(3);
+    gasValue.className = 'field-value ' + (
+      num > 0.5 ? 'gas-hot' : num > 0.1 ? 'gas-warm' : 'gas-cool'
+    );
+  }
+}, 100);
+
+// JSON state display (hidden, but we use it to feed the status bar)
+const jsonStateDisplay = document.createElement('div');
+jsonStateDisplay.className = 'json-state-display';
+
+// Override updateJsonStateDisplay to also update status bar fields
+const _origUpdateJsonState = updateJsonStateDisplay;
+
+// ── Controls drawer (gear icon, top-right) ───────────────────────────
+
+const gearBtn = document.createElement('button');
+gearBtn.className = 'controls-toggle';
+gearBtn.innerHTML = '&#9881;'; // ⚙
+gearBtn.title = 'Settings';
+
+const drawer = document.createElement('div');
+drawer.className = 'controls-drawer hidden';
+
+let drawerOpen = false;
+gearBtn.addEventListener('click', () => {
+  drawerOpen = !drawerOpen;
+  drawer.classList.toggle('hidden', !drawerOpen);
+  gearBtn.classList.toggle('open', drawerOpen);
+});
+
+// Agent section in drawer
+const agentTitle = document.createElement('div');
+agentTitle.className = 'section-title';
+agentTitle.textContent = 'Agent';
+
+const agentControls = document.createElement('div');
+agentControls.className = 'agent-controls';
 
 const agentSelect = document.createElement('select');
-agentSelect.className = 'full-width';
 for (const { label } of AGENT_OPTIONS) {
   const opt = document.createElement('option');
   opt.value = label;
@@ -479,28 +527,42 @@ agentSelect.addEventListener('change', () => {
   const chosen = AGENT_OPTIONS.find((o) => o.label === agentSelect.value);
   if (!chosen) return;
   selectedGasAgent = chosen.agent;
-  // Force a fresh agent session on next play so the new factory takes effect.
   if (sim.agentActive) sim.stopAgentLoop();
   mainPubSub = null;
   updateAgentButtons();
 });
 
-agentControls.append(agentSelect, btnToggle, btnReset);
+const agentButtons = document.createElement('div');
+agentButtons.className = 'agent-buttons';
+const btnResetDrawer = buildButton('Reset', resetAgent);
+agentButtons.append(btnResetDrawer);
 
-// JSON state display container
-const jsonStateDisplay = document.createElement('div');
-jsonStateDisplay.className = 'json-state-display';
+agentControls.append(agentSelect, agentButtons);
 
-// Build sidebar
-sidebar.append(
-  mapSys.element,
-  sim.gasReadout,
-  agentLabel,
+// Map section
+const mapTitle = document.createElement('div');
+mapTitle.className = 'section-title';
+mapTitle.textContent = 'Map';
+
+const sep1 = document.createElement('div');
+sep1.className = 'drawer-separator';
+const sep2 = document.createElement('div');
+sep2.className = 'drawer-separator';
+
+drawer.append(
+  agentTitle,
   agentControls,
-  jsonStateDisplay
+  sep1,
+  mapTitle,
+  mapSys.element,
+  sep2,
 );
 
-document.body.append(sidebar);
+// Keep gas readout in DOM but hidden
+sim.gasReadout.style.display = 'none';
+drawer.append(sim.gasReadout);
+
+document.body.append(gearBtn, drawer);
 
 // ── Load default map on startup ───────────────────────────────────────
 let defaultMap = './maps/train_real.yaml';
