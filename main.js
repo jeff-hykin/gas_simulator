@@ -279,17 +279,19 @@ function pauseAgent() {
   updateAgentButtons();
 }
 
-// Fields to show prominently in the status bar (in order)
-const STATUS_FIELDS = ['mode', 'heading', 'time'];
-// Fields to show when space permits (second tier)
-const EXTRA_FIELDS = ['steer', 'maxGas', 'peakGas', 'productivity'];
+// Fields to show in the status bar (mode is shown separately above)
+const STATUS_FIELDS = ['heading', 'time', 'steer', 'maxGas', 'peakGas', 'productivity'];
 
 function updateJsonStateDisplay() {
   if (typeof dynamicFieldsContainer === 'undefined' || !dynamicFieldsContainer) return;
-  dynamicFieldsContainer.innerHTML = '';
 
-  const allFields = [...STATUS_FIELDS, ...EXTRA_FIELDS];
-  for (const key of allFields) {
+  // Update mode indicator separately
+  if ('mode' in currentJsonState) {
+    updateModeIndicator(currentJsonState.mode);
+  }
+
+  dynamicFieldsContainer.innerHTML = '';
+  for (const key of STATUS_FIELDS) {
     if (!(key in currentJsonState)) continue;
     const value = currentJsonState[key];
     const field = document.createElement('div');
@@ -411,6 +413,30 @@ for (const { label, layer, initial } of layerToggles) {
   layerPanel.append(row);
 }
 document.body.append(layerPanel);
+
+// ── Mode indicator (above status bar) ──────────────────────────────
+
+const modeIndicator = document.createElement('div');
+modeIndicator.className = 'mode-indicator mode-idle';
+modeIndicator.textContent = 'Idle';
+document.body.append(modeIndicator);
+
+const MODE_LABELS = {
+  idle: 'Idle',
+  routeFollow: 'Following Route',
+  gasFollow: 'Chasing Gas',
+  'gasFollow-returnArrived': 'Returning to Route',
+  greedy: 'Navigating',
+  random: 'Exploring',
+};
+
+function updateModeIndicator(mode) {
+  if (!mode) return;
+  // Normalize mode name for CSS class (strip anything after first hyphen variant)
+  const cssClass = 'mode-' + mode.replace(/[^a-zA-Z-]/g, '');
+  modeIndicator.className = 'mode-indicator ' + cssClass;
+  modeIndicator.textContent = MODE_LABELS[mode] || mode;
+}
 
 // ── Status bar (bottom center) ─────────────────────────────────────
 

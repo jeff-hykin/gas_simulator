@@ -35,6 +35,58 @@
         height: 100vh;
       }
 
+      /* ── Mode badge (above status bar, persistent) ────────────── */
+      .mode-indicator {
+        position: fixed;
+        bottom: 96px;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 8px 24px;
+        border-radius: 22px;
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        z-index: 100;
+        border: none;
+        transition: background 0.4s ease, color 0.4s ease, box-shadow 0.4s ease;
+      }
+      .mode-idle {
+        background: #636366;
+        color: #fff;
+        box-shadow: 0 4px 14px rgba(99, 99, 102, 0.4);
+      }
+      .mode-routeFollow {
+        background: #0a84ff;
+        color: #fff;
+        box-shadow: 0 4px 14px rgba(10, 132, 255, 0.45);
+      }
+      .mode-gasFollow {
+        background: #ff453a;
+        color: #fff;
+        box-shadow: 0 4px 14px rgba(255, 69, 58, 0.5);
+        animation: mode-pulse 2s ease-in-out infinite;
+      }
+      .mode-gasFollow-returnArrived {
+        background: #ff9f0a;
+        color: #1c1c1e;
+        box-shadow: 0 4px 14px rgba(255, 159, 10, 0.45);
+      }
+      .mode-greedy {
+        background: #30d158;
+        color: #1c1c1e;
+        box-shadow: 0 4px 14px rgba(48, 209, 88, 0.45);
+      }
+      .mode-random {
+        background: #bf5af2;
+        color: #fff;
+        box-shadow: 0 4px 14px rgba(191, 90, 242, 0.45);
+      }
+      @keyframes mode-pulse {
+        0%, 100% { box-shadow: 0 4px 14px rgba(255, 69, 58, 0.5); }
+        50% { box-shadow: 0 6px 24px rgba(255, 69, 58, 0.7); }
+      }
+
       /* ── Status card (bottom center) ──────────────────────────── */
       .status-bar {
         position: fixed;
