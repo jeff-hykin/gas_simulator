@@ -29,7 +29,7 @@ function create({
     steerStep = DEG5,             // initial steering bias when things are improving
     steerDecrement = DEG1,        // how much to reduce steer toward 0 when things get worse
     waypointTimeout = 2,         // seconds before giving up on a waypoint (e.g. stuck on building)
-    minProductivity = 0.05,       // exit gasFollow if productivity drops below this (productivity=average rate of gas increase while searching for gas)
+    minProductivity = 0.03,      // exit gasFollow if productivity drops below this (productivity=average rate of gas increase while searching for gas)
     routeAgentConfig = {},
 } = {}) {
     const routeAgent = simpleRouteAgent.create(routeAgentConfig)
