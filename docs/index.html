@@ -7,196 +7,408 @@
     <style>
       :root {
         --bg: #0b0c10;
-        --panel: #141621;
-        --accent: #22d3ee;
-        --text: #e5e7eb;
-        --muted: #9ca3af;
+        --panel: rgba(28, 28, 30, 0.82);
+        --panel-solid: #1c1c1e;
+        --accent: #0a84ff;
+        --accent-glow: rgba(10, 132, 255, 0.25);
+        --text: #f5f5f7;
+        --muted: rgba(235, 235, 245, 0.6);
+        --separator: rgba(84, 84, 88, 0.36);
+        --green: #30d158;
+        --yellow: #ffd60a;
+        --red: #ff453a;
+        --orange: #ff9f0a;
+        --radius: 14px;
       }
-      * {
-        box-sizing: border-box;
-      }
+      * { box-sizing: border-box; margin: 0; }
       body {
-        margin: 0;
-        font-family: "Space Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-        background: radial-gradient(circle at 20% 20%, #1b1f2a, var(--bg));
+        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", system-ui, sans-serif;
+        background: var(--bg);
         color: var(--text);
         min-height: 100vh;
-        padding: 18px;
+        overflow: hidden;
+        -webkit-font-smoothing: antialiased;
       }
       canvas {
-        border-radius: 12px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+        display: block;
+        width: 100vw;
+        height: 100vh;
       }
-      .sidebar {
+
+      /* ── Mode badge (above status bar, persistent) ────────────── */
+      .mode-indicator {
         position: fixed;
-        top: 18px;
-        right: 18px;
-        width: 320px;
-        background: var(--panel);
-        border-radius: 14px;
-        padding: 16px;
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
-        max-height: calc(100vh - 36px);
-        overflow-y: auto;
-      }
-      .map-panel {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-      }
-      .map-controls {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
-      }
-      .map-name-label {
+        bottom: 96px;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 8px 24px;
+        border-radius: 22px;
         font-size: 14px;
-        color: var(--accent);
         font-weight: 700;
         letter-spacing: 0.05em;
-        padding: 8px 12px;
-        background: rgba(34, 211, 238, 0.08);
-        border-radius: 8px;
-        border: 1px solid rgba(34, 211, 238, 0.2);
-      }
-      .mode-label {
-        font-size: 13px;
-        color: var(--muted);
         text-transform: uppercase;
-        letter-spacing: 0.08em;
+        z-index: 100;
+        border: none;
+        transition: background 0.4s ease, color 0.4s ease, box-shadow 0.4s ease;
       }
-      button {
-        background: #111827;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        color: var(--text);
-        padding: 10px 12px;
-        border-radius: 10px;
-        cursor: pointer;
-        font-size: 13px;
-        transition: transform 0.12s ease, border-color 0.12s ease;
+      .mode-idle {
+        background: #636366;
+        color: #fff;
+        box-shadow: 0 4px 14px rgba(99, 99, 102, 0.4);
       }
-      button:hover {
-        transform: translateY(-1px);
-        border-color: var(--accent);
+      .mode-routeFollow {
+        background: #0a84ff;
+        color: #fff;
+        box-shadow: 0 4px 14px rgba(10, 132, 255, 0.45);
       }
-      button.is-active {
-        border-color: var(--accent);
-        box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.5), 0 0 18px rgba(34, 211, 238, 0.2);
+      .mode-gasFollow {
+        background: #ff453a;
+        color: #fff;
+        box-shadow: 0 4px 14px rgba(255, 69, 58, 0.5);
+        animation: mode-pulse 2s ease-in-out infinite;
       }
-      .agent-panel {
+      .mode-gasFollow-returnArrived {
+        background: #ff9f0a;
+        color: #1c1c1e;
+        box-shadow: 0 4px 14px rgba(255, 159, 10, 0.45);
+      }
+      .mode-greedy {
+        background: #30d158;
+        color: #1c1c1e;
+        box-shadow: 0 4px 14px rgba(48, 209, 88, 0.45);
+      }
+      .mode-random {
+        background: #bf5af2;
+        color: #fff;
+        box-shadow: 0 4px 14px rgba(191, 90, 242, 0.45);
+      }
+      @keyframes mode-pulse {
+        0%, 100% { box-shadow: 0 4px 14px rgba(255, 69, 58, 0.5); }
+        50% { box-shadow: 0 6px 24px rgba(255, 69, 58, 0.7); }
+      }
+
+      /* ── Status card (bottom center) ──────────────────────────── */
+      .status-bar {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
         display: flex;
-        flex-direction: column;
-        gap: 12px;
+        align-items: center;
+        gap: 16px;
+        padding: 10px 20px;
+        background: var(--panel);
+        backdrop-filter: blur(40px) saturate(180%);
+        -webkit-backdrop-filter: blur(40px) saturate(180%);
+        border-radius: 22px;
+        border: 1px solid var(--separator);
+        z-index: 100;
+        min-width: 200px;
+        max-width: min(680px, 70vw);
+        transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
       }
-      .agent-controls {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
-      }
-      .agent-controls .full-width {
-        grid-column: 1 / -1;
-      }
-      .gas-readout {
+      .status-bar .play-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: none;
+        background: var(--accent);
+        color: #fff;
         font-size: 18px;
-        padding: 12px;
-        border-radius: 10px;
-        background: rgba(34, 211, 238, 0.08);
-        border: 1px solid rgba(34, 211, 238, 0.3);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        transition: transform 0.15s ease, background 0.2s ease;
       }
-      .json-state-display {
+      .status-bar .play-btn:hover { transform: scale(1.08); }
+      .status-bar .play-btn:active { transform: scale(0.95); }
+      .status-bar .play-btn.is-playing { background: var(--orange); }
+      .status-divider {
+        width: 1px;
+        height: 28px;
+        background: var(--separator);
+        flex-shrink: 0;
+      }
+      .status-fields {
+        display: flex;
+        gap: 20px;
+        align-items: center;
+        overflow-x: auto;
+        scrollbar-width: none;
+      }
+      .status-fields::-webkit-scrollbar { display: none; }
+      .status-field {
         display: flex;
         flex-direction: column;
-        gap: 8px;
+        align-items: center;
+        gap: 2px;
+        white-space: nowrap;
       }
-      .json-entry {
-        font-size: 14px;
-        padding: 8px 12px;
-        border-radius: 8px;
-        background: rgba(34, 211, 238, 0.05);
-        border: 1px solid rgba(34, 211, 238, 0.2);
-        font-family: inherit;
+      .status-field .field-label {
+        font-size: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--muted);
       }
-      .json-key {
-        color: var(--accent);
-        font-weight: 700;
+      .status-field .field-value {
+        font-size: 15px;
+        font-weight: 600;
+        font-variant-numeric: tabular-nums;
+        letter-spacing: -0.01em;
       }
-      .json-value {
-        color: var(--text);
-      }
+      .field-value.gas-hot { color: var(--red); }
+      .field-value.gas-warm { color: var(--orange); }
+      .field-value.gas-cool { color: var(--green); }
+
+      /* ── Toast notifications (top center, Apple HIG style) ───── */
       .toast-container {
         position: fixed;
-        top: 24px;
+        top: 16px;
         left: 50%;
         transform: translateX(-50%);
         display: flex;
         flex-direction: column;
-        gap: 10px;
+        gap: 8px;
         z-index: 1000;
         pointer-events: none;
         align-items: center;
       }
       .toast {
-        background: var(--panel);
-        color: var(--text);
-        padding: 12px 22px;
-        border-radius: 10px;
+        padding: 12px 20px;
+        border-radius: 14px;
         font-size: 14px;
-        font-weight: 700;
-        letter-spacing: 0.02em;
-        box-shadow: 0 10px 32px rgba(0, 0, 0, 0.5);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        animation: toast-in 0.3s ease-out;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+        background: var(--panel);
+        backdrop-filter: blur(40px) saturate(180%);
+        -webkit-backdrop-filter: blur(40px) saturate(180%);
+        border: 1px solid var(--separator);
+        color: var(--text);
+        animation: toast-in 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         max-width: 80vw;
         text-align: center;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.4);
       }
       .toast.toast-out {
-        animation: toast-out 0.3s ease-in forwards;
+        animation: toast-out 0.25s ease-in forwards;
       }
-      .toast-info {
-        border-color: rgba(34, 211, 238, 0.6);
-        box-shadow: 0 10px 32px rgba(0, 0, 0, 0.5), 0 0 18px rgba(34, 211, 238, 0.25);
-      }
-      .toast-success {
-        border-color: rgba(74, 222, 128, 0.6);
-        box-shadow: 0 10px 32px rgba(0, 0, 0, 0.5), 0 0 18px rgba(74, 222, 128, 0.25);
-      }
-      .toast-warning {
-        border-color: rgba(251, 191, 36, 0.6);
-        box-shadow: 0 10px 32px rgba(0, 0, 0, 0.5), 0 0 18px rgba(251, 191, 36, 0.25);
-      }
-      .toast-alert {
-        border-color: rgba(239, 68, 68, 0.6);
-        box-shadow: 0 10px 32px rgba(0, 0, 0, 0.5), 0 0 18px rgba(239, 68, 68, 0.3);
-      }
+      .toast-info { border-color: rgba(10,132,255,0.5); }
+      .toast-success { border-color: rgba(48,209,88,0.5); }
+      .toast-warning { border-color: rgba(255,214,10,0.5); }
+      .toast-alert { border-color: rgba(255,69,58,0.5); }
       @keyframes toast-in {
-        from { opacity: 0; transform: translateY(-12px); }
-        to { opacity: 1; transform: translateY(0); }
+        from { opacity: 0; transform: translateY(-14px) scale(0.96); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
       }
       @keyframes toast-out {
-        from { opacity: 1; transform: translateY(0); }
-        to { opacity: 0; transform: translateY(-12px); }
+        from { opacity: 1; transform: translateY(0) scale(1); }
+        to { opacity: 0; transform: translateY(-14px) scale(0.96); }
       }
+
+      /* ── Controls drawer (gear icon, top-right) ──────────────── */
+      .controls-toggle {
+        position: fixed;
+        top: 16px;
+        right: 16px;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: 1px solid var(--separator);
+        background: var(--panel);
+        backdrop-filter: blur(40px) saturate(180%);
+        -webkit-backdrop-filter: blur(40px) saturate(180%);
+        color: var(--muted);
+        font-size: 20px;
+        cursor: pointer;
+        z-index: 200;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.3s ease, color 0.2s ease, border-color 0.2s ease;
+      }
+      .controls-toggle:hover {
+        color: var(--text);
+        border-color: rgba(255,255,255,0.2);
+      }
+      .controls-toggle.open {
+        transform: rotate(60deg);
+        color: var(--accent);
+        border-color: rgba(10,132,255,0.4);
+      }
+      .controls-drawer {
+        position: fixed;
+        top: 66px;
+        right: 16px;
+        width: 300px;
+        max-height: calc(100vh - 82px);
+        overflow-y: auto;
+        background: var(--panel);
+        backdrop-filter: blur(40px) saturate(180%);
+        -webkit-backdrop-filter: blur(40px) saturate(180%);
+        border-radius: var(--radius);
+        border: 1px solid var(--separator);
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        z-index: 190;
+        transform: translateX(0);
+        opacity: 1;
+        transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.25s ease;
+        scrollbar-width: thin;
+        scrollbar-color: var(--separator) transparent;
+      }
+      .controls-drawer.hidden {
+        transform: translateX(20px);
+        opacity: 0;
+        pointer-events: none;
+      }
+      .controls-drawer .section-title {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--muted);
+        padding-bottom: 4px;
+      }
+      .controls-drawer .map-name-label {
+        font-size: 13px;
+        color: var(--accent);
+        font-weight: 600;
+        padding: 8px 12px;
+        background: rgba(10,132,255,0.1);
+        border-radius: 10px;
+        border: 1px solid rgba(10,132,255,0.2);
+      }
+      .controls-drawer .mode-label {
+        font-size: 12px;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+      .controls-drawer .map-controls {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+      .controls-drawer button {
+        background: rgba(255,255,255,0.06);
+        border: 1px solid var(--separator);
+        color: var(--text);
+        padding: 9px 12px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 500;
+        transition: background 0.15s ease, border-color 0.15s ease;
+      }
+      .controls-drawer button:hover {
+        background: rgba(255,255,255,0.1);
+        border-color: rgba(255,255,255,0.2);
+      }
+      .controls-drawer button.is-active {
+        border-color: var(--accent);
+        background: rgba(10,132,255,0.15);
+      }
+      .controls-drawer select {
+        background: rgba(255,255,255,0.06);
+        border: 1px solid var(--separator);
+        color: var(--text);
+        padding: 9px 12px;
+        border-radius: 10px;
+        font-size: 13px;
+        font-weight: 500;
+        width: 100%;
+        appearance: none;
+        -webkit-appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23999' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+      }
+      .controls-drawer .agent-controls {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .controls-drawer .agent-buttons {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+      .drawer-separator {
+        height: 1px;
+        background: var(--separator);
+      }
+
+      /* ── Legend (top-left, minimal) ───────────────────────────── */
+      .canvas-legend {
+        position: fixed;
+        top: 16px;
+        left: 16px;
+        padding: 10px 14px;
+        background: var(--panel);
+        backdrop-filter: blur(40px) saturate(180%);
+        -webkit-backdrop-filter: blur(40px) saturate(180%);
+        border: 1px solid var(--separator);
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--text);
+        pointer-events: none;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        z-index: 50;
+      }
+
+      /* ── Layer toggles (bottom-left) ─────────────────────────── */
+      .canvas-layer-panel {
+        position: fixed;
+        bottom: 20px;
+        left: 16px;
+        z-index: 10;
+        padding: 10px 14px;
+        background: var(--panel);
+        backdrop-filter: blur(40px) saturate(180%);
+        -webkit-backdrop-filter: blur(40px) saturate(180%);
+        border: 1px solid var(--separator);
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--text);
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        user-select: none;
+      }
+      .canvas-layer-panel label {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+      }
+      .canvas-layer-panel input[type="checkbox"] {
+        accent-color: var(--accent);
+      }
+
+      /* ── Gas readout in status bar ───────────────────────────── */
+      .gas-readout {
+        display: none; /* hidden, value shown in status bar instead */
+      }
+
+      /* ── Map panel in drawer ─────────────────────────────────── */
+      .map-panel {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      /* ── JSON state (hidden, data goes to status bar) ────────── */
+      .json-state-display { display: none; }
     </style>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-    <style>@font-face {
-  font-family: 'Space Mono';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/spacemono/v17/i7dPIFZifjKcF5UAWdDRUEY.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Space Mono';
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/spacemono/v17/i7dMIFZifjKcF5UAWdDRaPpZYFI.ttf) format('truetype');
-}
-</style>
   </head>
 <body>
     <script>// main/systems/canvas.js
@@ -5426,7 +5638,10 @@ var AGENT_OPTIONS = [
   { label: "baseline", agent: baseline_agent_default }
 ];
 var selectedGasAgent = AGENT_OPTIONS[0].agent;
-var canvasSys = createCanvasSystem({ width: 1100, height: 830 });
+var canvasSys = createCanvasSystem({ width: window.innerWidth, height: window.innerHeight });
+window.addEventListener("resize", () => {
+  canvasSys.setSize(window.innerWidth, window.innerHeight);
+});
 var visualizationPointsById = /* @__PURE__ */ new Map();
 var visualizationLinesById = /* @__PURE__ */ new Map();
 var vectorFieldItems = [];
@@ -5467,8 +5682,10 @@ function buildButton(label, onClick) {
 }
 function updateAgentButtons() {
   const running = sim.isClockRunning;
-  btnToggle.textContent = running ? "Pause" : "Play";
-  btnToggle.classList.toggle("is-active", running);
+  if (btnToggle) {
+    btnToggle.innerHTML = running ? "&#9646;&#9646;" : "&#9654;";
+    btnToggle.classList.toggle("is-playing", running);
+  }
 }
 function playAgent() {
   if (sim.isClockRunning) return;
@@ -5632,22 +5849,33 @@ function pauseAgent() {
   sim.pause();
   updateAgentButtons();
 }
+var STATUS_FIELDS = ["heading", "time", "steer", "maxGas", "peakGas", "productivity"];
 function updateJsonStateDisplay() {
-  if (!jsonStateDisplay) return;
-  jsonStateDisplay.innerHTML = "";
-  Object.entries(currentJsonState).forEach(([key, value]) => {
-    const entry = document.createElement("div");
-    entry.className = "json-entry";
-    const keySpan = document.createElement("span");
-    keySpan.className = "json-key";
-    keySpan.textContent = key + ": ";
-    const valueSpan = document.createElement("span");
-    valueSpan.className = "json-value";
-    valueSpan.textContent = typeof value === "object" ? JSON.stringify(value) : String(value);
-    entry.appendChild(keySpan);
-    entry.appendChild(valueSpan);
-    jsonStateDisplay.appendChild(entry);
-  });
+  if (typeof dynamicFieldsContainer === "undefined" || !dynamicFieldsContainer) return;
+  if ("mode" in currentJsonState) {
+    updateModeIndicator(currentJsonState.mode);
+  }
+  dynamicFieldsContainer.innerHTML = "";
+  for (const key of STATUS_FIELDS) {
+    if (!(key in currentJsonState)) continue;
+    const value = currentJsonState[key];
+    const field = document.createElement("div");
+    field.className = "status-field";
+    const label = document.createElement("div");
+    label.className = "field-label";
+    label.textContent = key;
+    const val = document.createElement("div");
+    val.className = "field-value";
+    if (typeof value === "number") {
+      val.textContent = Number.isInteger(value) ? String(value) : value.toFixed(2);
+    } else if (typeof value === "object") {
+      val.textContent = JSON.stringify(value);
+    } else {
+      val.textContent = String(value);
+    }
+    field.append(label, val);
+    dynamicFieldsContainer.append(field);
+  }
 }
 function resetAgent() {
   const startPos = getStartPosition();
@@ -5682,43 +5910,26 @@ function showToast(message, type2 = "info", duration = 3e3) {
     setTimeout(() => toast.remove(), 300);
   }, duration);
 }
-var canvasWrap = document.createElement("div");
-canvasWrap.style.position = "relative";
-canvasWrap.style.display = "inline-block";
-canvasWrap.append(canvasSys.canvas);
+document.body.append(canvasSys.canvas);
 var legend = document.createElement("div");
 legend.className = "canvas-legend";
-Object.assign(legend.style, {
-  position: "absolute",
-  top: "10px",
-  left: "10px",
-  padding: "8px 10px",
-  background: "rgba(15,15,16,0.78)",
-  border: "1px solid #333",
-  borderRadius: "4px",
-  font: "12px monospace",
-  color: "#eaeaea",
-  pointerEvents: "none",
-  display: "flex",
-  flexDirection: "column",
-  gap: "4px"
-});
 var legendEntries = [
-  { label: "agent", stroke: "#22d3ee", fill: "rgba(34,211,238,0.2)" },
-  { label: "route", stroke: "#fbbf24", fill: "#fbbf24" },
-  { label: "building", stroke: "#e11d48", fill: "rgba(225,29,72,0.2)" },
-  { label: "gas", stroke: "#a855f7", fill: "transparent" },
-  { label: "smell lost point", stroke: "#22c55e", fill: "#22c55e" }
+  { label: "Agent", stroke: "#22d3ee", fill: "rgba(34,211,238,0.2)" },
+  { label: "Route", stroke: "#fbbf24", fill: "#fbbf24" },
+  { label: "Building", stroke: "#e11d48", fill: "rgba(225,29,72,0.2)" },
+  { label: "Gas", stroke: "#a855f7", fill: "transparent" },
+  { label: "Smell lost", stroke: "#22c55e", fill: "#22c55e" }
 ];
 for (const entry of legendEntries) {
   const row = document.createElement("div");
   Object.assign(row.style, { display: "flex", alignItems: "center", gap: "8px" });
   const swatch = document.createElement("div");
   Object.assign(swatch.style, {
-    width: "14px",
-    height: "14px",
+    width: "12px",
+    height: "12px",
     border: `2px solid ${entry.stroke}`,
     background: entry.fill,
+    borderRadius: "3px",
     boxSizing: "border-box"
   });
   const text = document.createElement("span");
@@ -5726,34 +5937,17 @@ for (const entry of legendEntries) {
   row.append(swatch, text);
   legend.append(row);
 }
-canvasWrap.append(legend);
+document.body.append(legend);
 var layerPanel = document.createElement("div");
 layerPanel.className = "canvas-layer-panel";
-Object.assign(layerPanel.style, {
-  position: "fixed",
-  bottom: "10px",
-  left: "10px",
-  zIndex: "10",
-  padding: "8px 10px",
-  background: "rgba(15,15,16,0.78)",
-  border: "1px solid #333",
-  borderRadius: "4px",
-  font: "12px monospace",
-  color: "#eaeaea",
-  display: "flex",
-  flexDirection: "column",
-  gap: "4px",
-  userSelect: "none"
-});
 var layerToggles = [
-  { label: "gas", layer: "gas", initial: true },
-  { label: "obstacles", layer: "obstacles", initial: true },
-  { label: "route", layer: "route", initial: true },
-  { label: "gradient-trail", layer: "gradient-trail", initial: true }
+  { label: "Gas", layer: "gas", initial: true },
+  { label: "Obstacles", layer: "obstacles", initial: true },
+  { label: "Route", layer: "route", initial: true },
+  { label: "Gradient trail", layer: "gradient-trail", initial: true }
 ];
 for (const { label, layer, initial } of layerToggles) {
   const row = document.createElement("label");
-  Object.assign(row.style, { display: "flex", alignItems: "center", gap: "6px", cursor: "pointer" });
   const cb = document.createElement("input");
   cb.type = "checkbox";
   cb.checked = initial;
@@ -5764,15 +5958,27 @@ for (const { label, layer, initial } of layerToggles) {
   row.append(cb, text);
   layerPanel.append(row);
 }
-document.body.append(canvasWrap);
 document.body.append(layerPanel);
-var sidebar = document.createElement("div");
-sidebar.className = "sidebar";
-var agentLabel = document.createElement("div");
-agentLabel.className = "mode-label";
-agentLabel.textContent = "Agent";
-var agentControls = document.createElement("div");
-agentControls.className = "agent-controls";
+var modeIndicator = document.createElement("div");
+modeIndicator.className = "mode-indicator mode-idle";
+modeIndicator.textContent = "Idle";
+document.body.append(modeIndicator);
+var MODE_LABELS = {
+  idle: "Idle",
+  routeFollow: "Following Route",
+  gasFollow: "Chasing Gas",
+  "gasFollow-returnArrived": "Returning to Route",
+  greedy: "Navigating",
+  random: "Exploring"
+};
+function updateModeIndicator(mode) {
+  if (!mode) return;
+  const cssClass = "mode-" + mode.replace(/[^a-zA-Z-]/g, "");
+  modeIndicator.className = "mode-indicator " + cssClass;
+  modeIndicator.textContent = MODE_LABELS[mode] || mode;
+}
+var statusBar = document.createElement("div");
+statusBar.className = "status-bar";
 function toggleAgent() {
   if (sim.isClockRunning) {
     pauseAgent();
@@ -5786,12 +5992,63 @@ window.addEventListener("keydown", (e) => {
     toggleAgent();
   }
 });
-var btnToggle = buildButton("Play", toggleAgent);
-var btnReset = buildButton("Reset", resetAgent);
-btnToggle.classList.add("full-width");
-btnReset.classList.add("full-width");
+var btnPlay = document.createElement("button");
+btnPlay.className = "play-btn";
+btnPlay.innerHTML = "&#9654;";
+btnPlay.addEventListener("click", toggleAgent);
+var btnToggle = btnPlay;
+var statusDivider = document.createElement("div");
+statusDivider.className = "status-divider";
+var statusFields = document.createElement("div");
+statusFields.className = "status-fields";
+var gasField = document.createElement("div");
+gasField.className = "status-field";
+var gasLabel = document.createElement("div");
+gasLabel.className = "field-label";
+gasLabel.textContent = "Gas";
+var gasValue = document.createElement("div");
+gasValue.className = "field-value gas-cool";
+gasValue.textContent = "0.000";
+gasField.append(gasLabel, gasValue);
+var dynamicFieldsContainer = document.createElement("div");
+dynamicFieldsContainer.className = "status-fields";
+statusFields.append(gasField);
+statusBar.append(btnPlay, statusDivider, statusFields, dynamicFieldsContainer);
+document.body.append(statusBar);
+var originalGasReadoutUpdate = Object.getOwnPropertyDescriptor(
+  sim.gasReadout,
+  "textContent"
+);
+var lastGasText = "";
+setInterval(() => {
+  const raw = sim.gasReadout.textContent;
+  if (raw !== lastGasText) {
+    lastGasText = raw;
+    const num = parseFloat(raw.replace(/[^0-9.]/g, "")) || 0;
+    gasValue.textContent = num.toFixed(3);
+    gasValue.className = "field-value " + (num > 0.5 ? "gas-hot" : num > 0.1 ? "gas-warm" : "gas-cool");
+  }
+}, 100);
+var jsonStateDisplay = document.createElement("div");
+jsonStateDisplay.className = "json-state-display";
+var gearBtn = document.createElement("button");
+gearBtn.className = "controls-toggle";
+gearBtn.innerHTML = "&#9881;";
+gearBtn.title = "Settings";
+var drawer = document.createElement("div");
+drawer.className = "controls-drawer hidden";
+var drawerOpen = false;
+gearBtn.addEventListener("click", () => {
+  drawerOpen = !drawerOpen;
+  drawer.classList.toggle("hidden", !drawerOpen);
+  gearBtn.classList.toggle("open", drawerOpen);
+});
+var agentTitle = document.createElement("div");
+agentTitle.className = "section-title";
+agentTitle.textContent = "Agent";
+var agentControls = document.createElement("div");
+agentControls.className = "agent-controls";
 var agentSelect = document.createElement("select");
-agentSelect.className = "full-width";
 for (const { label } of AGENT_OPTIONS) {
   const opt = document.createElement("option");
   opt.value = label;
@@ -5806,17 +6063,29 @@ agentSelect.addEventListener("change", () => {
   mainPubSub = null;
   updateAgentButtons();
 });
-agentControls.append(agentSelect, btnToggle, btnReset);
-var jsonStateDisplay = document.createElement("div");
-jsonStateDisplay.className = "json-state-display";
-sidebar.append(
-  mapSys.element,
-  sim.gasReadout,
-  agentLabel,
+var agentButtons = document.createElement("div");
+agentButtons.className = "agent-buttons";
+var btnResetDrawer = buildButton("Reset", resetAgent);
+agentButtons.append(btnResetDrawer);
+agentControls.append(agentSelect, agentButtons);
+var mapTitle = document.createElement("div");
+mapTitle.className = "section-title";
+mapTitle.textContent = "Map";
+var sep1 = document.createElement("div");
+sep1.className = "drawer-separator";
+var sep2 = document.createElement("div");
+sep2.className = "drawer-separator";
+drawer.append(
+  agentTitle,
   agentControls,
-  jsonStateDisplay
+  sep1,
+  mapTitle,
+  mapSys.element,
+  sep2
 );
-document.body.append(sidebar);
+sim.gasReadout.style.display = "none";
+drawer.append(sim.gasReadout);
+document.body.append(gearBtn, drawer);
 var defaultMap = "./maps/train_real.yaml";
 fetch(defaultMap).then((response) => response.text()).then((yamlText) => {
   mapSys.loadMapText(yamlText, defaultMap.split("/").at(-1));
