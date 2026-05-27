@@ -1,4 +1,2 @@
 #!/usr/bin/env bash
-# deno run -A run/noise_sweep.js main/agents/neo/greedy_gas_agent.js main/agents/neo/smart_lobster_agent.js main/agents/neo/dumb_lobster_agent.js main/agents/neo/baseline_agent.js --runs 10000 --seconds 2000 --seed 42
-deno run -A run/noise_sweep.js main/agents/neo/greedy_gas_agent.js main/agents/neo/smart_lobster_agent.js main/agents/neo/dumb_lobster_agent.js main/agents/neo/baseline_agent.js --runs 100 --seconds 2000 --seed 42
-# deno run -A run/noise_sweep.js main/agents/neo/smart_lobster_agent.js --runs 10000 --seconds 300 --seed 42
+deno run -A run/noise_sweep.js main/agents/neo/greedy_gas_agent.js main/agents/neo/smart_lobster_agent.js main/agents/neo/dumb_lobster_agent.js main/agents/neo/baseline_agent.js --runs 1000 --seconds 2000 --seed 42
