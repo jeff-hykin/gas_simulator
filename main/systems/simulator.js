@@ -12,6 +12,12 @@ export function gaussianPeakAt(distance, radius, peak) {
   return peak * Math.exp(-(distance * distance) / (2 * sigma2));
 }
 
+export function inverseSquarePeakAt(distance, radius, peak) {
+  if (radius <= 0) return 0;
+  const normalized = distance / radius;
+  return peak / (1 + normalized * normalized);
+}
+
 /**
  * Generate a normally-distributed random number (Box-Muller transform).
  * @param {number} stdDev - standard deviation
@@ -24,13 +30,20 @@ export function gaussianNoise(stdDev) {
   return stdDev * Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
 }
 
+export function gasValueAt(distance, radius, peak, gasCircleRate) {
+  if (gasCircleRate === 'inverse_square') {
+    return inverseSquarePeakAt(distance, radius, peak);
+  }
+  return gaussianPeakAt(distance, radius, peak);
+}
+
 export function maxGasAt(point, gasNodes) {
   let max = 0;
   for (const node of gasNodes) {
     const dx = point.x - node.x;
     const dy = point.y - node.y;
     const d = Math.hypot(dx, dy);
-    const value = gaussianPeakAt(d, node.radius, node.peak);
+    const value = gasValueAt(d, node.radius, node.peak, node.gasCircleRate);
     if (value > max) max = value;
   }
   return max;

@@ -125,22 +125,25 @@ export function obstacleAsCanvas(obstacle, styles) {
 
 export function gasNodeAsCanvas(node, styles) {
   const inherit = styles.gasNode;
-  const sigma = node.radius;
+  const radius = node.radius;
   const items = [];
-  // Topo-style iso-concentration rings. Gaussian: ppm(d) = peak * exp(-d^2/(2σ^2)).
-  // Ring at sigma-multiple k has ppm/peak = exp(-k^2/2). Closer rings → higher ppm → thicker stroke.
-  const ringKs = node.ringKs || [0.25, 0.45, 0.65, 0.85, 1.05, 1.25, 1.45, 1.65, 1.85, 2.05, 2.25, 2.5];
-  const maxK = ringKs[ringKs.length - 1];
-  for (const k of ringKs) {
-    // Far = thin+faint, near = thick+bold.
-    const t = 1 - (k / maxK); // 1 near center, 0 at outer edge
+  // Iso-concentration rings whose radii match the actual distribution function.
+  // For each concentration fraction f, solve for d: gaussian → d = σ√(-2 ln f), inverse_square → d = r√(1/f - 1).
+  const fractions = node.ringFractions || [0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.15, 0.1, 0.06, 0.03];
+  const isInvSq = node.gasCircleRate === 'inverse_square';
+  for (let i = 0; i < fractions.length; i++) {
+    const f = fractions[i];
+    const ringR = isInvSq
+      ? radius * Math.sqrt(1 / f - 1)
+      : radius * Math.sqrt(-2 * Math.log(f));
+    const t = 1 - i / (fractions.length - 1);
     const lineWidth = 0.2 + Math.pow(t, 2.6) * 6.8;
     const alpha = (0.35 + Math.pow(t, 2.0) * 0.65).toFixed(3);
     items.push({
       type: 'circle',
       x: node.x,
       y: node.y,
-      r: sigma * k,
+      r: ringR,
       stroke: `rgba(168,85,247,${alpha})`,
       lineWidth,
       inherit,
@@ -308,13 +311,12 @@ export function createMapSystem(canvasSys, { onMapLoaded } = {}) {
   }
 
   /**
-   * Add a gas node with gaussian radius/peak.
-   * @example
-   * mapSys.addGasNode({ x: 0, y: 0, radius: 80, peak: 1.5 });
+   * Add a gas node.
+   * @param {{x:number, y:number, radius?:number, peak?:number, gasCircleRate?:'gaussian'|'inverse_square'}} opts
    */
-  function addGasNode({ x, y, radius = 60, peak = 1 }) {
+  function addGasNode({ x, y, radius = 60, peak = 1, gasCircleRate = 'gaussian' }) {
     pushUndo();
-    const node = { id: makeId('gas'), x, y, radius, peak };
+    const node = { id: makeId('gas'), x, y, radius, peak, gasCircleRate };
     node.asCanvas = gasNodeAsCanvas(node, mapData.styles);
     mapData.gasNodes.push(node);
     mapWorldItems.push(node.asCanvas);
