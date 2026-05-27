@@ -1,0 +1,2921 @@
+{
+  "meta": {
+    "runs": 100,
+    "seconds": 100,
+    "seed": 42,
+    "noiseLevels": [
+      0,
+      0.01,
+      0.02,
+      0.05,
+      0.1,
+      0.2,
+      0.3,
+      0.5,
+      0.75,
+      1
+    ]
+  },
+  "agents": [
+    {
+      "name": "greedy_gas_agent",
+      "data": [
+        {
+          "noise": 0,
+          "agg": {
+            "minDistanceToGas": {
+              "mean": 93.905833223301,
+              "std": 116.79816080778511,
+              "n": 100,
+              "total": 100
+            },
+            "finalDistanceToGas": {
+              "mean": 409.61821826388035,
+              "std": 269.01203302111844,
+              "n": 100,
+              "total": 100
+            },
+            "meanDistanceToGas": {
+              "mean": 403.8286539320918,
+              "std": 162.67828210681995,
+              "n": 100,
+              "total": 100
+            },
+            "maxGasReading": {
+              "mean": 0.8382986069888028,
+              "std": 0.25925589548734607,
+              "n": 100,
+              "total": 100
+            },
+            "totalDistanceTraveled": {
+              "mean": 3602.16,
+              "std": 1060.020418328217,
+              "n": 100,
+              "total": 100
+            },
+            "timeToFirstWithin50": {
+              "mean": 34.336363636363515,
+              "std": 14.669183668320995,
+              "n": 55,
+              "total": 100
+            },
+            "routeCompletionFraction": {
+              "mean": 0.9328333333333333,
+              "std": 0.12885735565731554,
+              "n": 100,
+              "total": 100
+            },
+            "routeWaypointsHit": {
+              "mean": 5.31,
+              "std": 2.368543856465401,
+              "n": 100,
+              "total": 100
+            },
+            "waypointsHitPerMinute": {
+              "mean": 5.521093758640189,
+              "std": 3.276724188857413,
+              "n": 100,
+              "total": 100
+            },
+            "timeToCompleteRoute": {
+              "mean": 57.32054794520437,
+              "std": 15.927118809892962,
+              "n": 73,
+              "total": 100
+            },
+            "crashed": 0
+          },
+          "minDistMean": 93.905833223301,
+          "minDistStd": 116.79816080778511,
+          "meanDistMean": 403.8286539320918,
+          "maxGasMean": 0.8382986069888028,
+          "timeWithin50": 34.336363636363515,
+          "crashed": 0
+        },
+        {
+          "noise": 0.01,
+          "agg": {
+            "minDistanceToGas": {
+              "mean": 68.54791329244347,
+              "std": 106.5203512002594,
+              "n": 100,
+              "total": 100
+            },
+            "finalDistanceToGas": {
+              "mean": 369.5579189037887,
+              "std": 310.8645233182893,
+              "n": 100,
+              "total": 100
+            },
+            "meanDistanceToGas": {
+              "mean": 386.2786723663461,
+              "std": 166.90149393377982,
+              "n": 100,
+              "total": 100
+            },
+            "maxGasReading": {
+              "mean": 0.9043211151462345,
+              "std": 0.2393131837273264,
+              "n": 100,
+              "total": 100
+            },
+            "totalDistanceTraveled": {
+              "mean": 4292.67,
+              "std": 903.453967736144,
+              "n": 100,
+              "total": 100
+            },
+            "timeToFirstWithin50": {
+              "mean": 41.16319444444399,
+              "std": 20.326096791527043,
+              "n": 72,
+              "total": 100
+            },
+            "routeCompletionFraction": {
+              "mean": 0.9278055555555557,
+              "std": 0.14327827997696044,
+              "n": 100,
+              "total": 100
+            },
+            "routeWaypointsHit": {
+              "mean": 4.96,
+              "std": 2.2648834340197217,
+              "n": 100,
+              "total": 100
+            },
+            "waypointsHitPerMinute": {
+              "mean": 5.017552448570599,
+              "std": 3.2588291788103856,
+              "n": 100,
+              "total": 100
+            },
+            "timeToCompleteRoute": {
+              "mean": 61.80810810810672,
+              "std": 18.933159334856693,
+              "n": 74,
+              "total": 100
+            },
+            "crashed": 0
+          },
+          "minDistMean": 68.54791329244347,
+          "minDistStd": 106.5203512002594,
+          "meanDistMean": 386.2786723663461,
+          "maxGasMean": 0.9043211151462345,
+          "timeWithin50": 41.16319444444399,
+          "crashed": 0
+        },
+        {
+          "noise": 0.02,
+          "agg": {
+            "minDistanceToGas": {
+              "mean": 56.2163996561028,
+              "std": 96.31777427414627,
+              "n": 100,
+              "total": 100
+            },
+            "finalDistanceToGas": {
+              "mean": 327.1330264054126,
+              "std": 286.0651440235744,
+              "n": 100,
+              "total": 100
+            },
+            "meanDistanceToGas": {
+              "mean": 355.66520835889287,
+              "std": 147.3693523370649,
+              "n": 100,
+              "total": 100
+            },
+            "maxGasReading": {
+              "mean": 0.949993075964463,
+              "std": 0.21587041102838447,
+              "n": 100,
+              "total": 100
+            },
+            "totalDistanceTraveled": {
+              "mean": 4418.88,
+              "std": 762.3207294475562,
+              "n": 100,
+              "total": 100
+            },
+            "timeToFirstWithin50": {
+              "mean": 38.947945205479115,
+              "std": 18.44858365226734,
+              "n": 73,
+              "total": 100
+            },
+            "routeCompletionFraction": {
+              "mean": 0.8943055555555557,
+              "std": 0.15813871266769258,
+              "n": 100,
+              "total": 100
+            },
+            "routeWaypointsHit": {
+              "mean": 4.5,
+              "std": 2.3462844041271946,
+              "n": 100,
+              "total": 100
+            },
+            "waypointsHitPerMinute": {
+              "mean": 4.280847057404963,
+              "std": 3.0405553968900048,
+              "n": 100,
+              "total": 100
+            },
+            "timeToCompleteRoute": {
+              "mean": 62.77142857142713,
+              "std": 17.321554990273594,
+              "n": 63,
+              "total": 100
+            },
+            "crashed": 0
+          },
+          "minDistMean": 56.2163996561028,
+          "minDistStd": 96.31777427414627,
+          "meanDistMean": 355.66520835889287,
+          "maxGasMean": 0.949993075964463,
+          "timeWithin50": 38.947945205479115,
+          "crashed": 0
+        },
+        {
+          "noise": 0.05,
+          "agg": {
+            "minDistanceToGas": {
+              "mean": 56.0031295509936,
+              "std": 103.58245711153683,
+              "n": 100,
+              "total": 100
+            },
+            "finalDistanceToGas": {
+              "mean": 371.0081451785837,
+              "std": 301.57357985562146,
+              "n": 100,
+              "total": 100
+            },
+            "meanDistanceToGas": {
+              "mean": 360.0995861743129,
+              "std": 153.94416979048088,
+              "n": 100,
+              "total": 100
+            },
+            "maxGasReading": {
+              "mean": 1.0250137763946108,
+              "std": 0.21528908336814792,
+              "n": 100,
+              "total": 100
+            },
+            "totalDistanceTraveled": {
+              "mean": 4637.58,
+              "std": 829.1022549064194,
+              "n": 100,
+              "total": 100
+            },
+            "timeToFirstWithin50": {
+              "mean": 36.57199999999976,
+              "std": 16.35104187109346,
+              "n": 75,
+              "total": 100
+            },
+            "routeCompletionFraction": {
+              "mean": 0.8802499999999999,
+              "std": 0.17505005029560078,
+              "n": 100,
+              "total": 100
+            },
+            "routeWaypointsHit": {
+              "mean": 4.35,
+              "std": 2.293491009378719,
+              "n": 100,
+              "total": 100
+            },
+            "waypointsHitPerMinute": {
+              "mean": 4.1039703825124505,
+              "std": 2.991613367507077,
+              "n": 100,
+              "total": 100
+            },
+            "timeToCompleteRoute": {
+              "mean": 62.63135593220196,
+              "std": 18.627771486238025,
+              "n": 59,
+              "total": 100
+            },
+            "crashed": 0
+          },
+          "minDistMean": 56.0031295509936,
+          "minDistStd": 103.58245711153683,
+          "meanDistMean": 360.0995861743129,
+          "maxGasMean": 1.0250137763946108,
+          "timeWithin50": 36.57199999999976,
+          "crashed": 0
+        },
+        {
+          "noise": 0.1,
+          "agg": {
+            "minDistanceToGas": {
+              "mean": 49.09741618499343,
+              "std": 81.05544937966633,
+              "n": 100,
+              "total": 100
+            },
+            "finalDistanceToGas": {
+              "mean": 357.6152773031221,
+              "std": 309.9251176328428,
+              "n": 100,
+              "total": 100
+            },
+            "meanDistanceToGas": {
+              "mean": 358.1926776768462,
+              "std": 147.17202358088454,
+              "n": 100,
+              "total": 100
+            },
+            "maxGasReading": {
+              "mean": 1.1723641462949486,
+              "std": 0.18006213113283637,
+              "n": 100,
+              "total": 100
+            },
+            "totalDistanceTraveled": {
+              "mean": 4683.54,
+              "std": 805.7320082328299,
+              "n": 100,
+              "total": 100
+            },
+            "timeToFirstWithin50": {
+              "mean": 39.66907894736798,
+              "std": 21.04150179542762,
+              "n": 76,
+              "total": 100
+            },
+            "routeCompletionFraction": {
+              "mean": 0.8883888888888888,
+              "std": 0.15639871897387905,
+              "n": 100,
+              "total": 100
+            },
+            "routeWaypointsHit": {
+              "mean": 4.07,
+              "std": 2.09499162265387,
+              "n": 100,
+              "total": 100
+            },
+            "waypointsHitPerMinute": {
+              "mean": 3.8002284432126583,
+              "std": 2.767347039789432,
+              "n": 100,
+              "total": 100
+            },
+            "timeToCompleteRoute": {
+              "mean": 59.87368421052506,
+              "std": 18.77768219680404,
+              "n": 57,
+              "total": 100
+            },
+            "crashed": 0
+          },
+          "minDistMean": 49.09741618499343,
+          "minDistStd": 81.05544937966633,
+          "meanDistMean": 358.1926776768462,
+          "maxGasMean": 1.1723641462949486,
+          "timeWithin50": 39.66907894736798,
+          "crashed": 0
+        },
+        {
+          "noise": 0.2,
+          "agg": {
+            "minDistanceToGas": {
+              "mean": 72.6915662310808,
+              "std": 126.8494896983681,
+              "n": 100,
+              "total": 100
+            },
+            "finalDistanceToGas": {
+              "mean": 327.43970347275865,
+              "std": 269.9949114912073,
+              "n": 100,
+              "total": 100
+            },
+            "meanDistanceToGas": {
+              "mean": 395.4642865793337,
+              "std": 177.82505980726262,
+              "n": 100,
+              "total": 100
+            },
+            "maxGasReading": {
+              "mean": 1.4165223197405203,
+              "std": 0.25280558671346315,
+              "n": 100,
+              "total": 100
+            },
+            "totalDistanceTraveled": {
+              "mean": 4653.39,
+              "std": 680.1038229564659,
+              "n": 100,
+              "total": 100
+            },
+            "timeToFirstWithin50": {
+              "mean": 46.07014925373056,
+              "std": 26.293062888106675,
+              "n": 67,
+              "total": 100
+            },
+            "routeCompletionFraction": {
+              "mean": 0.8748333333333334,
+              "std": 0.16311871765491145,
+              "n": 100,
+              "total": 100
+            },
+            "routeWaypointsHit": {
+              "mean": 3.04,
+              "std": 1.7690949577953614,
+              "n": 100,
+              "total": 100
+            },
+            "waypointsHitPerMinute": {
+              "mean": 2.3869946518395606,
+              "std": 1.6588340359840679,
+              "n": 100,
+              "total": 100
+            },
+            "timeToCompleteRoute": {
+              "mean": 67.592307692306,
+              "std": 15.350884194420244,
+              "n": 52,
+              "total": 100
+            },
+            "crashed": 0
+          },
+          "minDistMean": 72.6915662310808,
+          "minDistStd": 126.8494896983681,
+          "meanDistMean": 395.4642865793337,
+          "maxGasMean": 1.4165223197405203,
+          "timeWithin50": 46.07014925373056,
+          "crashed": 0
+        },
+        {
+          "noise": 0.3,
+          "agg": {
+            "minDistanceToGas": {
+              "mean": 63.5290933564495,
+              "std": 91.61480690577413,
+              "n": 100,
+              "total": 100
+            },
+            "finalDistanceToGas": {
+              "mean": 280.9419213101752,
+              "std": 243.67605428740953,
+              "n": 100,
+              "total": 100
+            },
+            "meanDistanceToGas": {
+              "mean": 372.06349280998495,
+              "std": 134.66701563002067,
+              "n": 100,
+              "total": 100
+            },
+            "maxGasReading": {
+              "mean": 1.7262585996673387,
+              "std": 0.2561361311805454,
+              "n": 100,
+              "total": 100
+            },
+            "totalDistanceTraveled": {
+              "mean": 4862.1,
+              "std": 636.4868776766301,
+              "n": 100,
+              "total": 100
+            },
+            "timeToFirstWithin50": {
+              "mean": 51.46194029850642,
+              "std": 25.896658099523137,
+              "n": 67,
+              "total": 100
+            },
+            "routeCompletionFraction": {
+              "mean": 0.8593888888888891,
+              "std": 0.16383479866019438,
+              "n": 100,
+              "total": 100
+            },
+            "routeWaypointsHit": {
+              "mean": 2.94,
+              "std": 1.6866678644144752,
+              "n": 100,
+              "total": 100
+            },
+            "waypointsHitPerMinute": {
+              "mean": 2.2347039095981,
+              "std": 1.4600444189761288,
+              "n": 100,
+              "total": 100
+            },
+            "timeToCompleteRoute": {
+              "mean": 70.06770833333148,
+              "std": 14.056419331527374,
+              "n": 48,
+              "total": 100
+            },
+            "crashed": 0
+          },
+          "minDistMean": 63.5290933564495,
+          "minDistStd": 91.61480690577413,
+          "meanDistMean": 372.06349280998495,
+          "maxGasMean": 1.7262585996673387,
+          "timeWithin50": 51.46194029850642,
+          "crashed": 0
+        },
+        {
+          "noise": 0.5,
+          "agg": {
+            "minDistanceToGas": {
+              "mean": 79.14529188253485,
+              "std": 121.3175560130812,
+              "n": 100,
+              "total": 100
+            },
+            "finalDistanceToGas": {
+              "mean": 313.6472725706676,
+              "std": 275.73762180446863,
+              "n": 100,
+              "total": 100
+            },
+            "meanDistanceToGas": {
+              "mean": 395.3268831821177,
+              "std": 157.15809804390923,
+              "n": 100,
+              "total": 100
+            },
+            "maxGasReading": {
+              "mean": 2.3297330385198696,
+              "std": 0.30480186614353555,
+              "n": 100,
+              "total": 100
+            },
+            "totalDistanceTraveled": {
+              "mean": 4961.13,
+              "std": 600.1539643367281,
+              "n": 100,
+              "total": 100
+            },
+            "timeToFirstWithin50": {
+              "mean": 48.63790322580558,
+              "std": 25.925106012529916,
+              "n": 62,
+              "total": 100
+            },
+            "routeCompletionFraction": {
+              "mean": 0.8409166666666666,
+              "std": 0.17928429046859914,
+              "n": 100,
+              "total": 100
+            },
+            "routeWaypointsHit": {
+              "mean": 2.86,
+              "std": 1.8091797348885257,
+              "n": 100,
+              "total": 100
+            },
+            "waypointsHitPerMinute": {
+              "mean": 2.019848206027154,
+              "std": 1.4215056966731998,
+              "n": 100,
+              "total": 100
+            },
+            "timeToCompleteRoute": {
+              "mean": 78.95888888888652,
+              "std": 14.781600544137294,
+              "n": 45,
+              "total": 100
+            },
+            "crashed": 0
+          },
+          "minDistMean": 79.14529188253485,
+          "minDistStd": 121.3175560130812,
+          "meanDistMean": 395.3268831821177,
+          "maxGasMean": 2.3297330385198696,
+          "timeWithin50": 48.63790322580558,
+          "crashed": 0
+        },
+        {
+          "noise": 0.75,
+          "agg": {
+            "minDistanceToGas": {
+              "mean": 94.43022136834799,
+              "std": 129.10659479033717,
+              "n": 100,
+              "total": 100
+            },
+            "finalDistanceToGas": {
+              "mean": 362.2554343819848,
+              "std": 291.9110835630979,
+              "n": 100,
+              "total": 100
+            },
+            "meanDistanceToGas": {
+              "mean": 415.5980825799701,
+              "std": 171.74991564565946,
+              "n": 100,
+              "total": 100
+            },
+            "maxGasReading": {
+              "mean": 3.0974447923060056,
+              "std": 0.38565274463863913,
+              "n": 100,
+              "total": 100
+            },
+            "totalDistanceTraveled": {
+              "mean": 5040,
+              "std": 541.8152989551127,
+              "n": 100,
+              "total": 100
+            },
+            "timeToFirstWithin50": {
+              "mean": 45.30555555555473,
+              "std": 27.327882759199806,
+              "n": 54,
+              "total": 100
+            },
+            "routeCompletionFraction": {
+              "mean": 0.8180555555555555,
+              "std": 0.16866807105759105,
+              "n": 100,
+              "total": 100
+            },
+            "routeWaypointsHit": {
+              "mean": 2.8,
+              "std": 1.651445647689541,
+              "n": 100,
+              "total": 100
+            },
+            "waypointsHitPerMinute": {
+              "mean": 1.9328680470756012,
+              "std": 1.2987394799309977,
+              "n": 100,
+              "total": 100
+            },
+            "timeToCompleteRoute": {
+              "mean": 76.90416666666444,
+              "std": 11.802314391676923,
+              "n": 36,
+              "total": 100
+            },
+            "crashed": 0
+          },
+          "minDistMean": 94.43022136834799,
+          "minDistStd": 129.10659479033717,
+          "meanDistMean": 415.5980825799701,
+          "maxGasMean": 3.0974447923060056,
+          "timeWithin50": 45.30555555555473,
+          "crashed": 0
+        },
+        {
+          "noise": 1,
+          "agg": {
+            "minDistanceToGas": {
+              "mean": 116.92554868988171,
+              "std": 129.929572284259,
+              "n": 100,
+              "total": 100
+            },
+            "finalDistanceToGas": {
+              "mean": 376.84884885625894,
+              "std": 249.4532337992424,
+              "n": 100,
+              "total": 100
+            },
+            "meanDistanceToGas": {
+              "mean": 433.19517109386885,
+              "std": 144.61408763298454,
+              "n": 100,
+              "total": 100
+            },
+            "maxGasReading": {
+              "mean": 3.8629322479592205,
+              "std": 0.4064410316785565,
+              "n": 100,
+              "total": 100
+            },
+            "totalDistanceTraveled": {
+              "mean": 5046.09,
+              "std": 476.62076691489773,
+              "n": 100,
+              "total": 100
+            },
+            "timeToFirstWithin50": {
+              "mean": 50.77435897435796,
+              "std": 25.932104852445253,
+              "n": 39,
+              "total": 100
+            },
+            "routeCompletionFraction": {
+              "mean": 0.8153055555555555,
+              "std": 0.17030791153089803,
+              "n": 100,
+              "total": 100
+            },
+            "routeWaypointsHit": {
+              "mean": 2.88,
+              "std": 1.7307673314329557,
+              "n": 100,
+              "total": 100
+            },
+            "waypointsHitPerMinute": {
+              "mean": 1.9517668367715446,
+              "std": 1.2452780006761226,
+              "n": 100,
+              "total": 100
+            },
+            "timeToCompleteRoute": {
+              "mean": 76.20151515151298,
+              "std": 11.425051181835508,
+              "n": 33,
+              "total": 100
+            },
+            "crashed": 0
+          },
+          "minDistMean": 116.92554868988171,
+          "minDistStd": 129.929572284259,
+          "meanDistMean": 433.19517109386885,
+          "maxGasMean": 3.8629322479592205,
+          "timeWithin50": 50.77435897435796,
+          "crashed": 0
+        }
+      ]
+    },
+    {
+      "name": "smart_lobster_agent",
+      "data": [
+        {
+          "noise": 0,
+          "agg": {
+            "minDistanceToGas": {
+              "mean": 67.9061178175073,
+              "std": 94.24117407324961,
+              "n": 100,
+              "total": 100
+            },
+            "finalDistanceToGas": {
+              "mean": 544.8664424765135,
+              "std": 284.68794905459424,
+              "n": 100,
+              "total": 100
+            },
+            "meanDistanceToGas": {
+              "mean": 430.4604048539513,
+              "std": 124.5328955148399,
+              "n": 100,
+              "total": 100
+            },
+            "maxGasReading": {
+              "mean": 0.9002673312953082,
+              "std": 0.20631826483939913,
+              "n": 100,
+              "total": 100
+            },
+            "totalDistanceTraveled": {
+              "mean": 4035.84,
+              "std": 785.0151220315323,
+              "n": 100,
+              "total": 100
+            },
+            "timeToFirstWithin50": {
+              "mean": 36.598461538461194,
+              "std": 20.20032674788023,
+              "n": 65,
+              "total": 100
+            },
+            "routeCompletionFraction": {
+              "mean": 0.9651111111111109,
+              "std": 0.11208351152290945,
+              "n": 100,
+              "total": 100
+            },
+            "routeWaypointsHit": {
+              "mean": 7.04,
+              "std": 1.895875374159239,
+              "n": 100,
+              "total": 100
+            },
+            "waypointsHitPerMinute": {
+              "mean": 5.997729387747574,
+              "std": 2.0871393169951746,
+              "n": 100,
+              "total": 100
+            },
+            "timeToCompleteRoute": {
+              "mean": 69.87616279069587,
+              "std": 14.36041070759507,
+              "n": 86,
+              "total": 100
+            },
+            "crashed": 0
+          },
+          "minDistMean": 67.9061178175073,
+          "minDistStd": 94.24117407324961,
+          "meanDistMean": 430.4604048539513,
+          "maxGasMean": 0.9002673312953082,
+          "timeWithin50": 36.598461538461194,
+          "crashed": 0
+        },
+        {
+          "noise": 0.01,
+          "agg": {
+            "minDistanceToGas": {
+              "mean": 81.7343415020694,
+              "std": 91.32774897545431,
+              "n": 100,
+              "total": 100
+            },
+            "finalDistanceToGas": {
+              "mean": 571.2635507912521,
+              "std": 278.97095558452133,
+              "n": 100,
+              "total": 100
+            },
+            "meanDistanceToGas": {
+              "mean": 436.8423827795695,
+              "std": 121.23336231421672,
+              "n": 100,
+              "total": 100
+            },
+            "maxGasReading": {
+              "mean": 0.889637355423377,
+              "std": 0.1962093496415079,
+              "n": 100,
+              "total": 100
+            },
+            "totalDistanceTraveled": {
+              "mean": 4136.46,
+              "std": 715.1857203170758,
+              "n": 100,
+              "total": 100
+            },
+            "timeToFirstWithin50": {
+              "mean": 39.00312499999955,
+              "std": 21.94894318749393,
+              "n": 48,
+              "total": 100
+            },
+            "routeCompletionFraction": {
+              "mean": 0.9505555555555552,
+              "std": 0.1291676471970796,
+              "n": 100,
+              "total": 100
+            },
+            "routeWaypointsHit": {
+              "mean": 6.89,
+              "std": 2.0738633250311085,
+              "n": 100,
+              "total": 100
+            },
+            "waypointsHitPerMinute": {
+              "mean": 5.624596880079008,
+              "std": 2.1822549819793298,
+              "n": 100,
+              "total": 100
+            },
+            "timeToCompleteRoute": {
+              "mean": 72.0475308641956,
+              "std": 13.481419855754837,
+              "n": 81,
+              "total": 100
+            },
+            "crashed": 0
+          },
+          "minDistMean": 81.7343415020694,
+          "minDistStd": 91.32774897545431,
+          "meanDistMean": 436.8423827795695,
+          "maxGasMean": 0.889637355423377,
+          "timeWithin50": 39.00312499999955,
+          "crashed": 0
+        },
+        {
+          "noise": 0.02,
+          "agg": {
+            "minDistanceToGas": {
+              "mean": 71.41254208953151,
+              "std": 84.8812505362017,
+              "n": 100,
+              "total": 100
+            },
+            "finalDistanceToGas": {
+              "mean": 552.424392654795,
+              "std": 280.81229523339147,
+              "n": 100,
+              "total": 100
+            },
+            "meanDistanceToGas": {
+              "mean": 421.88000452603745,
+              "std": 123.0773849036251,
+              "n": 100,
+              "total": 100
+            },
+            "maxGasReading": {
+              "mean": 0.9336845101126411,
+              "std": 0.18736144096986493,
+              "n": 100,
+              "total": 100
+            },
+            "totalDistanceTraveled": {
+              "mean": 4202.34,
+              "std": 691.5113329775323,
+              "n": 100,
+              "total": 100
+            },
+            "timeToFirstWithin50": {
+              "mean": 40.54298245613988,
+              "std": 21.02195586633368,
+              "n": 57,
+              "total": 100
+            },
+            "routeCompletionFraction": {
+              "mean": 0.9446666666666669,
+              "std": 0.16202654126661575,
+              "n": 100,
+              "total": 100
+            },
+            "routeWaypointsHit": {
+              "mean": 7.39,
+              "std": 1.847165450635162,
+              "n": 100,
+              "total": 100
+            },
+            "waypointsHitPerMinute": {
+              "mean": 5.904686611479736,
+              "std": 1.8845268098923027,
+              "n": 100,
+              "total": 100
+            },
+            "timeToCompleteRoute": {
+              "mean": 74.42678571428361,
+              "std": 12.27772114571041,
+              "n": 84,
+              "total": 100
+            },
+            "crashed": 0
+          },
+          "minDistMean": 71.41254208953151,
+          "minDistStd": 84.8812505362017,
+          "meanDistMean": 421.88000452603745,
+          "maxGasMean": 0.9336845101126411,
+          "timeWithin50": 40.54298245613988,
+          "crashed": 0
+        },
+        {
+          "noise": 0.05,
+          "agg": {
+            "minDistanceToGas": {
+              "mean": 82.24520536341325,
+              "std": 89.4890211602134,
+              "n": 100,
+              "total": 100
+            },
+            "finalDistanceToGas": {
+              "mean": 495.61713405444993,
+              "std": 260.72100836319856,
+              "n": 100,
+              "total": 100
+            },
+            "meanDistanceToGas": {
+              "mean": 425.1198537437047,
+              "std": 115.38916161617709,
+              "n": 100,
+              "total": 100
+            },
+            "maxGasReading": {
+              "mean": 0.9874737193668682,
+              "std": 0.20461939092203263,
+              "n": 100,
+              "total": 100
+            },
+            "totalDistanceTraveled": {
+              "mean": 4427.58,
+              "std": 744.6072814822342,
+              "n": 100,
+              "total": 100
+            },
+            "timeToFirstWithin50": {
+              "mean": 53.20816326530506,
+              "std": 23.875367246168263,
+              "n": 49,
+              "total": 100
+            },
+            "routeCompletionFraction": {
+              "mean": 0.9008611111111112,
+              "std": 0.1940531155150631,
+              "n": 100,
+              "total": 100
+            },
+            "routeWaypointsHit": {
+              "mean": 6.81,
+              "std": 2.3298458786327094,
+              "n": 100,
+              "total": 100
+            },
+            "waypointsHitPerMinute": {
+              "mean": 5.2638736029179025,
+              "std": 2.3028966349404416,
+              "n": 100,
+              "total": 100
+            },
+            "timeToCompleteRoute": {
+              "mean": 74.88785714285503,
+              "std": 15.14291922279079,
+              "n": 70,
+              "total": 100
+            },
+            "crashed": 0
+          },
+          "minDistMean": 82.24520536341325,
+          "minDistStd": 89.4890211602134,
+          "meanDistMean": 425.1198537437047,
+          "maxGasMean": 0.9874737193668682,
+          "timeWithin50": 53.20816326530506,
+          "crashed": 0
+        },
+        {
+          "noise": 0.1,
+          "agg": {
+            "minDistanceToGas": {
+              "mean": 82.5398546944776,
+              "std": 90.62561371572565,
+              "n": 100,
+              "total": 100
+            },
+            "finalDistanceToGas": {
+              "mean": 484.6094789899907,
+              "std": 273.5475321423382,
+              "n": 100,
+              "total": 100
+            },
+            "meanDistanceToGas": {
+              "mean": 430.7405764649357,
+              "std": 116.4300407349942,
+              "n": 100,
+              "total": 100
+            },
+            "maxGasReading": {
+              "mean": 1.1083097761584424,
+              "std": 0.1970998102577379,
+              "n": 100,
+              "total": 100
+            },
+            "totalDistanceTraveled": {
+              "mean": 4617.63,
+              "std": 772.662138912663,
+              "n": 100,
+              "total": 100
+            },
+            "timeToFirstWithin50": {
+              "mean": 50.22999999999905,
+              "std": 23.2474751756136,
+              "n": 50,
+              "total": 100
+            },
+            "routeCompletionFraction": {
+              "mean": 0.8888055555555553,
+              "std": 0.20498656918582936,
+              "n": 100,
+              "total": 100
+            },
+            "routeWaypointsHit": {
+              "mean": 7.14,
+              "std": 2.3269175865392087,
+              "n": 100,
+              "total": 100
+            },
+            "waypointsHitPerMinute": {
+              "mean": 5.156588013121954,
+              "std": 2.010237235516546,
+              "n": 100,
+              "total": 100
+            },
+            "timeToCompleteRoute": {
+              "mean": 79.2552238805946,
+              "std": 13.964476398542823,
+              "n": 67,
+              "total": 100
+            },
+            "crashed": 0
+          },
+          "minDistMean": 82.5398546944776,
+          "minDistStd": 90.62561371572565,
+          "meanDistMean": 430.7405764649357,
+          "maxGasMean": 1.1083097761584424,
+          "timeWithin50": 50.22999999999905,
+          "crashed": 0
+        },
+        {
+          "noise": 0.2,
+          "agg": {
+            "minDistanceToGas": {
+              "mean": 100.53171626952455,
+              "std": 137.21512581223456,
+              "n": 100,
+              "total": 100
+            },
+            "finalDistanceToGas": {
+              "mean": 445.8986188280016,
+              "std": 268.664397795147,
+              "n": 100,
+              "total": 100
+            },
+            "meanDistanceToGas": {
+              "mean": 444.3724532495178,
+              "std": 136.43343404495693,
+              "n": 100,
+              "total": 100
+            },
+            "maxGasReading": {
+              "mean": 1.3440426633397968,
+              "std": 0.25286525561857176,
+              "n": 100,
+              "total": 100
+            },
+            "totalDistanceTraveled": {
+              "mean": 4831.35,
+              "std": 666.4349351041502,
+              "n": 100,
+              "total": 100
+            },
+            "timeToFirstWithin50": {
+              "mean": 54.63804347825968,
+              "std": 26.18503216381893,
+              "n": 46,
+              "total": 100
+            },
+            "routeCompletionFraction": {
+              "mean": 0.8566944444444446,
+              "std": 0.2261414682892325,
+              "n": 100,
+              "total": 100
+            },
+            "routeWaypointsHit": {
+              "mean": 6.78,
+              "std": 2.372315069268581,
+              "n": 100,
+              "total": 100
+            },
+            "waypointsHitPerMinute": {
+              "mean": 4.67240738733092,
+              "std": 1.8629166654569558,
+              "n": 100,
+              "total": 100
+            },
+            "timeToCompleteRoute": {
+              "mean": 82.58749999999746,
+              "std": 15.456123313474464,
+              "n": 60,
+              "total": 100
+            },
+            "crashed": 0
+          },
+          "minDistMean": 100.53171626952455,
+          "minDistStd": 137.21512581223456,
+          "meanDistMean": 444.3724532495178,
+          "maxGasMean": 1.3440426633397968,
+          "timeWithin50": 54.63804347825968,
+          "crashed": 0
+        },
+        {
+          "noise": 0.3,
+          "agg": {
+            "minDistanceToGas": {
+              "mean": 99.26286223979622,
+              "std": 107.63910465328608,
+              "n": 100,
+              "total": 100
+            },
+            "finalDistanceToGas": {
+              "mean": 399.9144722822807,
+              "std": 258.1067596091867,
+              "n": 100,
+              "total": 100
+            },
+            "meanDistanceToGas": {
+              "mean": 468.26959054623103,
+              "std": 145.12744793841074,
+              "n": 100,
+              "total": 100
+            },
+            "maxGasReading": {
+              "mean": 1.6152940870185306,
+              "std": 0.23032447005041914,
+              "n": 100,
+              "total": 100
+            },
+            "totalDistanceTraveled": {
+              "mean": 4909.08,
+              "std": 604.7790761171314,
+              "n": 100,
+              "total": 100
+            },
+            "timeToFirstWithin50": {
+              "mean": 55.463414634145145,
+              "std": 23.34488440855372,
+              "n": 41,
+              "total": 100
+            },
+            "routeCompletionFraction": {
+              "mean": 0.7349722222222222,
+              "std": 0.2718601129833148,
+              "n": 100,
+              "total": 100
+            },
+            "routeWaypointsHit": {
+              "mean": 5.96,
+              "std": 2.4981609397330833,
+              "n": 100,
+              "total": 100
+            },
+            "waypointsHitPerMinute": {
+              "mean": 3.978941930747328,
+              "std": 1.956106840397034,
+              "n": 100,
+              "total": 100
+            },
+            "timeToCompleteRoute": {
+              "mean": 80.01029411764463,
+              "std": 11.736415612358373,
+              "n": 34,
+              "total": 100
+            },
+            "crashed": 0
+          },
+          "minDistMean": 99.26286223979622,
+          "minDistStd": 107.63910465328608,
+          "meanDistMean": 468.26959054623103,
+          "maxGasMean": 1.6152940870185306,
+          "timeWithin50": 55.463414634145145,
+          "crashed": 0
+        },
+        {
+          "noise": 0.5,
+          "agg": {
+            "minDistanceToGas": {
+              "mean": 119.08740707717757,
+              "std": 126.83008739635517,
+              "n": 100,
+              "total": 100
+            },
+            "finalDistanceToGas": {
+              "mean": 445.23252891670876,
+              "std": 250.72939219267906,
+              "n": 100,
+              "total": 100
+            },
+            "meanDistanceToGas": {
+              "mean": 522.5690723528791,
+              "std": 170.8989238086048,
+              "n": 100,
+              "total": 100
+            },
+            "maxGasReading": {
+              "mean": 2.170231995719496,
+              "std": 0.30184949171299735,
+              "n": 100,
+              "total": 100
+            },
+            "totalDistanceTraveled": {
+              "mean": 5002.62,
+              "std": 543.7475049054564,
+              "n": 100,
+              "total": 100
+            },
+            "timeToFirstWithin50": {
+              "mean": 53.34615384615263,
+              "std": 28.15139144129312,
+              "n": 39,
+              "total": 100
+            },
+            "routeCompletionFraction": {
+              "mean": 0.7755555555555556,
+              "std": 0.26530792778525086,
+              "n": 100,
+              "total": 100
+            },
+            "routeWaypointsHit": {
+              "mean": 6.65,
+              "std": 2.3371181425253647,
+              "n": 100,
+              "total": 100
+            },
+            "waypointsHitPerMinute": {
+              "mean": 4.429816005284274,
+              "std": 1.7986387844869727,
+              "n": 100,
+              "total": 100
+            },
+            "timeToCompleteRoute": {
+              "mean": 83.76511627906716,
+              "std": 9.850812964297658,
+              "n": 43,
+              "total": 100
+            },
+            "crashed": 0
+          },
+          "minDistMean": 119.08740707717757,
+          "minDistStd": 126.83008739635517,
+          "meanDistMean": 522.5690723528791,
+          "maxGasMean": 2.170231995719496,
+          "timeWithin50": 53.34615384615263,
+          "crashed": 0
+        },
+        {
+          "noise": 0.75,
+          "agg": {
+            "minDistanceToGas": {
+              "mean": 122.13443003873306,
+              "std": 117.58829417101867,
+              "n": 100,
+              "total": 100
+            },
+            "finalDistanceToGas": {
+              "mean": 486.6117997900949,
+              "std": 255.3243778696367,
+              "n": 100,
+              "total": 100
+            },
+            "meanDistanceToGas": {
+              "mean": 547.6895498368534,
+              "std": 190.53688949394186,
+              "n": 100,
+              "total": 100
+            },
+            "maxGasReading": {
+              "mean": 2.935370911648262,
+              "std": 0.3306085365746354,
+              "n": 100,
+              "total": 100
+            },
+            "totalDistanceTraveled": {
+              "mean": 5009.31,
+              "std": 550.2620623600425,
+              "n": 100,
+              "total": 100
+            },
+            "timeToFirstWithin50": {
+              "mean": 60.77352941176323,
+              "std": 24.561568388667272,
+              "n": 34,
+              "total": 100
+            },
+            "routeCompletionFraction": {
+              "mean": 0.7409444444444443,
+              "std": 0.2798947446600066,
+              "n": 100,
+              "total": 100
+            },
+            "routeWaypointsHit": {
+              "mean": 6.27,
+              "std": 2.7371554946732934,
+              "n": 100,
+              "total": 100
+            },
+            "waypointsHitPerMinute": {
+              "mean": 4.22815224066471,
+              "std": 2.12169136304882,
+              "n": 100,
+              "total": 100
+            },
+            "timeToCompleteRoute": {
+              "mean": 82.26624999999747,
+              "std": 11.580384539803864,
+              "n": 40,
+              "total": 100
+            },
+            "crashed": 0
+          },
+          "minDistMean": 122.13443003873306,
+          "minDistStd": 117.58829417101867,
+          "meanDistMean": 547.6895498368534,
+          "maxGasMean": 2.935370911648262,
+          "timeWithin50": 60.77352941176323,
+          "crashed": 0
+        },
+        {
+          "noise": 1,
+          "agg": {
+            "minDistanceToGas": {
+              "mean": 146.5690404031471,
+              "std": 165.01661970423643,
+              "n": 100,
+              "total": 100
+            },
+            "finalDistanceToGas": {
+              "mean": 536.9908960131993,
+              "std": 271.5449166710605,
+              "n": 100,
+              "total": 100
+            },
+            "meanDistanceToGas": {
+              "mean": 568.3256666921266,
+              "std": 197.01770870609596,
+              "n": 100,
+              "total": 100
+            },
+            "maxGasReading": {
+              "mean": 3.685684212633768,
+              "std": 0.39041611679194443,
+              "n": 100,
+              "total": 100
+            },
+            "totalDistanceTraveled": {
+              "mean": 4721.55,
+              "std": 642.1918964127326,
+              "n": 100,
+              "total": 100
+            },
+            "timeToFirstWithin50": {
+              "mean": 52.27999999999893,
+              "std": 25.37847852834644,
+              "n": 30,
+              "total": 100
+            },
+            "routeCompletionFraction": {
+              "mean": 0.81675,
+              "std": 0.29427855029543953,
+              "n": 100,
+              "total": 100
+            },
+            "routeWaypointsHit": {
+              "mean": 6.59,
+              "std": 2.6442046406846393,
+              "n": 100,
+              "total": 100
+            },
+            "waypointsHitPerMinute": {
+              "mean": 4.663948277708476,
+              "std": 2.146512678069006,
+              "n": 100,
+              "total": 100
+            },
+            "timeToCompleteRoute": {
+              "mean": 80.69137931034238,
+              "std": 10.986212004347221,
+              "n": 58,
+              "total": 100
+            },
+            "crashed": 0
+          },
+          "minDistMean": 146.5690404031471,
+          "minDistStd": 165.01661970423643,
+          "meanDistMean": 568.3256666921266,
+          "maxGasMean": 3.685684212633768,
+          "timeWithin50": 52.27999999999893,
+          "crashed": 0
+        }
+      ]
+    },
+    {
+      "name": "dumb_lobster_agent",
+      "data": [
+        {
+          "noise": 0,
+          "agg": {
+            "minDistanceToGas": {
+              "mean": 95.86800904531712,
+              "std": 92.81906082125363,
+              "n": 100,
+              "total": 100
+            },
+            "finalDistanceToGas": {
+              "mean": 549.3104654697814,
+              "std": 265.6224498492091,
+              "n": 100,
+              "total": 100
+            },
+            "meanDistanceToGas": {
+              "mean": 415.6163705194719,
+              "std": 111.1880388334491,
+              "n": 100,
+              "total": 100
+            },
+            "maxGasReading": {
+              "mean": 0.8494870358422189,
+              "std": 0.20884987901790844,
+              "n": 100,
+              "total": 100
+            },
+            "totalDistanceTraveled": {
+              "mean": 4122.54,
+              "std": 721.2069908399137,
+              "n": 100,
+              "total": 100
+            },
+            "timeToFirstWithin50": {
+              "mean": 42.767857142856556,
+              "std": 21.298653975070582,
+              "n": 42,
+              "total": 100
+            },
+            "routeCompletionFraction": {
+              "mean": 0.9351944444444443,
+              "std": 0.1503176869237948,
+              "n": 100,
+              "total": 100
+            },
+            "routeWaypointsHit": {
+              "mean": 5.49,
+              "std": 2.217902366897811,
+              "n": 100,
+              "total": 100
+            },
+            "waypointsHitPerMinute": {
+              "mean": 4.174389161452166,
+              "std": 2.094529503768172,
+              "n": 100,
+              "total": 100
+            },
+            "timeToCompleteRoute": {
+              "mean": 80.6128205128181,
+              "std": 13.909583811584728,
+              "n": 78,
+              "total": 100
+            },
+            "crashed": 0
+          },
+          "minDistMean": 95.86800904531712,
+          "minDistStd": 92.81906082125363,
+          "meanDistMean": 415.6163705194719,
+          "maxGasMean": 0.8494870358422189,
+          "timeWithin50": 42.767857142856556,
+          "crashed": 0
+        },
+        {
+          "noise": 0.01,
+          "agg": {
+            "minDistanceToGas": {
+              "mean": 89.90884221825304,
+              "std": 88.73333489802438,
+              "n": 100,
+              "total": 100
+            },
+            "finalDistanceToGas": {
+              "mean": 542.446120467522,
+              "std": 273.5819092110153,
+              "n": 100,
+              "total": 100
+            },
+            "meanDistanceToGas": {
+              "mean": 413.29155365805514,
+              "std": 111.25580280940231,
+              "n": 100,
+              "total": 100
+            },
+            "maxGasReading": {
+              "mean": 0.8806260428343387,
+              "std": 0.19499401137915912,
+              "n": 100,
+              "total": 100
+            },
+            "totalDistanceTraveled": {
+              "mean": 4037.55,
+              "std": 720.3417591671331,
+              "n": 100,
+              "total": 100
+            },
+            "timeToFirstWithin50": {
+              "mean": 44.01744186046452,
+              "std": 21.858301473354935,
+              "n": 43,
+              "total": 100
+            },
+            "routeCompletionFraction": {
+              "mean": 0.9205,
+              "std": 0.15136180886106454,
+              "n": 100,
+              "total": 100
+            },
+            "routeWaypointsHit": {
+              "mean": 5.52,
+              "std": 1.9872319716356484,
+              "n": 100,
+              "total": 100
+            },
+            "waypointsHitPerMinute": {
+              "mean": 4.275524401035673,
+              "std": 1.9174756693237978,
+              "n": 100,
+              "total": 100
+            },
+            "timeToCompleteRoute": {
+              "mean": 75.91917808218962,
+              "std": 14.616480496098301,
+              "n": 73,
+              "total": 100
+            },
+            "crashed": 0
+          },
+          "minDistMean": 89.90884221825304,
+          "minDistStd": 88.73333489802438,
+          "meanDistMean": 413.29155365805514,
+          "maxGasMean": 0.8806260428343387,
+          "timeWithin50": 44.01744186046452,
+          "crashed": 0
+        },
+        {
+          "noise": 0.02,
+          "agg": {
+            "minDistanceToGas": {
+              "mean": 94.39323752863287,
+              "std": 80.40251489632071,
+              "n": 100,
+              "total": 100
+            },
+            "finalDistanceToGas": {
+              "mean": 552.8583619587974,
+              "std": 272.2783653652974,
+              "n": 100,
+              "total": 100
+            },
+            "meanDistanceToGas": {
+              "mean": 423.8707599650565,
+              "std": 88.89685630675694,
+              "n": 100,
+              "total": 100
+            },
+            "maxGasReading": {
+              "mean": 0.8913703277490592,
+              "std": 0.18204751396670624,
+              "n": 100,
+              "total": 100
+            },
+            "totalDistanceTraveled": {
+              "mean": 4049.22,
+              "std": 636.4856093495679,
+              "n": 100,
+              "total": 100
+            },
+            "timeToFirstWithin50": {
+              "mean": 44.15833333333268,
+              "std": 23.084551111077666,
+              "n": 36,
+              "total": 100
+            },
+            "routeCompletionFraction": {
+              "mean": 0.9155555555555556,
+              "std": 0.1611778568347933,
+              "n": 100,
+              "total": 100
+            },
+            "routeWaypointsHit": {
+              "mean": 5.54,
+              "std": 2.2760057162059186,
+              "n": 100,
+              "total": 100
+            },
+            "waypointsHitPerMinute": {
+              "mean": 4.1653851988327215,
+              "std": 1.9542894690469836,
+              "n": 100,
+              "total": 100
+            },
+            "timeToCompleteRoute": {
+              "mean": 79.20675675675443,
+              "std": 12.81326454270626,
+              "n": 74,
+              "total": 100
+            },
+            "crashed": 0
+          },
+          "minDistMean": 94.39323752863287,
+          "minDistStd": 80.40251489632071,
+          "meanDistMean": 423.8707599650565,
+          "maxGasMean": 0.8913703277490592,
+          "timeWithin50": 44.15833333333268,
+          "crashed": 0
+        },
+        {
+          "noise": 0.05,
+          "agg": {
+            "minDistanceToGas": {
+              "mean": 122.60505846533323,
+              "std": 116.60789744126859,
+              "n": 100,
+              "total": 100
+            },
+            "finalDistanceToGas": {
+              "mean": 433.09285650072127,
+              "std": 253.70236683128996,
+              "n": 100,
+              "total": 100
+            },
+            "meanDistanceToGas": {
+              "mean": 462.06702773854363,
+              "std": 126.36677920572431,
+              "n": 100,
+              "total": 100
+            },
+            "maxGasReading": {
+              "mean": 0.8949735490617219,
+              "std": 0.26441615852989064,
+              "n": 100,
+              "total": 100
+            },
+            "totalDistanceTraveled": {
+              "mean": 4414.83,
+              "std": 668.6325115147673,
+              "n": 100,
+              "total": 100
+            },
+            "timeToFirstWithin50": {
+              "mean": 53.60571428571307,
+              "std": 26.783477598490713,
+              "n": 35,
+              "total": 100
+            },
+            "routeCompletionFraction": {
+              "mean": 0.8277777777777776,
+              "std": 0.22113017305557933,
+              "n": 100,
+              "total": 100
+            },
+            "routeWaypointsHit": {
+              "mean": 4.38,
+              "std": 2.6582442751302287,
+              "n": 100,
+              "total": 100
+            },
+            "waypointsHitPerMinute": {
+              "mean": 3.105841070125343,
+              "std": 2.1553443614056405,
+              "n": 100,
+              "total": 100
+            },
+            "timeToCompleteRoute": {
+              "mean": 81.46442307692058,
+              "std": 14.201492384081345,
+              "n": 52,
+              "total": 100
+            },
+            "crashed": 0
+          },
+          "minDistMean": 122.60505846533323,
+          "minDistStd": 116.60789744126859,
+          "meanDistMean": 462.06702773854363,
+          "maxGasMean": 0.8949735490617219,
+          "timeWithin50": 53.60571428571307,
+          "crashed": 0
+        },
+        {
+          "noise": 0.1,
+          "agg": {
+            "minDistanceToGas": {
+              "mean": 153.85455063957994,
+              "std": 142.45759825252827,
+              "n": 100,
+              "total": 100
+            },
+            "finalDistanceToGas": {
+              "mean": 446.7158180010103,
+              "std": 256.2034552215959,
+              "n": 100,
+              "total": 100
+            },
+            "meanDistanceToGas": {
+              "mean": 498.4788588872489,
+              "std": 142.0400318783395,
+              "n": 100,
+              "total": 100
+            },
+            "maxGasReading": {
+              "mean": 0.9614417041118921,
+              "std": 0.2885501228820184,
+              "n": 100,
+              "total": 100
+            },
+            "totalDistanceTraveled": {
+              "mean": 4456.14,
+              "std": 697.7403502475951,
+              "n": 100,
+              "total": 100
+            },
+            "timeToFirstWithin50": {
+              "mean": 54.16785714285595,
+              "std": 26.51456697562123,
+              "n": 28,
+              "total": 100
+            },
+            "routeCompletionFraction": {
+              "mean": 0.7800277777777777,
+              "std": 0.25056262137254426,
+              "n": 100,
+              "total": 100
+            },
+            "routeWaypointsHit": {
+              "mean": 4.4,
+              "std": 2.6930512903628947,
+              "n": 100,
+              "total": 100
+            },
+            "waypointsHitPerMinute": {
+              "mean": 2.9981750343032094,
+              "std": 1.9933329135005098,
+              "n": 100,
+              "total": 100
+            },
+            "timeToCompleteRoute": {
+              "mean": 82.49883720929978,
+              "std": 14.158173175354287,
+              "n": 43,
+              "total": 100
+            },
+            "crashed": 0
+          },
+          "minDistMean": 153.85455063957994,
+          "minDistStd": 142.45759825252827,
+          "meanDistMean": 498.4788588872489,
+          "maxGasMean": 0.9614417041118921,
+          "timeWithin50": 54.16785714285595,
+          "crashed": 0
+        },
+        {
+          "noise": 0.2,
+          "agg": {
+            "minDistanceToGas": {
+              "mean": 142.55089585930966,
+              "std": 112.76154437529564,
+              "n": 100,
+              "total": 100
+            },
+            "finalDistanceToGas": {
+              "mean": 451.2643461624258,
+              "std": 264.92252972943896,
+              "n": 100,
+              "total": 100
+            },
+            "meanDistanceToGas": {
+              "mean": 516.9245995896777,
+              "std": 151.60094031759616,
+              "n": 100,
+              "total": 100
+            },
+            "maxGasReading": {
+              "mean": 1.2495991253200287,
+              "std": 0.24983857645021412,
+              "n": 100,
+              "total": 100
+            },
+            "totalDistanceTraveled": {
+              "mean": 4435.74,
+              "std": 600.3955029811599,
+              "n": 100,
+              "total": 100
+            },
+            "timeToFirstWithin50": {
+              "mean": 66.07499999999816,
+              "std": 28.66659399215479,
+              "n": 28,
+              "total": 100
+            },
+            "routeCompletionFraction": {
+              "mean": 0.7812222222222224,
+              "std": 0.2348486151840629,
+              "n": 100,
+              "total": 100
+            },
+            "routeWaypointsHit": {
+              "mean": 4.8,
+              "std": 2.5065570575648746,
+              "n": 100,
+              "total": 100
+            },
+            "waypointsHitPerMinute": {
+              "mean": 3.2982031952761957,
+              "std": 1.9556589462632046,
+              "n": 100,
+              "total": 100
+            },
+            "timeToCompleteRoute": {
+              "mean": 79.30731707316836,
+              "std": 13.407108939735323,
+              "n": 41,
+              "total": 100
+            },
+            "crashed": 0
+          },
+          "minDistMean": 142.55089585930966,
+          "minDistStd": 112.76154437529564,
+          "meanDistMean": 516.9245995896777,
+          "maxGasMean": 1.2495991253200287,
+          "timeWithin50": 66.07499999999816,
+          "crashed": 0
+        },
+        {
+          "noise": 0.3,
+          "agg": {
+            "minDistanceToGas": {
+              "mean": 131.68582950792762,
+              "std": 104.12045334685278,
+              "n": 100,
+              "total": 100
+            },
+            "finalDistanceToGas": {
+              "mean": 464.76864721605335,
+              "std": 246.89103507816765,
+              "n": 100,
+              "total": 100
+            },
+            "meanDistanceToGas": {
+              "mean": 517.3310839111568,
+              "std": 137.60618089991337,
+              "n": 100,
+              "total": 100
+            },
+            "maxGasReading": {
+              "mean": 1.5641317919298967,
+              "std": 0.2594289326765089,
+              "n": 100,
+              "total": 100
+            },
+            "totalDistanceTraveled": {
+              "mean": 4419.69,
+              "std": 600.2762780586953,
+              "n": 100,
+              "total": 100
+            },
+            "timeToFirstWithin50": {
+              "mean": 67.39999999999822,
+              "std": 22.388943871747493,
+              "n": 27,
+              "total": 100
+            },
+            "routeCompletionFraction": {
+              "mean": 0.8191388888888889,
+              "std": 0.2283692789994355,
+              "n": 100,
+              "total": 100
+            },
+            "routeWaypointsHit": {
+              "mean": 5.37,
+              "std": 2.448066645953558,
+              "n": 100,
+              "total": 100
+            },
+            "waypointsHitPerMinute": {
+              "mean": 3.7362617569161807,
+              "std": 1.9590114721110166,
+              "n": 100,
+              "total": 100
+            },
+            "timeToCompleteRoute": {
+              "mean": 81.9148148148123,
+              "std": 12.58093657321986,
+              "n": 54,
+              "total": 100
+            },
+            "crashed": 0
+          },
+          "minDistMean": 131.68582950792762,
+          "minDistStd": 104.12045334685278,
+          "meanDistMean": 517.3310839111568,
+          "maxGasMean": 1.5641317919298967,
+          "timeWithin50": 67.39999999999822,
+          "crashed": 0
+        },
+        {
+          "noise": 0.5,
+          "agg": {
+            "minDistanceToGas": {
+              "mean": 142.47090350304615,
+              "std": 111.50798710589197,
+              "n": 100,
+              "total": 100
+            },
+            "finalDistanceToGas": {
+              "mean": 514.5357959333713,
+              "std": 269.0344640720498,
+              "n": 100,
+              "total": 100
+            },
+            "meanDistanceToGas": {
+              "mean": 537.3407544982794,
+              "std": 163.47680419363064,
+              "n": 100,
+              "total": 100
+            },
+            "maxGasReading": {
+              "mean": 2.1182840456725605,
+              "std": 0.2801685589596184,
+              "n": 100,
+              "total": 100
+            },
+            "totalDistanceTraveled": {
+              "mean": 4316.88,
+              "std": 633.7920393085645,
+              "n": 100,
+              "total": 100
+            },
+            "timeToFirstWithin50": {
+              "mean": 62.54318181818027,
+              "std": 20.56036579866367,
+              "n": 22,
+              "total": 100
+            },
+            "routeCompletionFraction": {
+              "mean": 0.8844722222222222,
+              "std": 0.18035756864877858,
+              "n": 100,
+              "total": 100
+            },
+            "routeWaypointsHit": {
+              "mean": 6.08,
+              "std": 2.3513589451397863,
+              "n": 100,
+              "total": 100
+            },
+            "waypointsHitPerMinute": {
+              "mean": 4.412193341638742,
+              "std": 1.9890303933855624,
+              "n": 100,
+              "total": 100
+            },
+            "timeToCompleteRoute": {
+              "mean": 79.43968253968018,
+              "std": 11.507827485931715,
+              "n": 63,
+              "total": 100
+            },
+            "crashed": 0
+          },
+          "minDistMean": 142.47090350304615,
+          "minDistStd": 111.50798710589197,
+          "meanDistMean": 537.3407544982794,
+          "maxGasMean": 2.1182840456725605,
+          "timeWithin50": 62.54318181818027,
+          "crashed": 0
+        },
+        {
+          "noise": 0.75,
+          "agg": {
+            "minDistanceToGas": {
+              "mean": 139.84478702935547,
+              "std": 149.7810432019596,
+              "n": 100,
+              "total": 100
+            },
+            "finalDistanceToGas": {
+              "mean": 485.597481671587,
+              "std": 260.93944343879514,
+              "n": 100,
+              "total": 100
+            },
+            "meanDistanceToGas": {
+              "mean": 540.957310075449,
+              "std": 167.21855599594983,
+              "n": 100,
+              "total": 100
+            },
+            "maxGasReading": {
+              "mean": 2.9022300041288043,
+              "std": 0.33004948429194536,
+              "n": 100,
+              "total": 100
+            },
+            "totalDistanceTraveled": {
+              "mean": 4222.71,
+              "std": 527.9440836438508,
+              "n": 100,
+              "total": 100
+            },
+            "timeToFirstWithin50": {
+              "mean": 66.51451612903057,
+              "std": 21.845404526460108,
+              "n": 31,
+              "total": 100
+            },
+            "routeCompletionFraction": {
+              "mean": 0.8885833333333332,
+              "std": 0.1778557519622241,
+              "n": 100,
+              "total": 100
+            },
+            "routeWaypointsHit": {
+              "mean": 6,
+              "std": 2.5065570575648746,
+              "n": 100,
+              "total": 100
+            },
+            "waypointsHitPerMinute": {
+              "mean": 4.448149502301605,
+              "std": 2.1012536761703084,
+              "n": 100,
+              "total": 100
+            },
+            "timeToCompleteRoute": {
+              "mean": 77.64296874999775,
+              "std": 10.935216399929178,
+              "n": 64,
+              "total": 100
+            },
+            "crashed": 0
+          },
+          "minDistMean": 139.84478702935547,
+          "minDistStd": 149.7810432019596,
+          "meanDistMean": 540.957310075449,
+          "maxGasMean": 2.9022300041288043,
+          "timeWithin50": 66.51451612903057,
+          "crashed": 0
+        },
+        {
+          "noise": 1,
+          "agg": {
+            "minDistanceToGas": {
+              "mean": 135.33972442100253,
+              "std": 104.13572200073628,
+              "n": 100,
+              "total": 100
+            },
+            "finalDistanceToGas": {
+              "mean": 544.4309238647587,
+              "std": 255.01501066697338,
+              "n": 100,
+              "total": 100
+            },
+            "meanDistanceToGas": {
+              "mean": 542.7856635059521,
+              "std": 150.92219713904174,
+              "n": 100,
+              "total": 100
+            },
+            "maxGasReading": {
+              "mean": 3.7301679905952194,
+              "std": 0.4481739522495375,
+              "n": 100,
+              "total": 100
+            },
+            "totalDistanceTraveled": {
+              "mean": 4146.63,
+              "std": 528.3131466366241,
+              "n": 100,
+              "total": 100
+            },
+            "timeToFirstWithin50": {
+              "mean": 61.08148148148008,
+              "std": 19.628713015473966,
+              "n": 27,
+              "total": 100
+            },
+            "routeCompletionFraction": {
+              "mean": 0.9220555555555553,
+              "std": 0.1484554997832256,
+              "n": 100,
+              "total": 100
+            },
+            "routeWaypointsHit": {
+              "mean": 6.74,
+              "std": 2.368223986130716,
+              "n": 100,
+              "total": 100
+            },
+            "waypointsHitPerMinute": {
+              "mean": 5.053449290489467,
+              "std": 1.973336710324423,
+              "n": 100,
+              "total": 100
+            },
+            "timeToCompleteRoute": {
+              "mean": 77.74797297297069,
+              "std": 10.643701717251476,
+              "n": 74,
+              "total": 100
+            },
+            "crashed": 0
+          },
+          "minDistMean": 135.33972442100253,
+          "minDistStd": 104.13572200073628,
+          "meanDistMean": 542.7856635059521,
+          "maxGasMean": 3.7301679905952194,
+          "timeWithin50": 61.08148148148008,
+          "crashed": 0
+        }
+      ]
+    },
+    {
+      "name": "baseline_agent",
+      "data": [
+        {
+          "noise": 0,
+          "agg": {
+            "minDistanceToGas": {
+              "mean": 137.94841113260824,
+              "std": 100.83230966239334,
+              "n": 100,
+              "total": 100
+            },
+            "finalDistanceToGas": {
+              "mean": 568.5383032386569,
+              "std": 285.5399037453687,
+              "n": 100,
+              "total": 100
+            },
+            "meanDistanceToGas": {
+              "mean": 538.9581832122532,
+              "std": 153.16440919342025,
+              "n": 100,
+              "total": 100
+            },
+            "maxGasReading": {
+              "mean": 0.753055030628651,
+              "std": 0.24261629494263603,
+              "n": 100,
+              "total": 100
+            },
+            "totalDistanceTraveled": {
+              "mean": 2510.73,
+              "std": 365.01235221938356,
+              "n": 100,
+              "total": 100
+            },
+            "timeToFirstWithin50": {
+              "mean": 30.263999999999967,
+              "std": 14.272223314302636,
+              "n": 25,
+              "total": 100
+            },
+            "routeCompletionFraction": {
+              "mean": 1,
+              "std": 0,
+              "n": 100,
+              "total": 100
+            },
+            "routeWaypointsHit": {
+              "mean": 8.19,
+              "std": 1.8017668096520232,
+              "n": 100,
+              "total": 100
+            },
+            "waypointsHitPerMinute": {
+              "mean": 10.600024539070837,
+              "std": 2.0701164757592774,
+              "n": 100,
+              "total": 100
+            },
+            "timeToCompleteRoute": {
+              "mean": 47.71049999999943,
+              "std": 11.14669470191786,
+              "n": 100,
+              "total": 100
+            },
+            "crashed": 0
+          },
+          "minDistMean": 137.94841113260824,
+          "minDistStd": 100.83230966239334,
+          "meanDistMean": 538.9581832122532,
+          "maxGasMean": 0.753055030628651,
+          "timeWithin50": 30.263999999999967,
+          "crashed": 0
+        },
+        {
+          "noise": 0.01,
+          "agg": {
+            "minDistanceToGas": {
+              "mean": 135.76789691993426,
+              "std": 101.22767322730327,
+              "n": 100,
+              "total": 100
+            },
+            "finalDistanceToGas": {
+              "mean": 568.973640960435,
+              "std": 279.65772870776607,
+              "n": 100,
+              "total": 100
+            },
+            "meanDistanceToGas": {
+              "mean": 534.2011461857086,
+              "std": 153.23966578065804,
+              "n": 100,
+              "total": 100
+            },
+            "maxGasReading": {
+              "mean": 0.7767516307716478,
+              "std": 0.24282804018814313,
+              "n": 100,
+              "total": 100
+            },
+            "totalDistanceTraveled": {
+              "mean": 2516.79,
+              "std": 364.6635448040988,
+              "n": 100,
+              "total": 100
+            },
+            "timeToFirstWithin50": {
+              "mean": 32.82391304347809,
+              "std": 18.343892156426847,
+              "n": 23,
+              "total": 100
+            },
+            "routeCompletionFraction": {
+              "mean": 1,
+              "std": 0,
+              "n": 100,
+              "total": 100
+            },
+            "routeWaypointsHit": {
+              "mean": 7.96,
+              "std": 1.938029823289518,
+              "n": 100,
+              "total": 100
+            },
+            "waypointsHitPerMinute": {
+              "mean": 10.290097273363052,
+              "std": 2.4805881224565,
+              "n": 100,
+              "total": 100
+            },
+            "timeToCompleteRoute": {
+              "mean": 48.11499999999942,
+              "std": 11.59492988292226,
+              "n": 100,
+              "total": 100
+            },
+            "crashed": 0
+          },
+          "minDistMean": 135.76789691993426,
+          "minDistStd": 101.22767322730327,
+          "meanDistMean": 534.2011461857086,
+          "maxGasMean": 0.7767516307716478,
+          "timeWithin50": 32.82391304347809,
+          "crashed": 0
+        },
+        {
+          "noise": 0.02,
+          "agg": {
+            "minDistanceToGas": {
+              "mean": 135.09527092395155,
+              "std": 100.06135341935352,
+              "n": 100,
+              "total": 100
+            },
+            "finalDistanceToGas": {
+              "mean": 571.66572810019,
+              "std": 282.39445693047065,
+              "n": 100,
+              "total": 100
+            },
+            "meanDistanceToGas": {
+              "mean": 533.132258547673,
+              "std": 151.66809990621758,
+              "n": 100,
+              "total": 100
+            },
+            "maxGasReading": {
+              "mean": 0.7966176475203848,
+              "std": 0.23936083775449782,
+              "n": 100,
+              "total": 100
+            },
+            "totalDistanceTraveled": {
+              "mean": 2529.69,
+              "std": 409.41063071866427,
+              "n": 100,
+              "total": 100
+            },
+            "timeToFirstWithin50": {
+              "mean": 31.121153846153803,
+              "std": 13.37533680381088,
+              "n": 26,
+              "total": 100
+            },
+            "routeCompletionFraction": {
+              "mean": 1,
+              "std": 0,
+              "n": 100,
+              "total": 100
+            },
+            "routeWaypointsHit": {
+              "mean": 7.87,
+              "std": 1.812721599131978,
+              "n": 100,
+              "total": 100
+            },
+            "waypointsHitPerMinute": {
+              "mean": 10.19661265136264,
+              "std": 2.431080847342011,
+              "n": 100,
+              "total": 100
+            },
+            "timeToCompleteRoute": {
+              "mean": 48.35799999999939,
+              "std": 12.526702227116713,
+              "n": 100,
+              "total": 100
+            },
+            "crashed": 0
+          },
+          "minDistMean": 135.09527092395155,
+          "minDistStd": 100.06135341935352,
+          "meanDistMean": 533.132258547673,
+          "maxGasMean": 0.7966176475203848,
+          "timeWithin50": 31.121153846153803,
+          "crashed": 0
+        },
+        {
+          "noise": 0.05,
+          "agg": {
+            "minDistanceToGas": {
+              "mean": 137.1672312280921,
+              "std": 100.06110677682531,
+              "n": 100,
+              "total": 100
+            },
+            "finalDistanceToGas": {
+              "mean": 572.0544763625085,
+              "std": 282.00387642714605,
+              "n": 100,
+              "total": 100
+            },
+            "meanDistanceToGas": {
+              "mean": 533.6837719704055,
+              "std": 147.32415965396376,
+              "n": 100,
+              "total": 100
+            },
+            "maxGasReading": {
+              "mean": 0.8580421545760006,
+              "std": 0.24043486842693898,
+              "n": 100,
+              "total": 100
+            },
+            "totalDistanceTraveled": {
+              "mean": 2511.93,
+              "std": 362.20252872968985,
+              "n": 100,
+              "total": 100
+            },
+            "timeToFirstWithin50": {
+              "mean": 30.327999999999978,
+              "std": 13.502770394749607,
+              "n": 25,
+              "total": 100
+            },
+            "routeCompletionFraction": {
+              "mean": 1,
+              "std": 0,
+              "n": 100,
+              "total": 100
+            },
+            "routeWaypointsHit": {
+              "mean": 8.08,
+              "std": 1.7037095593516713,
+              "n": 100,
+              "total": 100
+            },
+            "waypointsHitPerMinute": {
+              "mean": 10.512155900958955,
+              "std": 2.0142935166947136,
+              "n": 100,
+              "total": 100
+            },
+            "timeToCompleteRoute": {
+              "mean": 47.31949999999942,
+              "std": 10.335827888045594,
+              "n": 100,
+              "total": 100
+            },
+            "crashed": 0
+          },
+          "minDistMean": 137.1672312280921,
+          "minDistStd": 100.06110677682531,
+          "meanDistMean": 533.6837719704055,
+          "maxGasMean": 0.8580421545760006,
+          "timeWithin50": 30.327999999999978,
+          "crashed": 0
+        },
+        {
+          "noise": 0.1,
+          "agg": {
+            "minDistanceToGas": {
+              "mean": 138.02505260369682,
+              "std": 96.97554685128749,
+              "n": 100,
+              "total": 100
+            },
+            "finalDistanceToGas": {
+              "mean": 572.0911237622943,
+              "std": 282.0591418792104,
+              "n": 100,
+              "total": 100
+            },
+            "meanDistanceToGas": {
+              "mean": 536.3684391573122,
+              "std": 150.67875374975617,
+              "n": 100,
+              "total": 100
+            },
+            "maxGasReading": {
+              "mean": 0.9844322920236259,
+              "std": 0.24129093664461607,
+              "n": 100,
+              "total": 100
+            },
+            "totalDistanceTraveled": {
+              "mean": 2508.84,
+              "std": 355.10256648927884,
+              "n": 100,
+              "total": 100
+            },
+            "timeToFirstWithin50": {
+              "mean": 28.288095238095263,
+              "std": 12.808424032271553,
+              "n": 21,
+              "total": 100
+            },
+            "routeCompletionFraction": {
+              "mean": 1,
+              "std": 0,
+              "n": 100,
+              "total": 100
+            },
+            "routeWaypointsHit": {
+              "mean": 8.12,
+              "std": 1.6531573708904104,
+              "n": 100,
+              "total": 100
+            },
+            "waypointsHitPerMinute": {
+              "mean": 10.512231449573862,
+              "std": 1.9624349374823675,
+              "n": 100,
+              "total": 100
+            },
+            "timeToCompleteRoute": {
+              "mean": 47.52299999999943,
+              "std": 10.435093810228562,
+              "n": 100,
+              "total": 100
+            },
+            "crashed": 0
+          },
+          "minDistMean": 138.02505260369682,
+          "minDistStd": 96.97554685128749,
+          "meanDistMean": 536.3684391573122,
+          "maxGasMean": 0.9844322920236259,
+          "timeWithin50": 28.288095238095263,
+          "crashed": 0
+        },
+        {
+          "noise": 0.2,
+          "agg": {
+            "minDistanceToGas": {
+              "mean": 137.37733668288166,
+              "std": 100.50154983796762,
+              "n": 100,
+              "total": 100
+            },
+            "finalDistanceToGas": {
+              "mean": 572.1016370973888,
+              "std": 282.09559627020633,
+              "n": 100,
+              "total": 100
+            },
+            "meanDistanceToGas": {
+              "mean": 538.7214674247244,
+              "std": 149.02623448499926,
+              "n": 100,
+              "total": 100
+            },
+            "maxGasReading": {
+              "mean": 1.2401273405808768,
+              "std": 0.24613773253549545,
+              "n": 100,
+              "total": 100
+            },
+            "totalDistanceTraveled": {
+              "mean": 2513.52,
+              "std": 363.2318868661776,
+              "n": 100,
+              "total": 100
+            },
+            "timeToFirstWithin50": {
+              "mean": 30.160869565217332,
+              "std": 14.995627821299447,
+              "n": 23,
+              "total": 100
+            },
+            "routeCompletionFraction": {
+              "mean": 1,
+              "std": 0,
+              "n": 100,
+              "total": 100
+            },
+            "routeWaypointsHit": {
+              "mean": 8.16,
+              "std": 1.7157617503133646,
+              "n": 100,
+              "total": 100
+            },
+            "waypointsHitPerMinute": {
+              "mean": 10.554984362605566,
+              "std": 1.9505696933563792,
+              "n": 100,
+              "total": 100
+            },
+            "timeToCompleteRoute": {
+              "mean": 47.48749999999943,
+              "std": 10.109484932777189,
+              "n": 100,
+              "total": 100
+            },
+            "crashed": 0
+          },
+          "minDistMean": 137.37733668288166,
+          "minDistStd": 100.50154983796762,
+          "meanDistMean": 538.7214674247244,
+          "maxGasMean": 1.2401273405808768,
+          "timeWithin50": 30.160869565217332,
+          "crashed": 0
+        },
+        {
+          "noise": 0.3,
+          "agg": {
+            "minDistanceToGas": {
+              "mean": 135.2897007859432,
+              "std": 99.5088747861063,
+              "n": 100,
+              "total": 100
+            },
+            "finalDistanceToGas": {
+              "mean": 571.9738558066418,
+              "std": 282.0411536569262,
+              "n": 100,
+              "total": 100
+            },
+            "meanDistanceToGas": {
+              "mean": 538.7976162175439,
+              "std": 153.74337259773878,
+              "n": 100,
+              "total": 100
+            },
+            "maxGasReading": {
+              "mean": 1.53741045104019,
+              "std": 0.2572116159163902,
+              "n": 100,
+              "total": 100
+            },
+            "totalDistanceTraveled": {
+              "mean": 2494.35,
+              "std": 338.9860214334401,
+              "n": 100,
+              "total": 100
+            },
+            "timeToFirstWithin50": {
+              "mean": 29.66458333333333,
+              "std": 13.673438859833887,
+              "n": 24,
+              "total": 100
+            },
+            "routeCompletionFraction": {
+              "mean": 1,
+              "std": 0,
+              "n": 100,
+              "total": 100
+            },
+            "routeWaypointsHit": {
+              "mean": 8.17,
+              "std": 1.6940478091830757,
+              "n": 100,
+              "total": 100
+            },
+            "waypointsHitPerMinute": {
+              "mean": 10.704198796340036,
+              "std": 1.9738085337919926,
+              "n": 100,
+              "total": 100
+            },
+            "timeToCompleteRoute": {
+              "mean": 46.79949999999948,
+              "std": 9.575174379296126,
+              "n": 100,
+              "total": 100
+            },
+            "crashed": 0
+          },
+          "minDistMean": 135.2897007859432,
+          "minDistStd": 99.5088747861063,
+          "meanDistMean": 538.7976162175439,
+          "maxGasMean": 1.53741045104019,
+          "timeWithin50": 29.66458333333333,
+          "crashed": 0
+        },
+        {
+          "noise": 0.5,
+          "agg": {
+            "minDistanceToGas": {
+              "mean": 136.6665590917894,
+              "std": 101.88174941892892,
+              "n": 100,
+              "total": 100
+            },
+            "finalDistanceToGas": {
+              "mean": 572.091343607749,
+              "std": 282.02610529616027,
+              "n": 100,
+              "total": 100
+            },
+            "meanDistanceToGas": {
+              "mean": 538.8825609484061,
+              "std": 151.52243099367857,
+              "n": 100,
+              "total": 100
+            },
+            "maxGasReading": {
+              "mean": 2.1302330470889372,
+              "std": 0.3093206120722727,
+              "n": 100,
+              "total": 100
+            },
+            "totalDistanceTraveled": {
+              "mean": 2499.45,
+              "std": 344.0349810438151,
+              "n": 100,
+              "total": 100
+            },
+            "timeToFirstWithin50": {
+              "mean": 30.234782608695607,
+              "std": 13.958611180448747,
+              "n": 23,
+              "total": 100
+            },
+            "routeCompletionFraction": {
+              "mean": 1,
+              "std": 0,
+              "n": 100,
+              "total": 100
+            },
+            "routeWaypointsHit": {
+              "mean": 8.14,
+              "std": 1.6454405937239867,
+              "n": 100,
+              "total": 100
+            },
+            "waypointsHitPerMinute": {
+              "mean": 10.625851422609443,
+              "std": 1.8482631860569312,
+              "n": 100,
+              "total": 100
+            },
+            "timeToCompleteRoute": {
+              "mean": 46.82349999999947,
+              "std": 9.335880212568306,
+              "n": 100,
+              "total": 100
+            },
+            "crashed": 0
+          },
+          "minDistMean": 136.6665590917894,
+          "minDistStd": 101.88174941892892,
+          "meanDistMean": 538.8825609484061,
+          "maxGasMean": 2.1302330470889372,
+          "timeWithin50": 30.234782608695607,
+          "crashed": 0
+        },
+        {
+          "noise": 0.75,
+          "agg": {
+            "minDistanceToGas": {
+              "mean": 134.58483666286648,
+              "std": 100.88044589197463,
+              "n": 100,
+              "total": 100
+            },
+            "finalDistanceToGas": {
+              "mean": 569.1403355743105,
+              "std": 279.6833231038217,
+              "n": 100,
+              "total": 100
+            },
+            "meanDistanceToGas": {
+              "mean": 534.2668726007213,
+              "std": 153.6073857814856,
+              "n": 100,
+              "total": 100
+            },
+            "maxGasReading": {
+              "mean": 2.9280693146027286,
+              "std": 0.3018449772699784,
+              "n": 100,
+              "total": 100
+            },
+            "totalDistanceTraveled": {
+              "mean": 2495.43,
+              "std": 338.5008916330409,
+              "n": 100,
+              "total": 100
+            },
+            "timeToFirstWithin50": {
+              "mean": 30.799999999999955,
+              "std": 13.790893734634894,
+              "n": 25,
+              "total": 100
+            },
+            "routeCompletionFraction": {
+              "mean": 1,
+              "std": 0,
+              "n": 100,
+              "total": 100
+            },
+            "routeWaypointsHit": {
+              "mean": 7.95,
+              "std": 1.7773831632742851,
+              "n": 100,
+              "total": 100
+            },
+            "waypointsHitPerMinute": {
+              "mean": 10.500276390797888,
+              "std": 2.2199365976873335,
+              "n": 100,
+              "total": 100
+            },
+            "timeToCompleteRoute": {
+              "mean": 46.567499999999484,
+              "std": 9.435060809276079,
+              "n": 100,
+              "total": 100
+            },
+            "crashed": 0
+          },
+          "minDistMean": 134.58483666286648,
+          "minDistStd": 100.88044589197463,
+          "meanDistMean": 534.2668726007213,
+          "maxGasMean": 2.9280693146027286,
+          "timeWithin50": 30.799999999999955,
+          "crashed": 0
+        },
+        {
+          "noise": 1,
+          "agg": {
+            "minDistanceToGas": {
+              "mean": 136.8991567044606,
+              "std": 100.42108054932984,
+              "n": 100,
+              "total": 100
+            },
+            "finalDistanceToGas": {
+              "mean": 569.1275530545511,
+              "std": 282.00241491499435,
+              "n": 100,
+              "total": 100
+            },
+            "meanDistanceToGas": {
+              "mean": 535.1394158263371,
+              "std": 153.22093942493518,
+              "n": 100,
+              "total": 100
+            },
+            "maxGasReading": {
+              "mean": 3.738484372153838,
+              "std": 0.401403329144583,
+              "n": 100,
+              "total": 100
+            },
+            "totalDistanceTraveled": {
+              "mean": 2488.89,
+              "std": 338.6195652941513,
+              "n": 100,
+              "total": 100
+            },
+            "timeToFirstWithin50": {
+              "mean": 29.293750000000017,
+              "std": 12.596689631562251,
+              "n": 24,
+              "total": 100
+            },
+            "routeCompletionFraction": {
+              "mean": 1,
+              "std": 0,
+              "n": 100,
+              "total": 100
+            },
+            "routeWaypointsHit": {
+              "mean": 8,
+              "std": 1.746569509210856,
+              "n": 100,
+              "total": 100
+            },
+            "waypointsHitPerMinute": {
+              "mean": 10.530414967781295,
+              "std": 2.1396466365399776,
+              "n": 100,
+              "total": 100
+            },
+            "timeToCompleteRoute": {
+              "mean": 46.74049999999947,
+              "std": 9.527100354336879,
+              "n": 100,
+              "total": 100
+            },
+            "crashed": 0
+          },
+          "minDistMean": 136.8991567044606,
+          "minDistStd": 100.42108054932984,
+          "meanDistMean": 535.1394158263371,
+          "maxGasMean": 3.738484372153838,
+          "timeWithin50": 29.293750000000017,
+          "crashed": 0
+        }
+      ]
+    }
+  ]
+}

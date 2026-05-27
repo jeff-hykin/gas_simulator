@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Noise Sweep</title>
+<style>body { font-family: system-ui; display: flex; justify-content: center; padding: 2em; background: #f9fafb; }</style>
+</head><body>
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+<rect width="800" height="500" fill="white" rx="8"/>
+<line x1="80" y1="430" x2="600" y2="430" stroke="#e5e7eb" stroke-width="1"/>
+<text x="70" y="434" text-anchor="end" font-size="12" fill="#6b7280">0</text>
+<line x1="80" y1="368.3333333333333" x2="600" y2="368.3333333333333" stroke="#e5e7eb" stroke-width="1"/>
+<text x="70" y="372.3333333333333" text-anchor="end" font-size="12" fill="#6b7280">53</text>
+<line x1="80" y1="306.66666666666663" x2="600" y2="306.66666666666663" stroke="#e5e7eb" stroke-width="1"/>
+<text x="70" y="310.66666666666663" text-anchor="end" font-size="12" fill="#6b7280">107</text>
+<line x1="80" y1="245" x2="600" y2="245" stroke="#e5e7eb" stroke-width="1"/>
+<text x="70" y="249" text-anchor="end" font-size="12" fill="#6b7280">160</text>
+<line x1="80" y1="183.33333333333331" x2="600" y2="183.33333333333331" stroke="#e5e7eb" stroke-width="1"/>
+<text x="70" y="187.33333333333331" text-anchor="end" font-size="12" fill="#6b7280">213</text>
+<line x1="80" y1="121.66666666666663" x2="600" y2="121.66666666666663" stroke="#e5e7eb" stroke-width="1"/>
+<text x="70" y="125.66666666666663" text-anchor="end" font-size="12" fill="#6b7280">267</text>
+<line x1="80" y1="60" x2="600" y2="60" stroke="#e5e7eb" stroke-width="1"/>
+<text x="70" y="64" text-anchor="end" font-size="12" fill="#6b7280">320</text>
+<line x1="80" y1="60" x2="80" y2="430" stroke="#e5e7eb" stroke-width="1"/>
+<text x="80" y="450" text-anchor="middle" font-size="12" fill="#6b7280">0</text>
+<line x1="85.2" y1="60" x2="85.2" y2="430" stroke="#e5e7eb" stroke-width="1"/>
+<text x="85.2" y="450" text-anchor="middle" font-size="12" fill="#6b7280">0.01</text>
+<line x1="90.4" y1="60" x2="90.4" y2="430" stroke="#e5e7eb" stroke-width="1"/>
+<text x="90.4" y="450" text-anchor="middle" font-size="12" fill="#6b7280">0.02</text>
+<line x1="106" y1="60" x2="106" y2="430" stroke="#e5e7eb" stroke-width="1"/>
+<text x="106" y="450" text-anchor="middle" font-size="12" fill="#6b7280">0.05</text>
+<line x1="132" y1="60" x2="132" y2="430" stroke="#e5e7eb" stroke-width="1"/>
+<text x="132" y="450" text-anchor="middle" font-size="12" fill="#6b7280">0.1</text>
+<line x1="184" y1="60" x2="184" y2="430" stroke="#e5e7eb" stroke-width="1"/>
+<text x="184" y="450" text-anchor="middle" font-size="12" fill="#6b7280">0.2</text>
+<line x1="236" y1="60" x2="236" y2="430" stroke="#e5e7eb" stroke-width="1"/>
+<text x="236" y="450" text-anchor="middle" font-size="12" fill="#6b7280">0.3</text>
+<line x1="340" y1="60" x2="340" y2="430" stroke="#e5e7eb" stroke-width="1"/>
+<text x="340" y="450" text-anchor="middle" font-size="12" fill="#6b7280">0.5</text>
+<line x1="470" y1="60" x2="470" y2="430" stroke="#e5e7eb" stroke-width="1"/>
+<text x="470" y="450" text-anchor="middle" font-size="12" fill="#6b7280">0.75</text>
+<line x1="600" y1="60" x2="600" y2="430" stroke="#e5e7eb" stroke-width="1"/>
+<text x="600" y="450" text-anchor="middle" font-size="12" fill="#6b7280">1</text>
+<line x1="80" y1="60" x2="80" y2="430" stroke="#374151" stroke-width="2"/>
+<line x1="80" y1="430" x2="600" y2="430" stroke="#374151" stroke-width="2"/>
+<text x="340" y="480" text-anchor="middle" font-size="14" fill="#111827">Gas Noise Std Dev (PPM)</text>
+<text x="20" y="245" text-anchor="middle" font-size="14" fill="#111827" transform="rotate(-90, 20, 245)">Min Distance to Gas Source</text>
+<text x="340" y="30" text-anchor="middle" font-size="18" font-weight="bold" fill="#111827">Sensor Noise vs Gas-Finding Accuracy</text>
+<text x="340" y="48" text-anchor="middle" font-size="12" fill="#6b7280">100 runs × 100s, seed=42</text>
+<path d="M80,186.3735069015567 L85.2,227.57731918031232 L90.4,253.6323613931495 L106,245.47916542144918 L132,279.51074919086216 L184,199.28065408157468 L236,250.61486532180393 L340,198.21483212069396 L470,171.53555631652029 L600,144.57376637364985 L600,430 L470,430 L340,430 L236,430 L184,430 L132,430 L106,430 L90.4,430 L85.2,430 L80,430 Z" fill="#2563eb" fill-opacity="0.12" stroke="none"/>
+<path d="M80,321.42138033555824 L85.2,350.7414752556123 L90.4,364.9997878976311 L106,365.24638145666364 L132,373.23111253610136 L184,345.95037654531285 L236,356.5444858066053 L340,338.48825626081907 L470,320.8150565428476 L600,294.8048343273243 " fill="none" stroke="#2563eb" stroke-width="2.5"/>
+<circle cx="80" cy="321.42138033555824" r="4" fill="#2563eb"/>
+<circle cx="85.2" cy="350.7414752556123" r="4" fill="#2563eb"/>
+<circle cx="90.4" cy="364.9997878976311" r="4" fill="#2563eb"/>
+<circle cx="106" cy="365.24638145666364" r="4" fill="#2563eb"/>
+<circle cx="132" cy="373.23111253610136" r="4" fill="#2563eb"/>
+<circle cx="184" cy="345.95037654531285" r="4" fill="#2563eb"/>
+<circle cx="236" cy="356.5444858066053" r="4" fill="#2563eb"/>
+<circle cx="340" cy="338.48825626081907" r="4" fill="#2563eb"/>
+<circle cx="470" cy="320.8150565428476" r="4" fill="#2563eb"/>
+<circle cx="600" cy="294.8048343273243" r="4" fill="#2563eb"/>
+<path d="M80,242.51719375131233 L85.2,229.8969578853632 L90.4,249.285302276496 L106,231.43230058205666 L132,229.77742715070252 L184,155.10521384296607 L236,190.7696007798736 L340,145.65789701497778 L470,152.82060013247457 L600,69.72908050083777 L600,430 L470,424.74353040295523 L340,430 L236,430 L184,430 L132,430 L106,430 L90.4,430 L85.2,430 L80,430 Z" fill="#dc2626" fill-opacity="0.12" stroke="none"/>
+<path d="M80,351.4835512735072 L85.2,335.4946676382323 L90.4,347.4292482089792 L106,334.90398129855345 L132,334.5632930095103 L184,313.76020306336227 L236,315.2273155352356 L340,292.3051855670134 L470,288.78206526771487 L600,260.52954703386115 " fill="none" stroke="#dc2626" stroke-width="2.5"/>
+<circle cx="80" cy="351.4835512735072" r="4" fill="#dc2626"/>
+<circle cx="85.2" cy="335.4946676382323" r="4" fill="#dc2626"/>
+<circle cx="90.4" cy="347.4292482089792" r="4" fill="#dc2626"/>
+<circle cx="106" cy="334.90398129855345" r="4" fill="#dc2626"/>
+<circle cx="132" cy="334.5632930095103" r="4" fill="#dc2626"/>
+<circle cx="184" cy="313.76020306336227" r="4" fill="#dc2626"/>
+<circle cx="236" cy="315.2273155352356" r="4" fill="#dc2626"/>
+<circle cx="340" cy="292.3051855670134" r="4" fill="#dc2626"/>
+<circle cx="470" cy="288.78206526771487" r="4" fill="#dc2626"/>
+<circle cx="600" cy="260.52954703386115" r="4" fill="#dc2626"/>
+<path d="M80,211.83057546677753 L85.2,223.44498270930424 L90.4,227.89241125864743 L106,153.41001973299166 L132,87.38907784349988 L184,134.79499097873764 L236,157.34898544916012 L340,136.33690773341533 L470,95.12013379504197 L600,153.1065150748645 L600,393.92037220156715 L470,430 L340,394.1991279157905 L236,398.1275338137572 L184,395.55606234660877 L132,416.8222738024715 L106,423.06578256592525 L90.4,413.8232269563891 L85.2,428.6408196609856 L80,426.47465361592657 Z" fill="#16a34a" fill-opacity="0.12" stroke="none"/>
+<path d="M80,319.1526145413521 L85.2,326.0429011851449 L90.4,320.85781910751825 L106,288.2379011494585 L132,252.1056758229857 L184,265.1755266626732 L236,277.7382596314587 L340,265.2680178246029 L470,268.3044649973077 L600,273.5134436382158 " fill="none" stroke="#16a34a" stroke-width="2.5"/>
+<circle cx="80" cy="319.1526145413521" r="4" fill="#16a34a"/>
+<circle cx="85.2" cy="326.0429011851449" r="4" fill="#16a34a"/>
+<circle cx="90.4" cy="320.85781910751825" r="4" fill="#16a34a"/>
+<circle cx="106" cy="288.2379011494585" r="4" fill="#16a34a"/>
+<circle cx="132" cy="252.1056758229857" r="4" fill="#16a34a"/>
+<circle cx="184" cy="265.1755266626732" r="4" fill="#16a34a"/>
+<circle cx="236" cy="277.7382596314587" r="4" fill="#16a34a"/>
+<circle cx="340" cy="265.2680178246029" r="4" fill="#16a34a"/>
+<circle cx="470" cy="268.3044649973077" r="4" fill="#16a34a"/>
+<circle cx="600" cy="273.5134436382158" r="4" fill="#16a34a"/>
+<path d="M80,153.90979158077943 L85.2,155.9738720172566 L90.4,158.10015310305351 L106,155.70473418181422 L132,158.2805568801744 L184,154.95253746026805 L236,158.51414699481774 L340,154.17851828448192 L470,157.74326704596496 L600,155.59847567530483 L600,387.82222444563007 L470,391.0292981711563 L340,389.78006381575506 L236,388.6284199376886 L184,387.3623714605681 L132,382.53650897377673 L106,387.09604360322277 L90.4,389.4920328853085 L85.2,390.06286635539544 L80,387.084507675064 Z" fill="#9333ea" fill-opacity="0.12" stroke="none"/>
+<path d="M80,270.4971496279217 L85.2,273.018369186326 L90.4,273.796092994181 L106,271.40038889251855 L132,270.40853292697557 L184,271.1574544604181 L236,273.57128346625313 L340,271.9792910501185 L470,274.38628260856063 L600,271.7103500604674 " fill="none" stroke="#9333ea" stroke-width="2.5"/>
+<circle cx="80" cy="270.4971496279217" r="4" fill="#9333ea"/>
+<circle cx="85.2" cy="273.018369186326" r="4" fill="#9333ea"/>
+<circle cx="90.4" cy="273.796092994181" r="4" fill="#9333ea"/>
+<circle cx="106" cy="271.40038889251855" r="4" fill="#9333ea"/>
+<circle cx="132" cy="270.40853292697557" r="4" fill="#9333ea"/>
+<circle cx="184" cy="271.1574544604181" r="4" fill="#9333ea"/>
+<circle cx="236" cy="273.57128346625313" r="4" fill="#9333ea"/>
+<circle cx="340" cy="271.9792910501185" r="4" fill="#9333ea"/>
+<circle cx="470" cy="274.38628260856063" r="4" fill="#9333ea"/>
+<circle cx="600" cy="271.7103500604674" r="4" fill="#9333ea"/>
+<line x1="620" y1="70" x2="640" y2="70" stroke="#2563eb" stroke-width="2.5"/>
+<circle cx="630" cy="70" r="4" fill="#2563eb"/>
+<text x="648" y="74" font-size="13" fill="#374151">greedy_gas_agent</text>
+<line x1="620" y1="94" x2="640" y2="94" stroke="#dc2626" stroke-width="2.5"/>
+<circle cx="630" cy="94" r="4" fill="#dc2626"/>
+<text x="648" y="98" font-size="13" fill="#374151">smart_lobster_agent</text>
+<line x1="620" y1="118" x2="640" y2="118" stroke="#16a34a" stroke-width="2.5"/>
+<circle cx="630" cy="118" r="4" fill="#16a34a"/>
+<text x="648" y="122" font-size="13" fill="#374151">dumb_lobster_agent</text>
+<line x1="620" y1="142" x2="640" y2="142" stroke="#9333ea" stroke-width="2.5"/>
+<circle cx="630" cy="142" r="4" fill="#9333ea"/>
+<text x="648" y="146" font-size="13" fill="#374151">baseline_agent</text>
+
+</svg>
+</body></html>

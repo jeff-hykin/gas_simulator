@@ -8,6 +8,7 @@ import {
   maxGasAt,
   moveWithAvoidance,
   isCircleInAnyObstacle,
+  gaussianNoise,
 } from '../main/systems/simulator.js'
 import { createPubSub, connectNeoAgent } from '../main/tooling/pubsub.js'
 import localPlannerAgent from '../main/agents/neo/local_planner.js'
@@ -128,6 +129,7 @@ function runScenario({ agentModule, scenario, config }) {
         y: gasPosition.y,
         radius: config.gasRadius,
         peak: config.gasPeak,
+        gasCircleRate: config.gasCircleRate || 'gaussian',
     }]
 
     const robot = createRobot({
@@ -256,8 +258,10 @@ function runScenario({ agentModule, scenario, config }) {
 
             // Publish gas readings (mirror simulator tick order: gas first, then time+odom)
             const gas = maxGasAt(robot, gasNodes)
-            pubsub.publish('gas_reading', { ppm: gas })
-            maxGasPpm = Math.max(maxGasPpm, gas)
+            const noiseStdDev = config.gasNoiseStdDev ?? 0
+            const noisyGas = Math.max(0, gas + gaussianNoise(noiseStdDev))
+            pubsub.publish('gas_reading', { ppm: noisyGas })
+            maxGasPpm = Math.max(maxGasPpm, noisyGas)
             pubsub.publish('max_gas_reading', { ppm: maxGasPpm })
 
             pubsub.publish('time', { virtualTime })
@@ -572,4 +576,6 @@ async function writeMetricsJson(outPath, { results, scenarios, runs, seconds, se
     await Deno.writeTextFile(outPath, JSON.stringify(json, null, 2))
 }
 
-await main()
+export { loadMaps, generateScenarios, runScenario, aggregate, mean, stddev }
+
+if (import.meta.main) await main()
