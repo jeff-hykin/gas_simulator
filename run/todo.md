@@ -1,0 +1,6 @@
+- better human-readable UI (show the mode more clearly)
+- record/replay system (json)
+- create unified map system (load any map from inside the metrics.json)
+- be able to click on a chart and see the map it came from
+- non-rectangle obstacles
+- get it working/usable on github pages

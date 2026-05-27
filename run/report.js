@@ -4,23 +4,29 @@ import { parseArgs } from 'https://deno.land/std@0.224.0/cli/parse_args.ts'
 import { join } from 'https://deno.land/std@0.224.0/path/mod.ts'
 
 const args = parseArgs(Deno.args, {
-    string: ['input', 'output'],
+    string: ['input', 'output', 'noise-sweep'],
     default: {
         input: 'logs/metrics.json',
         output: 'logs/report.html',
+        'noise-sweep': 'logs/noise_sweep.json',
     },
 })
 
 const inputPath = args.input.startsWith('/') ? args.input : join(Deno.cwd(), args.input)
 const outputPath = args.output.startsWith('/') ? args.output : join(Deno.cwd(), args.output)
+const noiseSweepPath = args['noise-sweep'].startsWith('/') ? args['noise-sweep'] : join(Deno.cwd(), args['noise-sweep'])
 
-function buildHtml(metrics) {
-    const safeJson = JSON.stringify(metrics)
+function safeJsonString(obj) {
+    return JSON.stringify(obj)
         .replace(/<\//g, '<\\/')
         .replace(/\u2028/g, '\\u2028')
         .replace(/\u2029/g, '\\u2029')
+}
 
-    return HTML_TEMPLATE.replace('__METRICS_JSON__', safeJson)
+function buildHtml(metrics, noiseSweep) {
+    return HTML_TEMPLATE
+        .replace('__METRICS_JSON__', safeJsonString(metrics))
+        .replace('__NOISE_SWEEP_JSON__', noiseSweep ? safeJsonString(noiseSweep) : 'null')
 }
 
 async function main() {
@@ -33,7 +39,15 @@ async function main() {
         Deno.exit(1)
     }
 
-    const html = buildHtml(metrics)
+    let noiseSweep = null
+    try {
+        noiseSweep = JSON.parse(await Deno.readTextFile(noiseSweepPath))
+        console.log(`Loaded noise sweep data from ${noiseSweepPath}`)
+    } catch {
+        console.log(`No noise sweep data at ${noiseSweepPath} (skipping chart)`)
+    }
+
+    const html = buildHtml(metrics, noiseSweep)
     await Deno.writeTextFile(outputPath, html)
     console.log(`Wrote ${outputPath}`)
 }
@@ -245,6 +259,11 @@ const HTML_TEMPLATE = `<!doctype html>
         <h2>Per-scenario closeness (higher = better)</h2>
         <div id="scatter-chart" style="height: 380px;"></div>
       </div>
+      <div id="noise-sweep-section" class="chart-card chart-full" style="display:none;">
+        <h2>Sensor noise vs gas-finding accuracy</h2>
+        <div id="noise-sweep-subtitle" class="legend-note"></div>
+        <div id="noise-sweep-chart" style="height: 420px;"></div>
+      </div>
       <div class="chart-card chart-full">
         <h2>Closeness by map</h2>
         <div id="per-map" class="small-multiples"></div>
@@ -270,6 +289,7 @@ const HTML_TEMPLATE = `<!doctype html>
 
   <script>
     const METRICS = __METRICS_JSON__;
+    const NOISE_SWEEP = __NOISE_SWEEP_JSON__;
 
     const COLORS = ['#22d3ee','#fbbf24','#22c55e','#a78bfa','#f97316','#f43f5e','#60a5fa','#f472b6']
     const TEXT = '#f1f5f9'
@@ -955,11 +975,63 @@ const HTML_TEMPLATE = `<!doctype html>
       })
     }
 
+    function noiseSweepChart() {
+      if (!NOISE_SWEEP) return
+      const section = document.getElementById('noise-sweep-section')
+      section.style.display = ''
+      const m = NOISE_SWEEP.meta
+      document.getElementById('noise-sweep-subtitle').textContent =
+        m.runs + ' runs × ' + m.seconds + 's per noise level · seed=' + m.seed +
+        ' · noise levels: ' + m.noiseLevels.join(', ')
+
+      const traces = NOISE_SWEEP.agents.map((agent, i) => {
+        const xs = agent.data.map(d => d.noise)
+        const ys = agent.data.map(d => d.minDistMean)
+        const errHi = agent.data.map(d => d.minDistStd / Math.sqrt(d.agg.minDistanceToGas.n))
+        return {
+          type: 'scatter',
+          mode: 'lines+markers',
+          name: agent.name,
+          x: xs,
+          y: ys,
+          error_y: {
+            type: 'data',
+            array: errHi,
+            visible: true,
+            color: COLORS[i % COLORS.length],
+            thickness: 1.5,
+            width: 4,
+          },
+          line: { color: COLORS[i % COLORS.length], width: 2.5 },
+          marker: { color: COLORS[i % COLORS.length], size: 7 },
+          hovertemplate: '<b>' + agent.name + '</b><br>noise σ=%{x}<br>min dist: %{y:.1f} ± %{error_y.array:.1f}<extra></extra>',
+        }
+      })
+
+      const layout = {
+        ...BASE_LAYOUT,
+        showlegend: true,
+        legend: { orientation: 'h', y: -0.18, font: { color: TEXT, size: 12 }, bgcolor: 'transparent' },
+        xaxis: {
+          ...BASE_LAYOUT.xaxis,
+          title: { text: 'gas noise std dev (PPM)', font: { color: MUTED, size: 12 } },
+        },
+        yaxis: {
+          ...BASE_LAYOUT.yaxis,
+          title: { text: 'min distance to gas source (lower is better)', font: { color: MUTED, size: 12 } },
+          rangemode: 'tozero',
+        },
+        margin: { l: 70, r: 20, t: 10, b: 60 },
+      }
+      Plotly.newPlot('noise-sweep-chart', traces, layout, PLOTLY_CONFIG)
+    }
+
     renderMeta()
     renderSummary()
     closenessChart()
     routeChart()
     scatterChart()
+    noiseSweepChart()
     ecdfChart()
     perMapCharts()
     waypointsPerMapChart()

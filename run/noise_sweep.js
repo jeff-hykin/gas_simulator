@@ -13,7 +13,7 @@ async function main() {
         string: ['seed', 'runs', 'seconds', 'noise'],
         boolean: ['verbose'],
         alias: { v: 'verbose' },
-        default: { runs: '20', seconds: '100', seed: '42' },
+        default: { runs: '20', seconds: '2000', seed: '42' },
     })
     const positional = args._.map(String)
     if (positional.length < 1) {

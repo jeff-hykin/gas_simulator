@@ -567,6 +567,27 @@ agentButtons.append(btnResetDrawer);
 
 agentControls.append(agentSelect, agentButtons);
 
+// Gas distribution section
+const gasDistTitle = document.createElement('div');
+gasDistTitle.className = 'section-title';
+gasDistTitle.textContent = 'Gas Distribution';
+
+const gasDistSelect = document.createElement('select');
+for (const label of ['gaussian', 'inverse_square']) {
+  const opt = document.createElement('option');
+  opt.value = label;
+  opt.textContent = label;
+  gasDistSelect.append(opt);
+}
+gasDistSelect.addEventListener('change', () => {
+  const rate = gasDistSelect.value;
+  for (const node of mapSys.mapData.gasNodes) {
+    node.gasCircleRate = rate;
+    delete node.asCanvas;
+  }
+  mapSys.rebuildWorld();
+});
+
 // Map section
 const mapTitle = document.createElement('div');
 mapTitle.className = 'section-title';
@@ -577,10 +598,16 @@ sep1.className = 'drawer-separator';
 const sep2 = document.createElement('div');
 sep2.className = 'drawer-separator';
 
+const sep3 = document.createElement('div');
+sep3.className = 'drawer-separator';
+
 drawer.append(
   agentTitle,
   agentControls,
   sep1,
+  gasDistTitle,
+  gasDistSelect,
+  sep3,
   mapTitle,
   mapSys.element,
   sep2,
