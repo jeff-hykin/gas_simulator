@@ -8,6 +8,31 @@ const REPO_ROOT = fromFileUrl(new URL('..', import.meta.url))
 
 const NOISE_LEVELS = [0, 0.01, 0.02, 0.05, 0.1, 0.2, 0.3, 0.5, 0.75, 1.0]
 
+// Composite metrics for first-responder scenarios.
+// Uses exponential time-discounting from search theory:
+//   score = proximity × exp(-t / τ)
+// proximity ∈ [0,1]: how close the agent got (1 = on source, 0 = at gasRadius or farther)
+// exp(-t/τ): penalizes slow detection; τ chosen so score halves at 1/4 of sim duration
+function compositeScores(run, config) {
+    const D = config.gasRadius
+    const maxT = config.maxSeconds
+    const tau = maxT / 4
+
+    const proximity = Math.max(0, 1 - run.minDistanceToGas / D)
+
+    // Detection score: proximity with inverse-square time penalty
+    // score = proximity / (1 + (t₅₀/τ)²)  — harsh penalty for slow detection
+    const t50 = Number.isFinite(run.timeToFirstWithin50) ? run.timeToFirstWithin50 : maxT
+    const detectionScore = proximity / (1 + (t50 / tau) ** 2)
+
+    // Response score: proximity discounted by route completion time (exponential)
+    const tauExp = maxT / (4 * Math.LN2)
+    const tRoute = Number.isFinite(run.timeToCompleteRoute) ? run.timeToCompleteRoute : maxT
+    const responseScore = proximity * Math.exp(-tRoute / tauExp)
+
+    return { detectionScore, responseScore }
+}
+
 async function main() {
     const args = parseArgs(Deno.args, {
         string: ['seed', 'runs', 'seconds', 'noise'],
@@ -59,9 +84,16 @@ async function main() {
                 verbose: args.verbose,
             }
             const agentRuns = []
+            const detectionScores = []
+            const responseScores = []
             for (const s of scenarios) {
                 const r = runScenario({ agentModule: modules[a], scenario: s, config })
                 agentRuns.push(r)
+                if (!r.crashed) {
+                    const cs = compositeScores(r, config)
+                    detectionScores.push(cs.detectionScore)
+                    responseScores.push(cs.responseScore)
+                }
             }
             const agg = aggregate(agentRuns)
             agentResults.push({
@@ -73,6 +105,8 @@ async function main() {
                 maxGasMean: agg.maxGasReading.mean,
                 timeWithin50: agg.timeToFirstWithin50.mean,
                 crashed: agg.crashed,
+                detectionScore: { mean: mean(detectionScores), std: stddev(detectionScores), n: detectionScores.length },
+                responseScore: { mean: mean(responseScores), std: stddev(responseScores), n: responseScores.length },
             })
             console.log(`minDist=${agg.minDistanceToGas.mean.toFixed(1)} ± ${agg.minDistanceToGas.std.toFixed(1)}`)
         }

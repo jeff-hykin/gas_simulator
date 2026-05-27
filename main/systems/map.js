@@ -131,6 +131,7 @@ export function gasNodeAsCanvas(node, styles) {
   // For each concentration fraction f, solve for d: gaussian → d = σ√(-2 ln f), inverse_square → d = r√(1/f - 1).
   const fractions = node.ringFractions || [0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.15, 0.1, 0.06, 0.03];
   const isInvSq = node.gasCircleRate === 'inverse_square';
+  const xSkew = node.xSkew || 1;
   for (let i = 0; i < fractions.length; i++) {
     const f = fractions[i];
     const ringR = isInvSq
@@ -139,17 +140,24 @@ export function gasNodeAsCanvas(node, styles) {
     const t = 1 - i / (fractions.length - 1);
     const lineWidth = 0.2 + Math.pow(t, 2.6) * 6.8;
     const alpha = (0.35 + Math.pow(t, 2.0) * 0.65).toFixed(3);
-    items.push({
-      type: 'circle',
+    const shapeType = xSkew !== 1 ? 'ellipse' : 'circle';
+    const shape = {
+      type: shapeType,
       x: node.x,
       y: node.y,
-      r: ringR,
       stroke: `rgba(168,85,247,${alpha})`,
       lineWidth,
       inherit,
       layer: 'gas',
       owner: node,
-    });
+    };
+    if (shapeType === 'ellipse') {
+      shape.rx = ringR * xSkew;
+      shape.ry = ringR;
+    } else {
+      shape.r = ringR;
+    }
+    items.push(shape);
   }
   items.push({
     type: 'point',
@@ -312,11 +320,11 @@ export function createMapSystem(canvasSys, { onMapLoaded } = {}) {
 
   /**
    * Add a gas node.
-   * @param {{x:number, y:number, radius?:number, peak?:number, gasCircleRate?:'gaussian'|'inverse_square'}} opts
+   * @param {{x:number, y:number, radius?:number, peak?:number, gasCircleRate?:'gaussian'|'inverse_square', xSkew?:number}} opts
    */
-  function addGasNode({ x, y, radius = 60, peak = 1, gasCircleRate = 'gaussian' }) {
+  function addGasNode({ x, y, radius = 60, peak = 1, gasCircleRate = 'gaussian', xSkew = 1 }) {
     pushUndo();
-    const node = { id: makeId('gas'), x, y, radius, peak, gasCircleRate };
+    const node = { id: makeId('gas'), x, y, radius, peak, gasCircleRate, xSkew };
     node.asCanvas = gasNodeAsCanvas(node, mapData.styles);
     mapData.gasNodes.push(node);
     mapWorldItems.push(node.asCanvas);

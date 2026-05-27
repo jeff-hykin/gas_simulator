@@ -196,6 +196,12 @@ export function createCanvasSystem({ width = 800, height = 600 } = {}) {
       ctx.beginPath();
       ctx.arc(center.x, center.y, radius, 0, Math.PI * 2);
       applyStrokeFill(item);
+    } else if (type === 'ellipse') {
+      const { x, y, rx, ry } = item;
+      const center = worldToScreen({ x, y });
+      ctx.beginPath();
+      ctx.ellipse(center.x, center.y, rx * state.scale, ry * state.scale, 0, 0, Math.PI * 2);
+      applyStrokeFill(item);
     } else if (type === 'radialGradient') {
       const { x, y, r } = item;
       const center = worldToScreen({ x, y });

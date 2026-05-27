@@ -588,6 +588,40 @@ gasDistSelect.addEventListener('change', () => {
   mapSys.rebuildWorld();
 });
 
+const xSkewLabel = document.createElement('label');
+xSkewLabel.style.cssText = 'display:flex;align-items:center;gap:8px;margin-top:6px;font-size:13px;color:#ccc';
+xSkewLabel.textContent = 'xSkew: ';
+const xSkewInput = document.createElement('input');
+xSkewInput.type = 'number';
+xSkewInput.value = '1';
+xSkewInput.min = '0.1';
+xSkewInput.step = '0.1';
+xSkewInput.style.cssText = 'width:60px;background:#333;color:#fff;border:1px solid #555;border-radius:4px;padding:2px 6px';
+xSkewInput.addEventListener('change', () => {
+  const skew = parseFloat(xSkewInput.value) || 1;
+  for (const node of mapSys.mapData.gasNodes) {
+    node.xSkew = skew;
+    delete node.asCanvas;
+  }
+  mapSys.rebuildWorld();
+});
+xSkewLabel.append(xSkewInput);
+
+const noiseLabel = document.createElement('label');
+noiseLabel.style.cssText = 'display:flex;align-items:center;gap:8px;margin-top:6px;font-size:13px;color:#ccc';
+noiseLabel.textContent = 'Sensor noise σ: ';
+const noiseInput = document.createElement('input');
+noiseInput.type = 'number';
+noiseInput.value = '0.2';
+noiseInput.min = '0';
+noiseInput.step = '0.05';
+noiseInput.style.cssText = 'width:60px;background:#333;color:#fff;border:1px solid #555;border-radius:4px;padding:2px 6px';
+agentConfig.gasNoiseStdDev = 0.2;
+noiseInput.addEventListener('change', () => {
+  agentConfig.gasNoiseStdDev = Math.max(0, parseFloat(noiseInput.value) || 0);
+});
+noiseLabel.append(noiseInput);
+
 // Map section
 const mapTitle = document.createElement('div');
 mapTitle.className = 'section-title';
@@ -607,6 +641,8 @@ drawer.append(
   sep1,
   gasDistTitle,
   gasDistSelect,
+  xSkewLabel,
+  noiseLabel,
   sep3,
   mapTitle,
   mapSys.element,

@@ -4,17 +4,19 @@ import { parseArgs } from 'https://deno.land/std@0.224.0/cli/parse_args.ts'
 import { join } from 'https://deno.land/std@0.224.0/path/mod.ts'
 
 const args = parseArgs(Deno.args, {
-    string: ['input', 'output', 'noise-sweep'],
+    string: ['input', 'output', 'noise-sweep', 'gas-rate'],
     default: {
         input: 'logs/metrics.json',
         output: 'logs/report.html',
         'noise-sweep': 'logs/noise_sweep.json',
+        'gas-rate': 'logs/gas_rate_comparison.json',
     },
 })
 
 const inputPath = args.input.startsWith('/') ? args.input : join(Deno.cwd(), args.input)
 const outputPath = args.output.startsWith('/') ? args.output : join(Deno.cwd(), args.output)
 const noiseSweepPath = args['noise-sweep'].startsWith('/') ? args['noise-sweep'] : join(Deno.cwd(), args['noise-sweep'])
+const gasRatePath = args['gas-rate'].startsWith('/') ? args['gas-rate'] : join(Deno.cwd(), args['gas-rate'])
 
 function safeJsonString(obj) {
     return JSON.stringify(obj)
@@ -23,10 +25,11 @@ function safeJsonString(obj) {
         .replace(/\u2029/g, '\\u2029')
 }
 
-function buildHtml(metrics, noiseSweep) {
+function buildHtml(metrics, noiseSweep, gasRate) {
     return HTML_TEMPLATE
         .replace('__METRICS_JSON__', safeJsonString(metrics))
         .replace('__NOISE_SWEEP_JSON__', noiseSweep ? safeJsonString(noiseSweep) : 'null')
+        .replace('__GAS_RATE_JSON__', gasRate ? safeJsonString(gasRate) : 'null')
 }
 
 async function main() {
@@ -47,7 +50,15 @@ async function main() {
         console.log(`No noise sweep data at ${noiseSweepPath} (skipping chart)`)
     }
 
-    const html = buildHtml(metrics, noiseSweep)
+    let gasRate = null
+    try {
+        gasRate = JSON.parse(await Deno.readTextFile(gasRatePath))
+        console.log(`Loaded gas rate comparison from ${gasRatePath}`)
+    } catch {
+        console.log(`No gas rate comparison at ${gasRatePath} (skipping chart)`)
+    }
+
+    const html = buildHtml(metrics, noiseSweep, gasRate)
     await Deno.writeTextFile(outputPath, html)
     console.log(`Wrote ${outputPath}`)
 }
@@ -264,6 +275,26 @@ const HTML_TEMPLATE = `<!doctype html>
         <div id="noise-sweep-subtitle" class="legend-note"></div>
         <div id="noise-sweep-chart" style="height: 420px;"></div>
       </div>
+      <div id="detection-score-section" class="chart-card chart-full" style="display:none;">
+        <h2>Detection score — proximity with inverse-square time penalty</h2>
+        <div class="legend-note">score = max(0, 1 − d/D) / (1 + (t₅₀/τ)²) · higher = got close fast · τ = 25% of sim time</div>
+        <div id="detection-score-chart" style="height: 380px;"></div>
+      </div>
+      <div id="response-score-section" class="chart-card chart-full" style="display:none;">
+        <h2>Response score — proximity × time discount (by route completion time)</h2>
+        <div class="legend-note">score = max(0, 1 − d/D) × exp(−t_route/τ) · higher = found gas while completing route quickly</div>
+        <div id="response-score-chart" style="height: 380px;"></div>
+      </div>
+      <div id="gas-rate-section" class="chart-card chart-full" style="display:none;">
+        <h2 id="gas-rate-title">Gas dispersion model (Gaussian vs Inv Square)</h2>
+        <div id="gas-rate-subtitle" class="legend-note"></div>
+        <div id="gas-rate-chart" style="height: 380px;"></div>
+      </div>
+      <div id="gas-rate-diff-section" class="chart-card chart-full" style="display:none;">
+        <h2>Paired difference (gaussian − inverse square)</h2>
+        <div class="legend-note">95% CI shown · bar crossing zero = not statistically significant</div>
+        <div id="gas-rate-diff-chart" style="height: 320px;"></div>
+      </div>
       <div class="chart-card chart-full">
         <h2>Closeness by map</h2>
         <div id="per-map" class="small-multiples"></div>
@@ -290,6 +321,7 @@ const HTML_TEMPLATE = `<!doctype html>
   <script>
     const METRICS = __METRICS_JSON__;
     const NOISE_SWEEP = __NOISE_SWEEP_JSON__;
+    const GAS_RATE = __GAS_RATE_JSON__;
 
     const COLORS = ['#22d3ee','#fbbf24','#22c55e','#a78bfa','#f97316','#f43f5e','#60a5fa','#f472b6']
     const TEXT = '#f1f5f9'
@@ -1026,12 +1058,209 @@ const HTML_TEMPLATE = `<!doctype html>
       Plotly.newPlot('noise-sweep-chart', traces, layout, PLOTLY_CONFIG)
     }
 
+    function computeCompositeFromAgg(dataPoint, timeKey) {
+      const m = NOISE_SWEEP.meta
+      const D = 200  // gasRadius
+      const maxT = m.seconds
+      const tau = maxT / 4
+
+      const distAgg = dataPoint.agg.minDistanceToGas
+      const timeAgg = dataPoint.agg[timeKey]
+      if (!distAgg || !timeAgg) return { mean: 0, se: 0 }
+
+      // If we have per-run composite scores, prefer those
+      if (dataPoint.detectionScore && timeKey === 'timeToFirstWithin50') {
+        return { mean: dataPoint.detectionScore.mean, se: dataPoint.detectionScore.std / Math.sqrt(dataPoint.detectionScore.n || 1) }
+      }
+      if (dataPoint.responseScore && timeKey === 'timeToCompleteRoute') {
+        return { mean: dataPoint.responseScore.mean, se: dataPoint.responseScore.std / Math.sqrt(dataPoint.responseScore.n || 1) }
+      }
+
+      // Fallback: approximate from aggregated means
+      const proximity = Math.max(0, 1 - distAgg.mean / D)
+      const t = Number.isFinite(timeAgg.mean) ? timeAgg.mean : maxT
+      if (timeKey === 'timeToFirstWithin50') {
+        // Inverse-square time penalty
+        return { mean: proximity / (1 + (t / tau) ** 2), se: 0 }
+      } else {
+        // Exponential discount for route completion
+        const tauExp = maxT / (4 * Math.LN2)
+        return { mean: proximity * Math.exp(-t / tauExp), se: 0 }
+      }
+    }
+
+    function noiseCompositeChart(timeKey, chartId, sectionId, yLabel) {
+      if (!NOISE_SWEEP) return
+      document.getElementById(sectionId).style.display = ''
+
+      const traces = NOISE_SWEEP.agents.map((agent, i) => {
+        const xs = agent.data.map(d => d.noise)
+        const scores = agent.data.map(d => computeCompositeFromAgg(d, timeKey))
+        return {
+          type: 'scatter',
+          mode: 'lines+markers',
+          name: agent.name,
+          x: xs,
+          y: scores.map(s => s.mean),
+          error_y: {
+            type: 'data',
+            array: scores.map(s => s.se),
+            visible: true,
+            color: COLORS[i % COLORS.length],
+            thickness: 1.5,
+            width: 4,
+          },
+          line: { color: COLORS[i % COLORS.length], width: 2.5 },
+          marker: { color: COLORS[i % COLORS.length], size: 7 },
+          hovertemplate: '<b>' + agent.name + '</b><br>noise σ=%{x}<br>score: %{y:.3f}<extra></extra>',
+        }
+      })
+
+      const layout = {
+        ...BASE_LAYOUT,
+        showlegend: true,
+        legend: { orientation: 'h', y: -0.18, font: { color: TEXT, size: 12 }, bgcolor: 'transparent' },
+        xaxis: {
+          ...BASE_LAYOUT.xaxis,
+          title: { text: 'gas noise std dev (PPM)', font: { color: MUTED, size: 12 } },
+        },
+        yaxis: {
+          ...BASE_LAYOUT.yaxis,
+          title: { text: yLabel, font: { color: MUTED, size: 12 } },
+          rangemode: 'tozero',
+        },
+        margin: { l: 70, r: 20, t: 10, b: 60 },
+      }
+      Plotly.newPlot(chartId, traces, layout, PLOTLY_CONFIG)
+    }
+
+    function gasRateChart() {
+      if (!GAS_RATE) return
+      document.getElementById('gas-rate-section').style.display = ''
+      document.getElementById('gas-rate-diff-section').style.display = ''
+
+      const m = GAS_RATE.meta
+      document.getElementById('gas-rate-title').textContent =
+        'Gas dispersion model (Gaussian vs Inv Square) — ' + m.agent
+      document.getElementById('gas-rate-subtitle').textContent =
+        m.runs + ' runs × ' + m.seconds + 's · seed=' + m.seed +
+        ' · maps: ' + m.maps.map(n => n.replace('.yaml', '')).join(', ')
+
+      const models = ['gaussian', 'inverse_square']
+      const modelColors = [COLORS[0], COLORS[1]]
+      const modelLabels = ['Gaussian', 'Inverse Square']
+
+      const metricDefs = [
+        { key: 'minDistanceToGas',    label: 'Min dist to gas',       lower: true,  fmt: 1 },
+        { key: 'meanDistanceToGas',   label: 'Mean dist to gas',      lower: true,  fmt: 1 },
+        { key: 'maxGasReading',       label: 'Peak gas (ppm)',        lower: false, fmt: 3 },
+        { key: 'timeToFirstWithin50', label: 'Time to within 50',     lower: true,  fmt: 1 },
+        { key: 'timeToCompleteRoute', label: 'Route completion time', lower: true,  fmt: 1 },
+        { key: 'routeWaypointsHit',   label: 'Waypoints hit',         lower: false, fmt: 1 },
+      ]
+
+      // Grouped bar chart
+      const traces = models.map((model, mi) => ({
+        type: 'bar',
+        name: modelLabels[mi],
+        x: metricDefs.map(d => d.label),
+        y: metricDefs.map(d => {
+          const agg = GAS_RATE[model][d.key]
+          return agg ? agg.mean : 0
+        }),
+        error_y: {
+          type: 'data',
+          array: metricDefs.map(d => {
+            const agg = GAS_RATE[model][d.key]
+            return agg ? agg.se * 1.96 : 0
+          }),
+          visible: true,
+          color: MUTED,
+          thickness: 1.5,
+          width: 4,
+        },
+        marker: { color: modelColors[mi], line: { width: 0 } },
+        customdata: metricDefs.map(d => {
+          const agg = GAS_RATE[model][d.key]
+          return agg ? [agg.mean, agg.std, agg.reached || agg.n, agg.total || agg.n] : [0, 0, 0, 0]
+        }),
+        hovertemplate: '<b>' + modelLabels[mi] + '</b><br>%{x}<br>mean: %{customdata[0]:.2f} ± %{customdata[1]:.2f}<br>n=%{customdata[2]}/%{customdata[3]}<extra></extra>',
+      }))
+
+      const layout = {
+        ...BASE_LAYOUT,
+        barmode: 'group',
+        bargap: 0.25,
+        bargroupgap: 0.08,
+        showlegend: true,
+        legend: { orientation: 'h', y: -0.22, font: { color: TEXT, size: 12 }, bgcolor: 'transparent' },
+        xaxis: { ...BASE_LAYOUT.xaxis, automargin: true },
+        yaxis: { ...BASE_LAYOUT.yaxis, title: { text: 'value', font: { color: MUTED, size: 11 } } },
+        margin: { l: 60, r: 20, t: 10, b: 120 },
+      }
+      Plotly.newPlot('gas-rate-chart', traces, layout, PLOTLY_CONFIG)
+
+      // Paired difference chart
+      const pd = GAS_RATE.paired_difference
+      const diffMetrics = metricDefs.filter(d => pd[d.key])
+      const diffTrace = {
+        type: 'bar',
+        orientation: 'h',
+        x: diffMetrics.map(d => pd[d.key].mean),
+        y: diffMetrics.map(d => d.label),
+        error_x: {
+          type: 'data',
+          symmetric: false,
+          array: diffMetrics.map(d => pd[d.key].ci_hi - pd[d.key].mean),
+          arrayminus: diffMetrics.map(d => pd[d.key].mean - pd[d.key].ci_lo),
+          visible: true,
+          color: MUTED,
+          thickness: 1.5,
+          width: 6,
+        },
+        marker: {
+          color: diffMetrics.map(d => pd[d.key].significant ? '#22d3ee' : '#64748b'),
+          line: { width: 0 },
+        },
+        customdata: diffMetrics.map(d => [
+          pd[d.key].significant ? 'significant' : 'not significant',
+          pd[d.key].ci_lo,
+          pd[d.key].ci_hi,
+        ]),
+        hovertemplate: '%{y}<br>Δ mean: %{x:.3f}<br>95% CI: [%{customdata[1]:.3f}, %{customdata[2]:.3f}]<br>%{customdata[0]}<extra></extra>',
+      }
+
+      const diffLayout = {
+        ...BASE_LAYOUT,
+        xaxis: {
+          ...BASE_LAYOUT.xaxis,
+          title: { text: 'difference (gaussian − inverse square)', font: { color: MUTED, size: 11 } },
+          zeroline: true,
+          zerolinecolor: 'rgba(241, 245, 249, 0.5)',
+          zerolinewidth: 2,
+        },
+        yaxis: { ...BASE_LAYOUT.yaxis, automargin: true },
+        margin: { l: 180, r: 30, t: 10, b: 50 },
+        shapes: [{
+          type: 'line',
+          xref: 'x', x0: 0, x1: 0,
+          yref: 'paper', y0: 0, y1: 1,
+          line: { color: 'rgba(241, 245, 249, 0.4)', width: 1.5, dash: 'dash' },
+          layer: 'below',
+        }],
+      }
+      Plotly.newPlot('gas-rate-diff-chart', [diffTrace], diffLayout, PLOTLY_CONFIG)
+    }
+
     renderMeta()
     renderSummary()
     closenessChart()
     routeChart()
     scatterChart()
     noiseSweepChart()
+    noiseCompositeChart('timeToFirstWithin50', 'detection-score-chart', 'detection-score-section', 'detection score (higher = got close fast)')
+    noiseCompositeChart('timeToCompleteRoute', 'response-score-chart', 'response-score-section', 'response score (higher = found gas + completed route fast)')
+    gasRateChart()
     ecdfChart()
     perMapCharts()
     waypointsPerMapChart()

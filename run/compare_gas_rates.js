@@ -9,7 +9,7 @@ const REPO_ROOT = fromFileUrl(new URL('..', import.meta.url))
 const args = parseArgs(Deno.args, {
     string: ['seed', 'runs', 'seconds', 'out'],
     boolean: ['verbose'],
-    default: { runs: '60', seconds: '300', seed: '42' },
+    default: { runs: '60', seconds: '2000', seed: '42' },
 })
 
 const runs = parseInt(args.runs, 10)

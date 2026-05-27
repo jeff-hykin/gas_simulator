@@ -40,7 +40,7 @@ export function gasValueAt(distance, radius, peak, gasCircleRate) {
 export function maxGasAt(point, gasNodes) {
   let max = 0;
   for (const node of gasNodes) {
-    const dx = point.x - node.x;
+    const dx = (point.x - node.x) / (node.xSkew || 1);
     const dy = point.y - node.y;
     const d = Math.hypot(dx, dy);
     const value = gasValueAt(d, node.radius, node.peak, node.gasCircleRate);

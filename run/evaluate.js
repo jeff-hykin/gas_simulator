@@ -130,6 +130,7 @@ function runScenario({ agentModule, scenario, config }) {
         radius: config.gasRadius,
         peak: config.gasPeak,
         gasCircleRate: config.gasCircleRate || 'gaussian',
+        xSkew: config.xSkew || 1,
     }]
 
     const robot = createRobot({

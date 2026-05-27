@@ -45,6 +45,7 @@ routes:
         'y': -211.36155209359492
       - x: -392.2347193278566
         'y': 241.5261569394723
+
 obstacles:
   - id: obstacle-rvcp8d
     x: -59.46948512646327
@@ -153,3 +154,9 @@ gasNodes:
     'y': -78
     radius: 190.26297590440447
     peak: 1
+#   - id: gas-skewed
+#     x: 0
+#     'y': 500
+#     radius: 120
+#     peak: 1
+#     xSkew: 3
